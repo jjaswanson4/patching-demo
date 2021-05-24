@@ -3,4 +3,4 @@ ansible_host: 10.15.121.2
 ip_address: "{{ ansible_host }}"
 cpus: 4
 memory_mb: 16
-os: rhel8.3
+os: rhel8.4
