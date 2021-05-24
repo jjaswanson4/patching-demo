@@ -12,3 +12,18 @@ satellite:
   server: satellite05.lab.msp.redhat.com
   username: admin
   password: "{{ satellite_password }}"
+
+config_files:
+  - hosts
+  - NetworkManager.conf
+  - resolv.conf
+
+timesync_ntp_servers:
+  - hostname: 0.rhel.pool.ntp.org
+    iburst: yes
+  - hostname: 1.rhel.pool.ntp.org
+    iburst: yes
+  - hostname: 2.rhel.pool.ntp.org
+    iburst: yes
+  - hostname: 3.rhel.pool.ntp.org
+    iburst: yes
