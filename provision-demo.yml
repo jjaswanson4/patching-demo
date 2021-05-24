@@ -27,8 +27,6 @@
               record_type: PTR
               record_value: "{{ inventory_hostname }}."
         delegate_to: "{{ dns.server }}"
-    roles:
-    tasks:
       - name: provision virtual machines
         redhat.satellite.host:
           username: "{{ satellite.username }}"
@@ -49,4 +47,13 @@
           organization: "{{ provisioning.organization }}"
           location: "{{ provisioning.location }}"
         delegate_to: localhost
+      - name: wait for connection
+        ansible.builtin.wait_for_connection:
+          timeout: 1800
+          sleep: 30
+      - name: run the setup module
+        ansible.builtin.setup:
+    roles:
+      - common
+    tasks:
     post_tasks:
