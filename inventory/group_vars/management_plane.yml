@@ -1,7 +1,7 @@
 ---
 
 provisioning:
-  #activation_key: ak-rhel8-production
-  host_group: kickstart-rhel8.3-vlan146
+  host_group: "kickstart-{{ os }}-vlan146"
   organization: MSP Lab
   location: MSP Lab
+  method: bootdisk

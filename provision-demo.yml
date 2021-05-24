@@ -36,14 +36,16 @@
           server_url: "https://{{ satellite.server }}"
           validate_certs: no
           name: "{{ inventory_hostname }}"
+          domain: "{{ dns.zone }}"
           hostgroup: "{{ provisioning.host_group }}"
+          provision_method: "{{ provisioning.method }}"
+          ip: "{{ ip_address }}"
           build: yes
           managed: yes
           compute_attributes:
             start: "1"
             cpus: "{{ cpus }}"
             memory_mb: "{{ memory_mb }}"
-            domain: "{{ dns.zone }}"
           organization: "{{ provisioning.organization }}"
           location: "{{ provisioning.location }}"
         delegate_to: localhost
