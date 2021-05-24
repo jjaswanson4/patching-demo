@@ -1,0 +1,50 @@
+---
+
+  - name: provision infra management plane
+    hosts:
+      - satellite
+      - tower
+    gather_facts: no
+    pre_tasks:
+      - name: dns block
+        block:
+          - name: setup A records
+            community.general.ipa_dnsrecord:
+              ipa_host: "{{ dns.server }}"
+              validate_certs: no
+              ipa_pass: "{{ dns.pass }}"
+              zone_name: "{{ dns.zone }}"
+              record_name: "{{ inventory_hostname }}"
+              record_type: A
+              record_value: "{{ ip_address }}"
+          - name: setup PTR records
+            community.general.ipa_dnsrecord:
+              ipa_host: "{{ dns.server }}"
+              validate_certs: no
+              ipa_pass: "{{ dns.pass }}"
+              zone_name: "{{ dns.reverse }}"
+              record_name: "{{ ip_address.split('.')[-1] }}"
+              record_type: PTR
+              record_value: "{{ inventory_hostname }}."
+        delegate_to: "{{ dns.server }}"
+    roles:
+    tasks:
+      - name: provision virtual machines
+        redhat.satellite.host:
+          username: "{{ satellite.username }}"
+          password: "{{ satellite.password }}"
+          server_url: "https://{{ satellite.server }}"
+          validate_certs: no
+          name: "{{ inventory_hostname }}"
+          hostgroup: "{{ provisioning.host_group }}"
+          build: yes
+          managed: yes
+          compute_attributes:
+            start: "1"
+            cpus: "{{ cpus }}"
+            memory_mb: "{{ memory_mb }}"
+            domain: "{{ dns.zone }}"
+          organization: "{{ provisioning.organization }}"
+          location: "{{ provisioning.location }}"
+        delegate_to: localhost
+    post_tasks:
