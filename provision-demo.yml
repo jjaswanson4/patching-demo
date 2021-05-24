@@ -1,6 +1,6 @@
 ---
 
-  - name: provision infra management plane
+  - name: provision infra for management plane
     hosts:
       - satellite
       - tower
