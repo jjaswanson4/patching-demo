@@ -5,6 +5,20 @@ cpus: 8
 memory_mb: 24576
 os: rhel7.9
 
+additional_storage:
+  - size_gb: 1000
+    scsi_controller: 0
+    unit_number: 1
+    datastore: storage04-nfs-lun0
+
+selinux_policy: targeted
+selinux_state: permissive
+
+config_files:
+  - hosts
+  - NetworkManager.conf
+  - resolv.conf
+
 satellite:
   admin_username: admin
   admin_password: "{{ satellite_password }}"
@@ -14,7 +28,7 @@ satellite:
       size: 20
       path: /var/cache/pulp
     - name: pulp
-      size: 700
+      size: 500
       path: /var/lib/pulp
     - name: mongodb
       size: 100
