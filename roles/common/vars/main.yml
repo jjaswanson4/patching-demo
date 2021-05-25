@@ -18,9 +18,3 @@ available_config_files:
     owner: root
     group: root
     mode: '0644'
-  - name: hosts_with_satellite
-    src: templates/hosts_with_satellite.j2
-    dest: /etc/hosts
-    owner: root
-    group: root
-    mode: '0644'
