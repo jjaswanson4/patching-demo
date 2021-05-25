@@ -3,3 +3,9 @@
 collections:
   - name: community.general
   - name: redhat.satellite
+  - name: vmware.vmware_rest
+  - name: redhat.rhel_system_roles
+  - name: jjaswanson4.setup_rhel_for_satellite
+  - name: jjaswanson4.install_satellite
+  - name: jjaswanson4.configure_satellite
+  - name: ansible.posix
