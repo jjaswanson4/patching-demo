@@ -61,7 +61,7 @@ satellite:
     - "--foreman-proxy-plugin-remote-execution-ssh-install-key true"
     - "--foreman-proxy-dns true"
   foreman:
-    organzations:
+    organizations:
       - name: Patching Demo
         initial_organization: yes
     locations:
