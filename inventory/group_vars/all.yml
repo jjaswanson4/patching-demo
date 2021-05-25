@@ -8,7 +8,7 @@ dns:
   zone: demo.lab.msp.redhat.com
   reverse: 121.15.10.in-addr.arpa.
 
-satellite:
+provisioning_satellite:
   server: satellite05.lab.msp.redhat.com
   username: admin
   password: "{{ satellite_password }}"
@@ -27,3 +27,9 @@ timesync_ntp_servers:
     iburst: yes
   - hostname: 3.rhel.pool.ntp.org
     iburst: yes
+
+vcenter:
+  server: vcenter02.lab.msp.redhat.com
+  username: 'Administrator@vsphere.local'
+  password: "{{ vcenter_password }}"
+  datacenter: MSP Lab
