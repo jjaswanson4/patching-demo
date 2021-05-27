@@ -17,7 +17,9 @@ This repository contains the code to provision a demo on patching RHEL systems.
 8. Re-run Red Hat Insights for Red Hat Enterprise Linux
 
 ### Requirements:
-- An existing satellite server that can provision infrastructure (compute resources set up)
+- An existing Satellite server that can provision infrastructure (compute resources set up)
+- A manifest for the Satellite server that will be provisioned
+- A manifest for the Ansible Tower instance that will be provisioned
 
 ### What Needs to be Provided:
 Most variables are self-explanitory, however a few are omitted due to being unique to my environment, namely:
@@ -26,3 +28,4 @@ Most variables are self-explanitory, however a few are omitted due to being uniq
 | `dns_pass`| Password for IDM DNS server |
 | `ansible_password` | Password to use for SSH access if not using keys |
 | `satellite_password` | Password to use to authenticate to Satellite's API |
+| `vcenter_password` | Password to be used for authentication to a VMware environment |
