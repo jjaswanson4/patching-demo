@@ -1,7 +1,0 @@
----
-- name: install some base packages
-  ansible.builtin.yum:
-    name:
-      - vim
-      - lsof
-    state: present
