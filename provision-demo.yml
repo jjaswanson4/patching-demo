@@ -4,106 +4,25 @@
   hosts:
     - satellite
   gather_facts: no
-  pre_tasks:
-    - name: dns block
-      block:
-        - name: setup A records
-          community.general.ipa_dnsrecord:
-            ipa_host: "{{ dns.server }}"
-            validate_certs: no
-            ipa_pass: "{{ dns.pass }}"
-            zone_name: "{{ dns.zone }}"
-            record_name: "{{ inventory_hostname }}"
-            record_type: A
-            record_value: "{{ ip_address }}"
-        - name: setup PTR records
-          community.general.ipa_dnsrecord:
-            ipa_host: "{{ dns.server }}"
-            validate_certs: no
-            ipa_pass: "{{ dns.pass }}"
-            zone_name: "{{ dns.reverse }}"
-            record_name: "{{ ip_address.split('.')[-1] }}"
-            record_type: PTR
-            record_value: "{{ inventory_hostname }}."
-      delegate_to: "{{ dns.server }}"
-    - name: provision virtual machines
-      redhat.satellite.host:
-        username: "{{ provisioning_satellite.username }}"
-        password: "{{ provisioning_satellite.password }}"
-        server_url: "https://{{ provisioning_satellite.server }}"
-        validate_certs: no
-        name: "{{ inventory_hostname }}"
-        domain: "{{ dns.zone }}"
-        hostgroup: "{{ provisioning.host_group }}"
-        provision_method: "{{ provisioning.method }}"
-        ip: "{{ ip_address }}"
-        build: yes
-        managed: yes
-        compute_attributes:
-          start: "1"
-          cpus: "{{ cpus }}"
-          memory_mb: "{{ memory_mb }}"
-        organization: "{{ provisioning.organization }}"
-        location: "{{ provisioning.location }}"
-      delegate_to: localhost
-    - name: wait for VM to come up
-      ansible.builtin.wait_for_connection:
-        timeout: 1800
-        sleep: 30
-    - name: run the setup module
-      ansible.builtin.setup:
-    - name: add additional storage to the VM
-      block:
-        - name: search for VM
-          vmware.vmware_rest.vcenter_vm_info:
-            vcenter_hostname: "{{ vcenter.server }}"
-            vcenter_username: "{{ vcenter.username }}"
-            vcenter_password: "{{ vcenter.password }}"
-            vcenter_validate_certs: no
-            filter_names: "{{ inventory_hostname }}"
-          register: vm_search_results
-        - name: get VM info
-          vmware.vmware_rest.vcenter_vm_info:
-            vcenter_hostname: "{{ vcenter.server }}"
-            vcenter_username: "{{ vcenter.username }}"
-            vcenter_password: "{{ vcenter.password }}"
-            vcenter_validate_certs: no
-            vm: "{{ vm_search_results.value[0].vm }}"
-          register: vm_info
-        - name: attach a new disk
-          vmware.vmware_rest.vcenter_vm_hardware_disk:
-            vcenter_hostname: "{{ vcenter.server }}"
-            vcenter_username: "{{ vcenter.username }}"
-            vcenter_password: "{{ vcenter.password }}"
-            vcenter_validate_certs: no
-            vm: "{{ vm_info.id }}"
-            type: SCSI
-            new_vmdk:
-              capacity: 1000000000000
-              #capacity: 1073741274244
-            scsi:
-              bus: 0
-              unit: 1
-      delegate_to: localhost
-    - name: expand vg
-      community.general.lvg:
-        vg: os
-        pvs: /dev/sda2,/dev/sdb
   roles:
-    - common
+    - jjaswanson4.utilities.idm_dns_records
+    - jjaswanson4.utilities.provision_via_satellite
+    - jjaswanson4.utilities.add_virtual_disk
+    - jjaswanson4.utilities.common_config
     - redhat.rhel_system_roles.selinux
+    - redhat.rhel_system_roles.timesync
     - jjaswanson4.setup_rhel_for_satellite.setup_storage
     - jjaswanson4.install_satellite.install_satellite
     - jjaswanson4.configure_satellite.configure_satellite_foreman
-#  tasks:
-#    - name: build satellite by organization
-#      include_role:
-#        name: jjaswanson4.configure_satellite.configure_satellite_katello
-#      loop_control:
-#        loop_var: organization
-#      loop: "{{ satellite.katello }}"
-#    - name: do that again but for katello dependent pieces
-#      include_role:
-#        name: jjaswanson4.configure_satellite.configure_satellite_foreman
-#      vars:
-#        requires_katello_content: true
+  tasks:
+    - name: build satellite by organization
+      include_role:
+        name: jjaswanson4.configure_satellite.configure_satellite_katello
+      loop_control:
+        loop_var: organization
+      loop: "{{ satellite.katello }}"
+    - name: do that again but for katello dependent pieces
+      include_role:
+        name: jjaswanson4.configure_satellite.configure_satellite_foreman
+      vars:
+        requires_katello_content: true
