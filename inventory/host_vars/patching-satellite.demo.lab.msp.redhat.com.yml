@@ -6,10 +6,15 @@ memory_mb: 24576
 os: rhel7.9
 
 additional_storage:
-  - size_gb: 1000
-    scsi_controller: 0
-    unit_number: 1
-    datastore: storage04-nfs-lun0
+  - capacity: 1073741274244
+    type: SCSI
+    scsi:
+      bus: 0
+      unit: 1
+
+lvm:
+  vg: os
+  pvs: /dev/sda2,/dev/sdb
 
 selinux_policy: targeted
 selinux_state: permissive
@@ -18,6 +23,36 @@ config_files:
   - hosts
   - NetworkManager.conf
   - resolv.conf
+
+dns_resolv:
+  search_domains:
+    - demo.josh.lab.msp.redhat.com
+    - josh.lab.msp.redhat.com
+    - demo.lab.msp.redhat.com
+    - lab.msp.redhat.com
+    - redhat.com
+  nameservers:
+    - 10.15.108.148
+    - 10.15.108.149
+  options:
+    - 'timeout:1'
+
+base_packages:
+  disable_gpg_check: yes
+  packages:
+    - lsof
+    - vim
+    - https://dl.fedoraproject.org/pub/epel/7/x86_64/Packages/h/htop-2.2.0-3.el7.x86_64.rpm
+
+timesync_ntp_servers:
+  - hostname: 0.rhel.pool.ntp.org
+    iburst: yes
+  - hostname: 1.rhel.pool.ntp.org
+    iburst: yes
+  - hostname: 2.rhel.pool.ntp.org
+    iburst: yes
+  - hostname: 3.rhel.pool.ntp.org
+    iburst: yes
 
 satellite:
   admin_username: admin
@@ -89,7 +124,7 @@ satellite:
           url: vcenter02.lab.msp.redhat.com
           user: 'Administrator@vsphere.local'
           password: "{{ vcenter_password }}"
-          datacenter: Patching Demo
+          datacenter: MSP Lab
         organizations:
           - name: Patching Demo
         locations:
@@ -116,7 +151,7 @@ satellite:
           interfaces_attributes:
             0:
               type: VirtualVmxnet3
-              network: dvportgroup-2023
+              network: dvportgroup-1017
           volumes_attributes:
             0:
               thin: true
@@ -187,7 +222,7 @@ satellite:
   katello:
     - organization_name: Patching Demo
       state: present
-      manifest: files/manifest.zip
+      manifest: files/satellite-manifest.zip
       repo_sync_attempts: 1
       lifecycle_environments:
         - name: Non_Production
