@@ -1,4 +1,4 @@
 *.swp
 ansible.cfg
 extra-vars.yml
-manifest.zip
+*manifest.zip
