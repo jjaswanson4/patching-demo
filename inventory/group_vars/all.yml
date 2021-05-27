@@ -17,6 +17,19 @@ dns:
       type: PTR
       value: "{{ inventory_hostname }}."
 
+provisioning:
+  satellite:
+    server: patching-satellite.lab.msp.redhat.com
+    username: admin
+    password: "{{ satellite_password }}"
+  host_group: "kickstart-{{ os }}-vlan146"
+  organization: Patching Demo
+  location: Patching Demo
+  method: bootdisk
+  dns_domain: demo.lab.msp.redhat.com
+  cpus: "{{ cpus }}"
+  memory_mb: "{{ memory_mb }}"
+
 config_files:
   - hosts
   - NetworkManager.conf
@@ -37,3 +50,36 @@ vcenter:
   username: 'Administrator@vsphere.local'
   password: "{{ vcenter_password }}"
   datacenter: MSP Lab
+
+selinux_policy: targeted
+selinux_state: permissive
+
+dns_resolv:
+  search_domains:
+    - demo.josh.lab.msp.redhat.com
+    - josh.lab.msp.redhat.com
+    - demo.lab.msp.redhat.com
+    - lab.msp.redhat.com
+    - redhat.com
+  nameservers:
+    - 10.15.108.148
+    - 10.15.108.149
+  options:
+    - 'timeout:1'
+
+timesync_ntp_servers:
+  - hostname: 0.rhel.pool.ntp.org
+    iburst: yes
+  - hostname: 1.rhel.pool.ntp.org
+    iburst: yes
+  - hostname: 2.rhel.pool.ntp.org
+    iburst: yes
+  - hostname: 3.rhel.pool.ntp.org
+    iburst: yes
+
+base_packages:
+  disable_gpg_check: yes
+  packages:
+    - lsof
+    - vim
+    - "{{ htop_url }}"
