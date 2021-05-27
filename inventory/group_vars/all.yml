@@ -2,16 +2,20 @@
 
 ansible_user: root
 
+dns_zone: demo.lab.msp.redhat.com
+
 dns:
   server: idm01.lab.msp.redhat.com
-  pass: "{{ dns_pass }}"
-  zone: demo.lab.msp.redhat.com
-  reverse: 121.15.10.in-addr.arpa.
-
-provisioning_satellite:
-  server: satellite05.lab.msp.redhat.com
-  username: admin
-  password: "{{ satellite_password }}"
+  password: "{{ dns_pass }}"
+  records:
+    - name: "{{ inventory_hostname.split('.')[0] }}"
+      zone: demo.lab.msp.redhat.com
+      type: A
+      value: "{{ ip_address }}"
+    - name: "{{ ip_address.split('.')[-1] }}"
+      zone: 121.15.10.in-addr.arpa.
+      type: PTR
+      value: "{{ inventory_hostname }}."
 
 config_files:
   - hosts
