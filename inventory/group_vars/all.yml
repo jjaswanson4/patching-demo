@@ -17,19 +17,6 @@ dns:
       type: PTR
       value: "{{ inventory_hostname }}."
 
-provisioning:
-  satellite:
-    server: patching-satellite.lab.msp.redhat.com
-    username: admin
-    password: "{{ satellite_password }}"
-  host_group: "kickstart-{{ os }}-vlan146"
-  organization: Patching Demo
-  location: Patching Demo
-  method: bootdisk
-  dns_domain: demo.lab.msp.redhat.com
-  cpus: "{{ cpus }}"
-  memory_mb: "{{ memory_mb }}"
-
 config_files:
   - hosts
   - NetworkManager.conf
@@ -72,4 +59,6 @@ base_packages:
   packages:
     - lsof
     - vim
+    - sos
+    - redhat-support-tool
     - "{{ htop_url }}"

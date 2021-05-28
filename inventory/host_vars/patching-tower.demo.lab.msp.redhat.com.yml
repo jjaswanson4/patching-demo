@@ -3,3 +3,15 @@ ansible_host: 10.15.121.2
 ip_address: "{{ ansible_host }}"
 cpus: 4
 memory_mb: 16
+os: rhel8
+application: general
+
+tower_install:
+  admin_password: "{{ ansible_password }}"
+  pg:
+    host: ''
+    port: ''
+    database: awx
+    username: awx
+    password: "{{ pg_password }}"
+    sslmode: prefer
