@@ -1,12 +1,22 @@
 ---
 
+- hosts: all
+  gather_facts: false
+  tasks:
+    - debug:
+        var: hostvars[inventory_hostname]['provisioning']['activation_keys']
+
 - name: build out satellite
   hosts:
     - satellite
   gather_facts: no
+  pre_tasks:
+    - name: print out host info
+      debug:
+        msg: "{{ hostvars[inventory_hostname] }}"
   roles:
     - jjaswanson4.utilities.idm_dns_records
-    - jjaswanson4.utilities.provision_via_satellite
+    - /Users/jswanson/code/ansible-utilities/roles/provision_via_satellite
     - jjaswanson4.utilities.add_virtual_disk
     - jjaswanson4.utilities.common_config
     - redhat.rhel_system_roles.selinux
@@ -26,3 +36,15 @@
         name: jjaswanson4.configure_satellite.configure_satellite_foreman
       vars:
         requires_katello_content: true
+
+- name: build out tower
+  hosts:
+    - tower
+  gather_facts: no
+  roles:
+    - jjaswanson4.utilities.idm_dns_records
+    - /Users/jswanson/code/ansible-utilities/roles/provision_via_satellite
+    - jjaswanson4.utilities.common_config
+    - redhat.rhel_system_roles.selinux
+    - redhat.rhel_system_roles.timesync
+    - /Users/jswanson/code/ansible-utilities/roles/install_aap
