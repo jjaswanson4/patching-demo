@@ -29,3 +29,8 @@ Most variables are self-explanitory, however a few are omitted due to being uniq
 | `ansible_password` | Password to use for SSH access if not using keys |
 | `satellite_password` | Password to use to authenticate to Satellite's API |
 | `vcenter_password` | Password to be used for authentication to a VMware environment |
+
+### Provisioning Notes
+Requirements files are provided, however there is one additional collection to install: `redhat.satellite`. This collection lives in automation hub, so a valid subscription is requried. For now, it has been left out of the collections/requirements.yml to allow for full provisioning without the use of auth to automation hub.
+
+`ansible-galaxy collection install redhat.satellite`
