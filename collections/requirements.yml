@@ -2,3 +2,4 @@
 
 collections:
   - name: theforeman.foreman
+    source: https://galaxy.ansible.com
