@@ -48,11 +48,27 @@ tower_hosts:
           - name: cv-server-rhel8
   - name: sapdnhdb1.demo.lab.msp.redhat.com
     inventory: Patching Demo
+    variables:
+      ansible_host: 10.15.120.31
   - name: sapdphdb1.demo.lab.msp.redhat.com
     inventory: Patching Demo
+    variables:
+      ansible_host: 10.15.120.32
   - name: sapdnapp1.demo.lab.msp.redhat.com
     inventory: Patching Demo
+    variables:
+      ansible_host: 10.15.120.33
   - name: sapdpapp1.demo.lab.msp.redhat.com
+    inventory: Patching Demo
+    variables:
+      ansible_host: 10.15.120.34
+
+tower_groups:
+  - name: hana
+    inventory: Patching Demo
+  - name: netweaver
+    inventory: Patching Demo
+  - name: sap
     inventory: Patching Demo
 
 tower_projects:
