@@ -51,13 +51,16 @@
   roles:
     - redhat_cop.tower_configuration.license
     - redhat_cop.tower_configuration.organizations
+    - redhat_cop.tower_configuration.credentials
     - redhat_cop.tower_configuration.projects
     - redhat_cop.tower_configuration.inventories
     - redhat_cop.tower_configuration.hosts
+    - redhat_cop.tower_configuration.groups
+    - redhat_cop.tower_configuration.job_templates
 
 - name: provision managed hosts
   hosts:
-    - none
+    - demo_hosts
   gather_facts: no
   roles:
     - jjaswanson4.utilities.idm_dns_records
