@@ -21,7 +21,7 @@
           loop_control:
             loop_var: content_view
           loop: "{{ satellite.content_views }}"
-        - name: "publish content view version {{ content_view }} to the library"
+        - name: "publish content view to the library"
           redhat.satellite.content_view_version:
             username: "{{ satellite.username }}"
             password: "{{ satellite.password }}"
