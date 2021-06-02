@@ -51,3 +51,4 @@ sap_hana_deployment_ase_user_password: "R3dh4t123!"
 sap_hana_deployment_apply_license: false
 sap_hana_hsr_hana_instance_number: "00"
 sap_hana_hsr_hana_db_system_password: "R3dh4t123!"
+sap_hana_preconfigure_fail_if_reboot_required: no
