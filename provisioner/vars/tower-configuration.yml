@@ -81,6 +81,10 @@ tower_groups:
     children:
       - hana
       - netweaver
+  - name: satellite
+    inventory: Patching Demo
+    hosts:
+      - patching-satellite.demo.lab.msp.redhat.com
 
 tower_projects:
   - name: Patching Demo
@@ -98,3 +102,8 @@ tower_templates:
     playbook: playbooks/1-run-insights-report.yml
     credentials:
       - root
+  - name: 2 - Publish New Content
+    inventory: Patching Demo
+    limit: satellite
+    project: Patching Demo
+    playbook: playbooks/2-publish-new-content.yml
