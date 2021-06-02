@@ -15,7 +15,7 @@
             server_url: "{{ satellite.url }}"
             organization: "{{ satellite.organization }}"
             name: "{{ satellite.content_view_filter_name }}"
-            state: absent
+            filter_state: absent
             content_view: "{{ content_view.name }}"
           loop_control:
             loop_var: content_view
