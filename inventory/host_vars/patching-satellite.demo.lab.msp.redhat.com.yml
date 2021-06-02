@@ -6,6 +6,8 @@ memory_mb: 24576
 os: rhel7
 application: satellite
 
+htop_url: https://dl.fedoraproject.org/pub/epel/7/x86_64/Packages/h/htop-2.2.0-3.el7.x86_64.rpm
+
 additional_storage:
   - capacity: 1073741274244
     type: SCSI
@@ -167,44 +169,8 @@ satellite:
         pxe_loader: None
         root_pass: "{{ ansible_password }}"
         kickstart_repository: Red Hat Enterprise Linux 8 for x86_64 - BaseOS Kickstart 8.2
-      - name: kickstart-rhel8-vlan146
-        architecture: x86_64
-        compute_profile: general-vlan146
-        compute_resource: vcenter02.lab.msp.redhat.com
-        content_source: patching-satellite.demo.lab.msp.redhat.com
-        content_view: composite-rhel8
-        domain: demo.lab.msp.redhat.com
-        lifecycle_environment: Production
-        operatingsystem: RedHat-8.4
-        ptable: RHEL8 Kickstart Partition Table
-        organization_of_content_source: Patching Demo
-        organizations:
-          - Patching Demo
-        locations:
-          - Patching Demo
-        subnet: VLAN146
-#        parameters:
-#          - name: "kt_activation_keys"
-#            value: "ak-rhel8-production"
-        pxe_loader: None
-        root_pass: "{{ ansible_password }}"
-        kickstart_repository: Red Hat Enterprise Linux 8 for x86_64 - BaseOS Kickstart 8.4
-    partition_tables:
-      - name: RHEL8 Kickstart Partition Table
-        file: files/rhel8-ptable.erb
-        os_family: Redhat
-        organizations:
-          - name: Patching Demo
-        locations:
-          - name: Patching Demo
     operating_systems:
       - name: RedHat-8.2
-        ptable:
-          - name: Kickstart default
-          - name: RHEL8 Kickstart Partition Table
-        update_existing: true
-        update_args: --partition-tables "RHEL8 Kickstart Partition Table,Kickstart default"
-      - name: RedHat-8.4
         ptable:
           - name: Kickstart default
           - name: RHEL8 Kickstart Partition Table
@@ -221,14 +187,6 @@ satellite:
         - name: Production
           prior: Non_Production
       content_views:
-        - name: cv-kickstart-rhel8.4
-          repos:
-            - repo: Red Hat Enterprise Linux 8 for x86_64 - AppStream (Kickstart)
-              product: Red Hat Enterprise Linux for x86_64
-              releasever: 8.4
-            - repo: Red Hat Enterprise Linux 8 for x86_64 - BaseOS (Kickstart)
-              product: Red Hat Enterprise Linux for x86_64
-              releasever: 8.4
         - name: cv-kickstart-rhel8.2
           repos:
             - repo: Red Hat Enterprise Linux 8 for x86_64 - AppStream (Kickstart)
@@ -240,51 +198,83 @@ satellite:
         - name: cv-ansible-rhel8
           repos:
             - repo: Red Hat Ansible Engine 2 for RHEL 8 x86_64 (RPMs)
-              product: Red Hat Ansible Engine            
-        - name: cv-automationhub4.2-rhel8
-          repos:
-            - repo: Red Hat Automation Hub 4.2 for RHEL 8 x86_64 (RPMs)
-              product: Red Hat Ansible Automation Platform
+              product: Red Hat Ansible Engine
+          filters:
+            - name: 12-31-2020
+              filter_type: erratum
+              end_date: '2020-12-31'
         - name: cv-e4s-server-rhel8.2
           repos:
             - repo: Red Hat Enterprise Linux 8 for x86_64 - BaseOS - Update Services for SAP Solutions (RPMs)
               product: Red Hat Enterprise Linux Server - Update Services for SAP Solutions
               releasever: 8.2
+          filters:
+            - name: 12-31-2020
+              filter_type: erratum
+              end_date: '2020-12-31'
         - name: cv-e4s-appstream-rhel8.2
           repos:
             - repo: Red Hat Enterprise Linux 8 for x86_64 - AppStream - Update Services for SAP Solutions (RPMs)
               product: Red Hat Enterprise Linux Server - Update Services for SAP Solutions
-              releasever: 8.2
+              releasever: 8.2       
+          filters:
+            - name: 12-31-2020
+              filter_type: erratum
+              end_date: '2020-12-31'  
         - name: cv-r4s-netweaver-rhel8.2
           repos:
             - repo: Red Hat Enterprise Linux 8 for x86_64 - SAP NetWeaver - Update Services for SAP Solutions (RPMs)
               product: RHEL for SAP - Update Services for SAP Solutions
               releasever: 8.2
+          filters:
+            - name: 12-31-2020
+              filter_type: erratum
+              end_date: '2020-12-31'
         - name: cv-r4h-hana-rhel8.2
           repos:
             - repo: Red Hat Enterprise Linux 8 for x86_64 - SAP Solutions - Update Services for SAP Solutions (RPMs)
               product: RHEL for SAP HANA - Update Services for SAP Solutions
               releasever: 8.2
+          filters:
+            - name: 12-31-2020
+              filter_type: erratum
+              end_date: '2020-12-31'
         - name: cv-e4s-satellitetools6.9-rhel8.2
           repos:
             - repo: Red Hat Satellite Tools 6.9 for RHEL 8 x86_64 - Update Services SAP Solutions (RPMs)
               product: Red Hat Enterprise Linux Server - Update Services for SAP Solutions
               releasever: 8.2
+          filters:
+            - name: 12-31-2020
+              filter_type: erratum
+              end_date: '2020-12-31'
         - name: cv-e4s-highavailability-rhel8.2
           repos:
             - repo: Red Hat Enterprise Linux 8 for x86_64 - High Availability - Update Services for SAP Solutions (RPMs)
               product: Red Hat Enterprise Linux High Availability - Update Services for SAP Solutions
               releasever: 8.2
+          filters:
+            - name: 12-31-2020
+              filter_type: erratum
+              end_date: '2020-12-31'
         - name: cv-server-rhel8
           repos:
             - repo: Red Hat Enterprise Linux 8 for x86_64 - BaseOS (RPMs)
               product: Red Hat Enterprise Linux for x86_64
               releasever: 8
+          filters:
+            - name: 12-31-2020
+              filter_type: erratum
+              end_date: '2020-12-31'
         - name: cv-appstream-rhel8
           repos:
             - repo: Red Hat Enterprise Linux 8 for x86_64 - AppStream (RPMs)
               product: Red Hat Enterprise Linux for x86_64
               releasever: 8
+          filters:
+            - name: 12-31-2020
+              filter_type: erratum
+              end_date: '2020-12-31'
         - name: cv-satellitetools6.9-rhel8
           repos:
             - repo: Red Hat Satellite Tools 6.9 for RHEL 8 x86_64 (RPMs)
@@ -304,8 +294,6 @@ satellite:
             - name: cv-appstream-rhel8
             - name: cv-satellitetools6.9-rhel8
             - name: cv-kickstart-rhel8.2
-            - name: cv-automationhub4.2-rhel8
-            - name: cv-kickstart-rhel8.4
       activation_keys:
         - name: ak-sap-rhel8.2-production
           lifecycle_environment: Production
@@ -329,11 +317,3 @@ satellite:
             - label: rhel-8-for-x86_64-sap-netweaver-e4s-rpms
             - label: rhel-8-for-x86_64-sap-solutions-e4s-rpms
             - label: rhel-8-for-x86_64-highavailability-e4s-rpms
-        - name: ak-general-rhel8-production
-          lifecycle_environment: Production
-          content_view: composite-rhel8
-          release_version: 8
-          content_overrides:
-            - label: rhel-8-for-x86_64-baseos-rpms
-            - label: rhel-8-for-x86_64-appstream-rpms
-            - label: satellite-tools-6.9-for-rhel-8-x86_64-rpms
