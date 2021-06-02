@@ -2,3 +2,29 @@
 
 cpus: 4
 memory_mb: 16384
+
+additional_storage:
+  - capacity: 107374182400
+    type: SCSI
+    scsi:
+      bus: 0
+      unit: 1
+
+manage_lvm: false
+
+storage_pools:
+  - name: sap
+    disks:
+      - sdb
+    volumes:
+      - name: sap
+        size: "50 GiB"
+        mount_point: "/usr/sap"
+        state: present
+      - name: sapmnt
+        size: "20 GiB"
+        mount_point: "/usr/sapmnt"
+        state: present
+      - name: swap
+        size: "20 GiB"
+        state: present
