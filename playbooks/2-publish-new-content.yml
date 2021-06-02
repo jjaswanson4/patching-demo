@@ -8,7 +8,7 @@
     - name: update content views for this patch cycle
       block:
         - name: remove content view filter used for demo purposes
-          theforeman.foreman.content_view_filter:
+          redhat.satellite.content_view_filter:
             username: "{{ satellite.username }}"
             password: "{{ satellite.password }}"
             validate_certs: false
@@ -21,7 +21,7 @@
             loop_var: content_view
           loop: "{{ content_views }}"
         - name: "publish content view version {{ content_view }} to the library"
-          theforeman.foreman.content_view_version:
+          redhat.satellite.content_view_version:
             username: "{{ satellite.username }}"
             password: "{{ satellite.password }}"
             validate_certs: false
@@ -34,7 +34,7 @@
             loop_var: content_view
           loop: "{{ satellite.content_views }}"
         - name: "publish new version of composite content view {{ satellite.composite_content_view }}"
-          theforeman.foreman.content_view_version:
+          redhat.satellite.content_view_version:
             username: "{{ satellite.username }}"
             password: "{{ satellite.password }}"
             validate_certs: false
