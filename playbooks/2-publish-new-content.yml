@@ -14,7 +14,7 @@
             validate_certs: false
             server_url: "{{ satellite.url }}"
             organization: "{{ satellite.organization }}"
-            name: "{{ content_view_filter_name }}"
+            name: "{{ satellite.content_view_filter_name }}"
             state: absent
             content_view: "{{ content_view.name }}"
           loop_control:
