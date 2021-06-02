@@ -16,6 +16,7 @@
             organization: "{{ satellite.organization }}"
             name: "{{ satellite.content_view_filter_name }}"
             filter_state: absent
+            filter_type: erratum
             content_view: "{{ content_view.name }}"
           loop_control:
             loop_var: content_view
