@@ -1,0 +1,6 @@
+---
+
+roles:
+  - name: redhat_sap.sap_hostagent
+    source: https://galaxy.ansible.com
+  - src: https://github.com/linux-system-roles/sap-preconfigure.git
