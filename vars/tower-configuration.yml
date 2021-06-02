@@ -1,0 +1,64 @@
+---
+
+tower_hostname: patching-tower.demo.lab.msp.redhat.com
+tower_validate_certs: no
+tower_username: admin
+tower_password: "{{ ansible_password }}"
+
+tower_license:
+  manifest: files/tower-manifest.zip
+  eula_accepted: yes
+
+tower_organizations:
+  - name: Patching Demo
+
+tower_credentials:
+  - name: root
+    organization: Patching Demo
+    credential_type: machine
+    inputs:
+      username: root
+      password: "{{ ansible_password }}"
+
+tower_inventories:
+  - name: Patching Demo
+    organization: Patching Demo
+
+tower_hosts:
+  - name: patching-satellite.demo.lab.msp.redhat.com
+    inventory: Patching Demo
+    variables:
+      ansible_host: '10.15.121.1'
+      satellite:
+        username: admin
+        password: "{{ ansible_password }}"
+        url: https://patching-satellite.demo.lab.msp.redhat.com
+        organization: Patching Demo
+        content_views:
+          - name: cv-ansible-rhel8
+          - name: cv-appstream-rhel8
+          - name: cv-e4s-appstream-rhel8.2
+          - name: cv-e4s-highavailability-rhel8.2
+          - name: cv-e4s-satellitetools6.9-rhel8.2
+          - name: cv-e4s-server-rhel8.2
+          - name: cv-kickstart-rhel8.2
+          - name: cv-r4h-hana-rhel8.2
+          - name: cv-r4s-netweaver-rhel8.2
+          - name: cv-satellitetools6.9-rhel8
+          - name: cv-server-rhel8
+  - name: sapdnhdb1.demo.lab.msp.redhat.com
+    inventory: Patching Demo
+  - name: sapdphdb1.demo.lab.msp.redhat.com
+    inventory: Patching Demo
+  - name: sapdnapp1.demo.lab.msp.redhat.com
+    inventory: Patching Demo
+  - name: sapdpapp1.demo.lab.msp.redhat.com
+    inventory: Patching Demo
+
+tower_projects:
+  - name: Patching Demo
+    organization: Patching Demo
+    scm_branch: main
+    scm_type: git
+    scm_url: https://github.com/jjaswanson4/patching-demo.git
+    wait: yes
