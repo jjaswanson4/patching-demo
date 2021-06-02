@@ -9,20 +9,32 @@ tower_license:
   manifest: files/tower-manifest.zip
   eula_accepted: yes
 
-tower_organizations:
-  - name: Patching Demo
-
 tower_credentials:
   - name: root
-    organization: Patching Demo
     credential_type: Machine
+    organization: Default
     inputs:
       username: root
       password: "{{ ansible_password }}"
+  - name: MSP Lab Automation Hub - RH Certified
+    credential_type: Ansible Galaxy/Automation Hub API Token
+    organization: Default
+    inputs:
+      url: https://automationhub01.lab.msp.redhat.com/api/galaxy/content/rh-certified/
+      token: "{{ automation_hub_token }}"
+
+tower_settings:
+  - name: GALAXY_IGNORE_CERTS
+    value: true
+
+tower_organizations:
+  - name: Default
+    galaxy_credentials:
+      - MSP Lab Automation Hub - RH Certified
 
 tower_inventories:
   - name: Patching Demo
-    organization: Patching Demo
+    organization: Default
 
 tower_hosts:
   - name: patching-satellite.demo.lab.msp.redhat.com
@@ -88,7 +100,7 @@ tower_groups:
 
 tower_projects:
   - name: Patching Demo
-    organization: Patching Demo
+    #organization: Patching Demo
     scm_branch: main
     scm_type: git
     scm_url: https://github.com/jjaswanson4/patching-demo.git
