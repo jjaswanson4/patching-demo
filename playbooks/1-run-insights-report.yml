@@ -7,3 +7,4 @@
   tasks:
     - name: run an insights scan
       ansible.builtin.shell: /usr/bin/insights-client
+      changed_when: no
