@@ -1,6 +1,6 @@
 ---
 
-  - name: build out satellite
+- name: build out satellite
   hosts:
     - satellite
   gather_facts: no
@@ -57,8 +57,8 @@
 
 - name: provision managed hosts
   hosts:
-    - demo_hosts
-  gather_facts: false
+    - none
+  gather_facts: no
   roles:
     - jjaswanson4.utilities.idm_dns_records
     - jjaswanson4.utilities.provision_via_satellite
@@ -67,6 +67,60 @@
     - redhat.rhel_system_roles.timesync
     - jjaswanson4.utilities.add_virtual_disk
     - redhat.rhel_system_roles.storage
-    - /Users/jswanson/code/ansible-utilities/roles/mount_nfs_shares
+    - jjaswanson4.utilities.mount_nfs_shares
     - sap-preconfigure
     - redhat_sap.sap_hostagent
+  post_tasks:
+    - name: check if reboot is required
+      ansible.builtin.shell: yum needs-restarting -r
+      changed_when: false
+      ignore_errors: true
+      register: reboot_needed
+    - name: reboot system
+      ansible.builtin.reboot:
+      when:
+        - reboot_needed.rc | int != 0
+
+- name: prep for SAP HANA install
+  hosts:
+    - hana
+  roles:
+    - sap-hana-preconfigure
+  post_tasks:
+    - name: check if reboot is required
+      ansible.builtin.shell: yum needs-restarting -r
+      changed_when: false
+      ignore_errors: true
+      register: reboot_needed
+    - name: reboot system
+      ansible.builtin.reboot:
+      when:
+        - reboot_needed.rc | int != 0
+
+- name: install SAP HANA
+  hosts:
+    - hana
+  roles:  
+    - redhat_sap.sap_hana_deployment
+
+- name: prep for S4 install
+  hosts:
+    - app
+  roles:
+    - sap-netweaver-preconfigure
+  post_tasks:
+    - name: check if reboot is required
+      ansible.builtin.shell: yum needs-restarting -r
+      changed_when: false
+      ignore_errors: true
+      register: reboot_needed
+    - name: reboot system
+      ansible.builtin.reboot:
+      when:
+        - reboot_needed.rc | int != 0    
+
+- name: install S4
+  hosts:
+    - app
+  roles:
+    - redhat_sap.sap_s4hana_deployment
