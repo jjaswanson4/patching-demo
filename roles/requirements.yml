@@ -3,10 +3,18 @@
 roles:
   - name: redhat_sap.sap_hostagent
     source: https://galaxy.ansible.com
-  - src: https://github.com/linux-system-roles/sap-preconfigure.git
+  - name: sap-preconfigure
+    source: https://github.com/linux-system-roles/sap-preconfigure.git
     #version: v1.0
-  - src: https://github.com/linux-system-roles/sap-hana-preconfigure.git
+  - name: sap-hana-preconfigure
+    source: https://github.com/linux-system-roles/sap-hana-preconfigure.git
     #version: v1.0
   - name: redhat_sap.sap_hana_deployment
+    source: https://galaxy.ansible.com
+    #version: v1.1.0
+  - name: sap-netweaver-preconfigure
+    source: https://github.com/linux-system-roles/sap-netweaver-preconfigure.git
+    #version: v1.0
+  - name: redhat_sap.sap_s4hana_deployment
     source: https://galaxy.ansible.com
     #version: v1.1.0
