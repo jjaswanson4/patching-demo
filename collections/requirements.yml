@@ -10,3 +10,4 @@ collections:
   - name: jjaswanson4.configure_satellite
   - name: ansible.posix
   - name: redhat_cop.tower_configuration
+  - name: awx.awx
