@@ -15,7 +15,7 @@ tower_organizations:
 tower_credentials:
   - name: root
     organization: Patching Demo
-    credential_type: machine
+    credential_type: Machine
     inputs:
       username: root
       password: "{{ ansible_password }}"
@@ -46,6 +46,8 @@ tower_hosts:
           - name: cv-r4s-netweaver-rhel8.2
           - name: cv-satellitetools6.9-rhel8
           - name: cv-server-rhel8
+        composite_content_view: composite-rhel8
+        content_view_filter_name: '12-31-2020'
   - name: sapdnhdb1.demo.lab.msp.redhat.com
     inventory: Patching Demo
     variables:
@@ -89,8 +91,8 @@ tower_projects:
     wait: yes
 
 tower_templates:
-  - name: 1 - Run Insights Report.yml
-    inventory: Demo inventory
+  - name: 1 - Run Insights Report
+    inventory: Patching Demo
     limit: sap
     project: Patching Demo
     playbook: playbooks/1-run-insights-report.yml
