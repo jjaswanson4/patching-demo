@@ -66,10 +66,19 @@ tower_hosts:
 tower_groups:
   - name: hana
     inventory: Patching Demo
+    hosts:
+      - sapdnhdb1.demo.lab.msp.redhat.com
+      - sapdphdb1.demo.lab.msp.redhat.com
   - name: netweaver
     inventory: Patching Demo
+    hosts:
+      - sapdnapp1.demo.lab.msp.redhat.com
+      - sapdpapp1.demo.lab.msp.redhat.com
   - name: sap
     inventory: Patching Demo
+    children:
+      - hana
+      - netweaver
 
 tower_projects:
   - name: Patching Demo
@@ -78,3 +87,12 @@ tower_projects:
     scm_type: git
     scm_url: https://github.com/jjaswanson4/patching-demo.git
     wait: yes
+
+tower_templates:
+  - name: 1 - Run Insights Report.yml
+    inventory: Demo inventory
+    limit: sap
+    project: Patching Demo
+    playbook: playbooks/1-run-insights-report.yml
+    credentials:
+      - root
