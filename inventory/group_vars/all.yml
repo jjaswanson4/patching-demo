@@ -1,6 +1,7 @@
 ---
 
 ansible_user: root
+ansible_become: false
 
 dns_zone: demo.lab.msp.redhat.com
 
@@ -13,7 +14,7 @@ dns:
       type: A
       value: "{{ ip_address }}"
     - name: "{{ ip_address.split('.')[-1] }}"
-      zone: 121.15.10.in-addr.arpa.
+      zone: "{{ ip_address.split('.')[2] }}.15.10.in-addr.arpa."
       type: PTR
       value: "{{ inventory_hostname }}."
 
