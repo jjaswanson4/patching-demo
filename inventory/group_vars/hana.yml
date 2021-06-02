@@ -4,10 +4,13 @@ cpus: 8
 memory_mb: 73728
 
 additional_storage:
-  - size_gb: 750
-    scsi_controller: 0
-    unit_number: 1
-    datastore: storage04-nfs-lun0
+  - capacity: 805306368000
+    type: SCSI
+    scsi:
+      bus: 0
+      unit: 1
+
+manage_lvm: false
 
 storage_pools:
   - name: sap
