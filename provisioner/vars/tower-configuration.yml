@@ -100,7 +100,7 @@ tower_groups:
 
 tower_projects:
   - name: Patching Demo
-    organization: Patching Demo
+    organization: Default
     scm_branch: main
     scm_type: git
     scm_url: https://github.com/jjaswanson4/patching-demo.git
