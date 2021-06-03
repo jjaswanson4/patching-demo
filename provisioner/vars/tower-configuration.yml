@@ -67,11 +67,11 @@ tower_hosts:
   - name: sapdphdb1.demo.lab.msp.redhat.com
     inventory: Patching Demo
     variables:
-      ansible_host: 10.15.120.32
+      ansible_host: 10.15.120.33
   - name: sapdnapp1.demo.lab.msp.redhat.com
     inventory: Patching Demo
     variables:
-      ansible_host: 10.15.120.33
+      ansible_host: 10.15.120.32
   - name: sapdpapp1.demo.lab.msp.redhat.com
     inventory: Patching Demo
     variables:
@@ -93,6 +93,16 @@ tower_groups:
     children:
       - hana
       - netweaver
+  - name: non_production
+    inventory: Patching Demo
+    hosts:
+      - sapdnapp1.demo.lab.msp.redhat.com
+      - sapdnhdb1.demo.lab.msp.redhat.com
+  - name: production
+    inventory: Patching Demo
+    hosts:
+      - sapdpapp1.demo.lab.msp.redhat.com
+      - sapdphdb1.demo.lab.msp.redhat.com
   - name: satellite
     inventory: Patching Demo
     hosts:
@@ -111,11 +121,39 @@ tower_templates:
     inventory: Patching Demo
     limit: sap
     project: Patching Demo
-    playbook: playbooks/1-run-insights-report.yml
+    playbook: playbooks/run-insights-report.yml
     credentials:
       - root
   - name: 2 - Publish New Content
     inventory: Patching Demo
     limit: satellite
     project: Patching Demo
-    playbook: playbooks/2-publish-new-content.yml
+    playbook: playbooks/publish-new-content.yml
+  - name: 3 - Install Tracer
+    inventory: Patching Demo
+    limit: netweaver
+    project: Patching Demo
+    playbook: playbooks/install-tracer.yml
+    credentials:
+      - root
+  - name: 4 - Update All Packages | Non Production
+    inventory: Patching Demo
+    limit: 'netweaver:&non_production'
+    project: Patching Demo
+    playbook: playbooks/update-all-packages.yml
+    credentials:
+      - root
+  - name: 5 - kpatch Databases | Non Production
+    inventory: Patching Demo
+    limit: 'hana:&non_production'
+    project: Patching Demo
+    playbook: playbooks/kpatch-server.yml
+    credentials:
+      - root
+  - name: 6 - Run Tracer Report | Non Production
+    inventory: Patching Demo
+    limit: 'netweaver:&non_production'
+    project: Patching Demo
+    playbook: playbooks/run-tracer-report.yml
+    credentials:
+      - root
