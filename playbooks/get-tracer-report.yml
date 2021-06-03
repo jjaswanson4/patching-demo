@@ -27,5 +27,5 @@
       delegate_to: localhost
     - name: print out tracer information
       ansible.builtin.debug:
-        msg: "component name: {{ item.application }}, reboot required: {{ item.reboot_required }}"
+        msg: "{{ item }}"
       loop: "{{ traces.json.results }}"
