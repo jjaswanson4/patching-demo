@@ -1,0 +1,19 @@
+---
+
+- name: kpatch server
+  hosts:
+    - all
+  tasks:
+    - name: get kpatches available for kernel
+      ansible.builtin.shell:
+        cmd: "yum search kpatch-patch-{{ ansible_kernel | regex_replace('.el8.x86_64', '') | regex_replace('\\.', '_') }}"
+      check_mode: no
+      changed_when: no
+      register: kpatches
+    - name: list out available kpatches
+      ansible.builtin.debug:
+        var: kpatches.stdout_lines
+    - name: install appropriate kpatch
+      ansible.builtin.yum:
+        name: "kpatch-patch-{{ ansible_kernel | regex_replace('.el8.x86_64', '') | regex_replace('\\.', '_') }}"
+        state: latest
