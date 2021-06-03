@@ -1,0 +1,10 @@
+---
+
+- name: install tracer on systems
+  hosts:
+    - all
+  tasks:
+    - name: install tracer rpms
+      ansible.builtin.yum:
+        name: katello-host-tools-tracer
+        state: present
