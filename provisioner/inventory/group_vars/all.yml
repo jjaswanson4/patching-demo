@@ -20,7 +20,6 @@ dns:
 
 config_files:
   - hosts
-  - NetworkManager.conf
   - resolv.conf
 
 timesync_ntp_servers:
