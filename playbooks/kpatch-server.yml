@@ -19,3 +19,18 @@
       ansible.builtin.yum:
         name: "kpatch-patch-{{ ansible_kernel | regex_replace('\\.el8.*$', '') | regex_replace('\\.', '_') }}"
         state: latest
+      notify: list active kpatches
+  handlers:
+    - name: grab active kpatches
+      ansible.builtin.shell:
+        cmd: kpatch list
+      check_mode: no
+      changed_when: no
+      register: active_kpatches
+      listen:
+        - list active kpatches
+    - name: print out active kpatches
+      ansible.builtin.debug:
+        var: active_kpatches.stdout_lines
+      listen:
+        - list active kpatches
