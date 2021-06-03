@@ -13,7 +13,6 @@
         server_url: "{{ satellite.url }}"
         organization: "{{ satellite.organization }}"
         content_view: "{{ satellite.composite_content_view }}"
-        current_lifecycle_environment: Non_Production
-        lifecycle_environments:
-          - Production
+        current_lifecycle_environment: "{{ current_lifecycle_environment }}"
+        lifecycle_environments: "{{ new_lifecycle_environment }}"
       delegate_to: localhost
