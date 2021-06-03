@@ -39,27 +39,6 @@ tower_inventories:
 tower_hosts:
   - name: patching-satellite.demo.lab.msp.redhat.com
     inventory: Patching Demo
-    variables:
-      ansible_host: '10.15.121.1'
-      satellite:
-        username: admin
-        password: "{{ ansible_password }}"
-        url: https://patching-satellite.demo.lab.msp.redhat.com
-        organization: Patching Demo
-        content_views:
-          - name: cv-ansible-rhel8
-          - name: cv-appstream-rhel8
-          - name: cv-e4s-appstream-rhel8.2
-          - name: cv-e4s-highavailability-rhel8.2
-          - name: cv-e4s-satellitetools6.9-rhel8.2
-          - name: cv-e4s-server-rhel8.2
-          - name: cv-kickstart-rhel8.2
-          - name: cv-r4h-hana-rhel8.2
-          - name: cv-r4s-netweaver-rhel8.2
-          - name: cv-satellitetools6.9-rhel8
-          - name: cv-server-rhel8
-        composite_content_view: composite-rhel8
-        content_view_filter_name: '12-31-2020'
   - name: sapdnhdb1.demo.lab.msp.redhat.com
     inventory: Patching Demo
     variables:
@@ -107,6 +86,35 @@ tower_groups:
     inventory: Patching Demo
     hosts:
       - patching-satellite.demo.lab.msp.redhat.com
+  - name: all
+    inventory: Patching Demo
+    hosts:
+      - sapdnhdb1.demo.lab.msp.redhat.com
+      - sapdphdb1.demo.lab.msp.redhat.com
+      - sapdnapp1.demo.lab.msp.redhat.com
+      - sapdpapp1.demo.lab.msp.redhat.com
+      - patching-satellite.demo.lab.msp.redhat.com
+    variables:
+      ansible_host: '10.15.121.1'
+      satellite:
+        username: admin
+        password: "{{ ansible_password }}"
+        url: https://patching-satellite.demo.lab.msp.redhat.com
+        organization: Patching Demo
+        content_views:
+          - name: cv-ansible-rhel8
+          - name: cv-appstream-rhel8
+          - name: cv-e4s-appstream-rhel8.2
+          - name: cv-e4s-highavailability-rhel8.2
+          - name: cv-e4s-satellitetools6.9-rhel8.2
+          - name: cv-e4s-server-rhel8.2
+          - name: cv-kickstart-rhel8.2
+          - name: cv-r4h-hana-rhel8.2
+          - name: cv-r4s-netweaver-rhel8.2
+          - name: cv-satellitetools6.9-rhel8
+          - name: cv-server-rhel8
+        composite_content_view: composite-rhel8
+        content_view_filter_name: '12-31-2020'
 
 tower_projects:
   - name: Patching Demo
@@ -131,36 +139,50 @@ tower_templates:
     playbook: playbooks/check-for-updates.yml
     credentials:
       - root
-  #- name: 2 - Publish New Content
+  - name: 3 - Recheck for Updates
+    inventory: Patching Demo
+    limit: sap
+    project: Patching Demo
+    playbook: playbooks/check-for-updates.yml
+    credentials:
+      - root
+  #- name: 4 - Publish New Content
   #  inventory: Patching Demo
   #  limit: satellite
   #  project: Patching Demo
   #  playbook: playbooks/publish-new-content.yml
-  - name: 4 - Install Tracer | Netweaver
+  - name: 5 - Install Tracer | Netweaver
     inventory: Patching Demo
     limit: netweaver
     project: Patching Demo
     playbook: playbooks/install-tracer.yml
     credentials:
       - root
-  - name: 5 - Update All Packages | Netweaver | Non Production
+  - name: 6 - Update All Packages | Netweaver | Non Production
     inventory: Patching Demo
     limit: 'netweaver:&non_production'
     project: Patching Demo
     playbook: playbooks/update-all-packages.yml
     credentials:
       - root
-  - name: 6 - kpatch Databases | HANA | Non Production
+  - name: 7 - kpatch Databases | HANA | Non Production
     inventory: Patching Demo
     limit: 'hana:&non_production'
     project: Patching Demo
     playbook: playbooks/kpatch-server.yml
     credentials:
       - root
-  - name: 7 - Run Tracer Report | Netweaver | Non Production
+  - name: 8 - Run Tracer Report | Netweaver | Non Production
     inventory: Patching Demo
     limit: 'netweaver:&non_production'
     project: Patching Demo
     playbook: playbooks/run-tracer-report.yml
+    credentials:
+      - root
+  - name: 9 - Get Tracer Information | Netweaver | Non Production
+    inventory: Patching Demo
+    limit: 'netweaver:&non_production'
+    project: Patching Demo
+    playbook: playbooks/get-tracer-report.yml
     credentials:
       - root
