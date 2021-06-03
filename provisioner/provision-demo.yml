@@ -121,10 +121,12 @@
     - name: reboot system
       ansible.builtin.reboot:
       when:
-        - reboot_needed.rc | int != 0    
+        - reboot_needed.rc | int != 0
 
 - name: install S4
   hosts:
     - app
   roles:
     - redhat_sap.sap_s4hana_deployment
+
+# to save time: run the playbook to publish content views

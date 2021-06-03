@@ -124,12 +124,19 @@ tower_templates:
     playbook: playbooks/run-insights-report.yml
     credentials:
       - root
-  - name: 2 - Publish New Content
+  - name: 2 - Check for Updates
     inventory: Patching Demo
-    limit: satellite
+    limit: sap
     project: Patching Demo
-    playbook: playbooks/publish-new-content.yml
-  - name: 3 - Install Tracer
+    playbook: playbooks/check-for-updates.yml
+    credentials:
+      - root
+  #- name: 2 - Publish New Content
+  #  inventory: Patching Demo
+  #  limit: satellite
+  #  project: Patching Demo
+  #  playbook: playbooks/publish-new-content.yml
+  - name: 4 - Install Tracer
     inventory: Patching Demo
     limit: netweaver
     project: Patching Demo
