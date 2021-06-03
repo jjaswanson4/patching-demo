@@ -80,18 +80,6 @@ tower_groups:
         password: "{{ ansible_password }}"
         url: https://patching-satellite.demo.lab.msp.redhat.com
         organization: Patching Demo
-        content_views:
-          - name: cv-ansible-rhel8
-          - name: cv-appstream-rhel8
-          - name: cv-e4s-appstream-rhel8.2
-          - name: cv-e4s-highavailability-rhel8.2
-          - name: cv-e4s-satellitetools6.9-rhel8.2
-          - name: cv-e4s-server-rhel8.2
-          - name: cv-kickstart-rhel8.2
-          - name: cv-r4h-hana-rhel8.2
-          - name: cv-r4s-netweaver-rhel8.2
-          - name: cv-satellitetools6.9-rhel8
-          - name: cv-server-rhel8
         composite_content_view: composite-rhel8
         content_view_filter_name: '12-31-2020'
   - name: non_production
@@ -132,6 +120,15 @@ tower_templates:
     playbook: playbooks/check-for-updates.yml
     credentials:
       - root
+  - name: 3 - Promote Content | Non_Production
+    inventory: Patching Demo
+    limit: satellite
+    project: Patching Demo
+    playbook: playbooks/promote-content.yml
+    extra_vars:
+      current_lifecycle_environment: Library
+      new_lifecycle_environment:
+        - Non_production
   - name: 3 - Recheck for Updates
     inventory: Patching Demo
     limit: sap
@@ -139,94 +136,93 @@ tower_templates:
     playbook: playbooks/check-for-updates.yml
     credentials:
       - root
-  #- name: 4 - Publish New Content
-  #  inventory: Patching Demo
-  #  limit: satellite
-  #  project: Patching Demo
-  #  playbook: playbooks/publish-new-content.yml
-  - name: 5 - Install Tracer | Netweaver
+  - name: 4 - Install Tracer | Netweaver
     inventory: Patching Demo
     limit: netweaver
     project: Patching Demo
     playbook: playbooks/install-tracer.yml
     credentials:
       - root
-  - name: 6 - Update All Packages | Netweaver | Non Production
+  - name: 5 - Update All Packages | Netweaver | Non Production
     inventory: Patching Demo
     limit: 'netweaver:&non_production'
     project: Patching Demo
     playbook: playbooks/update-all-packages.yml
     credentials:
       - root
-  - name: 7 - kpatch Databases | HANA | Non Production
+  - name: 6 - kpatch Databases | HANA | Non Production
     inventory: Patching Demo
     limit: 'hana:&non_production'
     project: Patching Demo
     playbook: playbooks/kpatch-server.yml
     credentials:
       - root
-  - name: 8 - Run Tracer Report | Netweaver | Non Production
+  - name: 7 - Run Tracer Report | Netweaver | Non Production
     inventory: Patching Demo
     limit: 'netweaver:&non_production'
     project: Patching Demo
     playbook: playbooks/run-tracer-report.yml
     credentials:
       - root
-  - name: 9 - Get Tracer Information | Netweaver | Non Production
+  - name: 8 - Get Tracer Information | Netweaver | Non Production
     inventory: Patching Demo
     limit: 'netweaver:&non_production'
     project: Patching Demo
     playbook: playbooks/get-tracer-report.yml
     credentials:
       - root
-  - name: 10 - Reboot Server | Netweaver | Non Production
+  - name: 9 - Reboot Server | Netweaver | Non Production
     inventory: Patching Demo
     limit: 'netweaver:&non_production'
     project: Patching Demo
     playbook: playbooks/reboot-server.yml
     credentials:
       - root
-  - name: 11 - Promote Content to Production
+  - name: 10 - Promote Content to Production
     inventory: Patching Demo
     limit: satellite
     project: Patching Demo
-    playbook: playbooks/promote-new-content.yml
-  - name: 12 - Check for Updates
+    playbook: playbooks/promote-content.yml
+    extra_vars:
+      current_lifecycle_environment: Non_Production
+      new_lifecycle_environment:
+        - Production
+  - name: 11 - Check for Updates
     inventory: Patching Demo
     limit: sap
     project: Patching Demo
     playbook: playbooks/check-for-updates.yml
     credentials:
       - root
-  - name: 13 - Update All Packages | Netweaver | Production
+  - name: 12 - Update All Packages | Netweaver | Production
     inventory: Patching Demo
     limit: 'netweaver:&production'
     project: Patching Demo
     playbook: playbooks/update-all-packages.yml
     credentials:
       - root
-  - name: 14 - kpatch Databases | HANA | Production
+  - name: 13 - kpatch Databases | HANA | Production
     inventory: Patching Demo
     limit: 'hana:&production'
     project: Patching Demo
     playbook: playbooks/kpatch-server.yml
     credentials:
       - root
-  - name: 15 - Run Tracer Report | Netweaver | Production
+  - name: 14 - Run Tracer Report | Netweaver | Production
     inventory: Patching Demo
     limit: 'netweaver:&production'
     project: Patching Demo
     playbook: playbooks/run-tracer-report.yml
     credentials:
       - root
-  - name: 16 - Get Tracer Information | Netweaver | Production
+  - name: 15 - Get Tracer Information | Netweaver | Production
     inventory: Patching Demo
     limit: 'netweaver:&production'
     project: Patching Demo
     playbook: playbooks/get-tracer-report.yml
     credentials:
       - root
-  - name: 17 - Reboot Server | Netweaver | Production
+  - name: 16 - Reboot Server | Netweaver | Production
     inventory: Patching Demo
     limit: 'netweaver:&production'
     project: Patching Demo
