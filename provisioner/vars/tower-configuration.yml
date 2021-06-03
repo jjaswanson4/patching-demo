@@ -74,28 +74,6 @@ tower_groups:
     children:
       - hana
       - netweaver
-  - name: non_production
-    inventory: Patching Demo
-    hosts:
-      - sapdnapp1.demo.lab.msp.redhat.com
-      - sapdnhdb1.demo.lab.msp.redhat.com
-  - name: production
-    inventory: Patching Demo
-    hosts:
-      - sapdpapp1.demo.lab.msp.redhat.com
-      - sapdphdb1.demo.lab.msp.redhat.com
-  - name: satellite
-    inventory: Patching Demo
-    hosts:
-      - patching-satellite.demo.lab.msp.redhat.com
-  - name: all
-    inventory: Patching Demo
-    hosts:
-      - sapdnhdb1.demo.lab.msp.redhat.com
-      - sapdphdb1.demo.lab.msp.redhat.com
-      - sapdnapp1.demo.lab.msp.redhat.com
-      - sapdpapp1.demo.lab.msp.redhat.com
-      - patching-satellite.demo.lab.msp.redhat.com
     variables:
       satellite:
         username: admin
@@ -116,6 +94,21 @@ tower_groups:
           - name: cv-server-rhel8
         composite_content_view: composite-rhel8
         content_view_filter_name: '12-31-2020'
+  - name: non_production
+    inventory: Patching Demo
+    hosts:
+      - sapdnapp1.demo.lab.msp.redhat.com
+      - sapdnhdb1.demo.lab.msp.redhat.com
+  - name: production
+    inventory: Patching Demo
+    hosts:
+      - sapdpapp1.demo.lab.msp.redhat.com
+      - sapdphdb1.demo.lab.msp.redhat.com
+  - name: satellite
+    inventory: Patching Demo
+    hosts:
+      - patching-satellite.demo.lab.msp.redhat.com
+
 tower_projects:
   - name: Patching Demo
     organization: Default
