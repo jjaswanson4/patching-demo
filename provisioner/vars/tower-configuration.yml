@@ -136,28 +136,28 @@ tower_templates:
   #  limit: satellite
   #  project: Patching Demo
   #  playbook: playbooks/publish-new-content.yml
-  - name: 4 - Install Tracer
+  - name: 4 - Install Tracer | Netweaver
     inventory: Patching Demo
     limit: netweaver
     project: Patching Demo
     playbook: playbooks/install-tracer.yml
     credentials:
       - root
-  - name: 4 - Update All Packages | Non Production
+  - name: 5 - Update All Packages | Netweaver | Non Production
     inventory: Patching Demo
     limit: 'netweaver:&non_production'
     project: Patching Demo
     playbook: playbooks/update-all-packages.yml
     credentials:
       - root
-  - name: 5 - kpatch Databases | Non Production
+  - name: 6 - kpatch Databases | HANA | Non Production
     inventory: Patching Demo
     limit: 'hana:&non_production'
     project: Patching Demo
     playbook: playbooks/kpatch-server.yml
     credentials:
       - root
-  - name: 6 - Run Tracer Report | Non Production
+  - name: 7 - Run Tracer Report | Netweaver | Non Production
     inventory: Patching Demo
     limit: 'netweaver:&non_production'
     project: Patching Demo
