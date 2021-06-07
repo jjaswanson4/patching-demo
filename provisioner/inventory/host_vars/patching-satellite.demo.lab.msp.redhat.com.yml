@@ -306,6 +306,10 @@ satellite:
             - label: rhel-8-for-x86_64-sap-netweaver-e4s-rpms
             - label: rhel-8-for-x86_64-sap-solutions-e4s-rpms
             - label: rhel-8-for-x86_64-highavailability-e4s-rpms
+            - label: rhel-8-for-x86_64-baseos-rpms
+              override: disabled
+            - label: rhel-8-for-x86_64-appstream-rpms
+              override: disabled
         - name: ak-sap-rhel8.2-non_production
           lifecycle_environment: Non_Production
           content_view: composite-rhel8
@@ -317,3 +321,7 @@ satellite:
             - label: rhel-8-for-x86_64-sap-netweaver-e4s-rpms
             - label: rhel-8-for-x86_64-sap-solutions-e4s-rpms
             - label: rhel-8-for-x86_64-highavailability-e4s-rpms
+            - label: rhel-8-for-x86_64-baseos-rpms
+              override: disabled
+            - label: rhel-8-for-x86_64-appstream-rpms
+              override: disabled
