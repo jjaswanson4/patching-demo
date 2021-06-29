@@ -19,6 +19,8 @@ lvm:
   vg: os
   pvs: /dev/sda2,/dev/sdb
 
+ignore_compute_resource_errors: true
+
 satellite:
   admin_username: admin
   admin_password: "{{ satellite_password }}"
@@ -176,6 +178,15 @@ satellite:
           - name: RHEL8 Kickstart Partition Table
         update_existing: true
         update_args: --partition-tables "RHEL8 Kickstart Partition Table,Kickstart default"
+    partition_tables:
+      - name: RHEL8 Kickstart Partition Table
+        file: files/rhel8-ptable.erb
+        os_family: Redhat
+        organizations:
+          - name: Patching Demo
+        locations:
+          - name: Patching Demo
+    
   katello:
     - organization_name: Patching Demo
       state: present
