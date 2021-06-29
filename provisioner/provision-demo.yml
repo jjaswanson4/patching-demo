@@ -7,6 +7,7 @@
   roles:
     - jjaswanson4.utilities.idm_dns_records
     - jjaswanson4.utilities.provision_via_satellite
+    - jjaswanson4.utilities.stop_networkmanager_dns
     - jjaswanson4.utilities.add_virtual_disk
     - jjaswanson4.utilities.common_config
     - redhat.rhel_system_roles.selinux
@@ -34,6 +35,7 @@
   roles:
     - jjaswanson4.utilities.idm_dns_records
     - jjaswanson4.utilities.provision_via_satellite
+    - jjaswanson4.utilities.stop_networkmanager_dns
     - jjaswanson4.utilities.common_config
     - redhat.rhel_system_roles.selinux
     - redhat.rhel_system_roles.timesync
@@ -62,8 +64,8 @@
   roles:
     - jjaswanson4.utilities.idm_dns_records
     - jjaswanson4.utilities.provision_via_satellite
-    - /Users/jswanson/code/ansible-utilities/roles/stop_networkmanager_dns
-    - /Users/jswanson/code/ansible-utilities/roles/common_config
+    - jjaswanson4.utilities.stop_networkmanager_dns
+    - jjaswanson4.utilities.common_config
     - redhat.rhel_system_roles.selinux
     - redhat.rhel_system_roles.timesync
     - jjaswanson4.utilities.add_virtual_disk
@@ -126,4 +128,50 @@
   roles:
     - redhat_sap.sap_s4hana_deployment
 
-# to save time: run the playbook to publish content views
+- name: prepare new content views for monthly patching
+  hosts:
+    - satellite
+  gather_facts: false
+  tasks:
+    - name: update content views for this patch cycle
+      block:
+        - name: remove content view filter used for demo purposes
+          redhat.satellite.content_view_filter:
+            username: "{{ satellite.admin_username }}"
+            password: "{{ satellite.admin_password }}"
+            validate_certs: false
+            server_url: "https://{{ ansible_fqdn }}"
+            #
+            organization: "{{ satellite.organization }}"
+            name: "{{ satellite.content_view_filter_name }}"
+            filter_state: absent
+            filter_type: erratum
+            content_view: "{{ content_view.name }}"
+          loop_control:
+            loop_var: content_view
+          loop: "{{ satellite.content_views }}"
+        - name: "publish content view to the library"
+          redhat.satellite.content_view_version:
+            username: "{{ satellite.username }}"
+            password: "{{ satellite.password }}"
+            validate_certs: false
+            server_url: "{{ satellite.url }}"
+            organization: "{{ satellite.organization }}"
+            content_view: "{{ content_view.name }}"
+            lifecycle_environments:
+              - Library
+          loop_control:
+            loop_var: content_view
+          loop: "{{ satellite.content_views }}"
+        - name: "publish new version of composite content view {{ satellite.composite_content_view }}"
+          redhat.satellite.content_view_version:
+            username: "{{ satellite.username }}"
+            password: "{{ satellite.password }}"
+            validate_certs: false
+            server_url: "{{ satellite.url }}"
+            organization: "{{ satellite.organization }}"
+            content_view: "{{ satellite.composite_content_view }}"
+            lifecycle_environments:
+              - Library
+              - Non_Production
+    delegate_to: localhost
