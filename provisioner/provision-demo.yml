@@ -141,7 +141,6 @@
             password: "{{ satellite.admin_password }}"
             validate_certs: false
             server_url: "https://{{ ansible_fqdn }}"
-            #
             organization: "{{ satellite.organization }}"
             name: "{{ satellite.content_view_filter_name }}"
             filter_state: absent
@@ -174,4 +173,4 @@
             lifecycle_environments:
               - Library
               - Non_Production
-    delegate_to: localhost
+      delegate_to: localhost
