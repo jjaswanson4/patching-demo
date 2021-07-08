@@ -11,3 +11,4 @@ collections:
   - name: ansible.posix
   - name: redhat_cop.tower_configuration
   - name: ansible.tower
+  - name: redhat.satellite
