@@ -7,7 +7,7 @@ provisioning:
     server: satellite06.lab.msp.redhat.com
     username: admin
     password: "{{ satellite_password }}"
-  host_group: "kickstart-{{ os }}-vlan146"
+  host_group: "{{ os }}"
   organization: MSP Lab
   location: MSP Lab
   method: bootdisk
