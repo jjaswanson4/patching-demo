@@ -3,14 +3,14 @@
 ansible_user: root
 ansible_become: false
 
-dns_zone: demo.lab.msp.redhat.com
+dns_zone: josh.lab.msp.redhat.com
 
 dns:
-  server: idm01.lab.msp.redhat.com
+  server: idm05.lab.msp.redhat.com
   password: "{{ dns_pass }}"
   records:
     - name: "{{ inventory_hostname.split('.')[0] }}"
-      zone: demo.lab.msp.redhat.com
+      zone: josh.lab.msp.redhat.com
       type: A
       value: "{{ ip_address }}"
     - name: "{{ ip_address.split('.')[-1] }}"
@@ -43,14 +43,11 @@ selinux_state: permissive
 
 dns_resolv:
   search_domains:
-    - demo.josh.lab.msp.redhat.com
     - josh.lab.msp.redhat.com
-    - demo.lab.msp.redhat.com
     - lab.msp.redhat.com
-    - redhat.com
   nameservers:
-    - 10.15.108.148
-    - 10.15.108.149
+    - 10.15.120.4
+    - 10.15.108.5
   options:
     - 'timeout:1'
 
@@ -62,3 +59,5 @@ base_packages:
     - sos
     - redhat-support-tool
     - "{{ htop_url }}"
+
+remove_cdrom: no
