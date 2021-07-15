@@ -28,24 +28,46 @@
       vars:
         requires_katello_content: true
 
-- name: build out tower
-  hosts:
-    - tower
-  gather_facts: no
-  roles:
-    - jjaswanson4.utilities.idm_dns_records
-    - jjaswanson4.utilities.provision_via_satellite
-    - jjaswanson4.utilities.stop_networkmanager_dns
-    - jjaswanson4.utilities.common_config
-    - redhat.rhel_system_roles.selinux
-    - redhat.rhel_system_roles.timesync
-    - jjaswanson4.utilities.install_aap
+#- name: build out tower
+#  hosts:
+#    - tower
+#  gather_facts: no
+#  roles:
+#    - jjaswanson4.utilities.idm_dns_records
+#    - jjaswanson4.utilities.provision_via_satellite
+#    - jjaswanson4.utilities.stop_networkmanager_dns
+#    - jjaswanson4.utilities.common_config
+#    - redhat.rhel_system_roles.selinux
+#    - redhat.rhel_system_roles.timesync
+#s    - jjaswanson4.utilities.install_aap
 
 - name: configure tower
   hosts:
     - localhost
   vars_files:
     - vars/tower-configuration.yml
+  pre_tasks:
+    - name: Check for organization
+      ansible.builtin.uri:
+        url: "https://{{tower_hostname }}/api/v2/organizations?search={{ tower_organizations[0].name | regex_replace(' ', '+') }}"
+        user: "{{ tower_username }}"
+        password: "{{ tower_password }}"
+        validate_certs: "{{ tower_validate_certs }}"
+        force_basic_auth: yes
+      register: organization_search
+    - name: create empty organization so credentials can be added to it
+      block:
+        - name: set organization name fact
+          ansible.builtin.set_fact:
+            organization_name: SAP S4 HANA Deployment Demo
+        - name: create empty organization
+          ansible.builtin.include_role:
+            name: redhat_cop.tower_configuration.organizations
+          vars:
+            tower_organizations:
+              - name: "{{ organization_name }}"
+      when:
+        - organization_search.json.count | int != 1  
   roles:
     - redhat_cop.tower_configuration.license
     - redhat_cop.tower_configuration.credentials
