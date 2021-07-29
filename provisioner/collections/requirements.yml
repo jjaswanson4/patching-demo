@@ -9,5 +9,5 @@ collections:
   - name: jjaswanson4.install_satellite
   - name: jjaswanson4.configure_satellite
   - name: ansible.posix
-  - name: redhat_cop.tower_configuration
+  - name: redhat_cop.controller_configuration
   - name: ansible.tower
