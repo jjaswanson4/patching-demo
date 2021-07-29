@@ -14,16 +14,16 @@
     - redhat.rhel_system_roles.timesync
     - jjaswanson4.setup_rhel_for_satellite.setup_storage
     - jjaswanson4.install_satellite.install_satellite
-    - jjaswanson4.configure_satellite.configure_satellite_foreman
-  tasks:
-    - name: build satellite by organization
-      include_role:
-        name: jjaswanson4.configure_satellite.configure_satellite_katello
-      loop_control:
-        loop_var: organization
-      loop: "{{ satellite.katello }}"
-    - name: do that again but for katello dependent pieces
-      include_role:
-        name: jjaswanson4.configure_satellite.configure_satellite_foreman
-      vars:
-        requires_katello_content: true
+    #- jjaswanson4.configure_satellite.configure_satellite_foreman
+  #tasks:
+  #  - name: build satellite by organization
+  #    include_role:
+  #      name: jjaswanson4.configure_satellite.configure_satellite_katello
+  #    loop_control:
+  #      loop_var: organization
+  #    loop: "{{ satellite.katello }}"
+  #  - name: do that again but for katello dependent pieces
+  #    include_role:
+  #      name: jjaswanson4.configure_satellite.configure_satellite_foreman
+  #    vars:
+  #      requires_katello_content: true
