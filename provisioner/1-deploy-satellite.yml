@@ -9,6 +9,7 @@
       ansible.builtin.get_url:
         url: http://satellite06.lab.msp.redhat.com/pub/satellite-manifest.zip
         dest: provisioner/files/satellite-manifest.zip
+      delegate_to: localhost
   roles:
     - jjaswanson4.utilities.idm_dns_records
     - jjaswanson4.utilities.provision_via_satellite
