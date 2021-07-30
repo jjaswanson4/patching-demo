@@ -64,13 +64,13 @@ satellite:
     - "--foreman-proxy-dns true"
   foreman:
     organizations:
-      - name: Patching Demo
+      - name: "{{ audience }}"
         initial_organization: yes
     locations:
-      - name: Patching Demo
+      - name: "{{ audience }}"
         initial_location: yes
         organizations:
-          - name: Patching Demo
+          - name: "{{ audience }}"
     settings:
       - name: default_download_policy
         value: on_demand
@@ -93,9 +93,9 @@ satellite:
           password: "{{ vcenter_password }}"
           datacenter: MSP Lab
         organizations:
-          - name: Patching Demo
+          - name: "{{ audience }}"
         locations:
-          - name: Patching Demo
+          - name: "{{ audience }}"
     compute_profiles:
       - name: general-vlan146
         compute_resource: vcenter02.lab.msp.redhat.com
@@ -128,11 +128,11 @@ satellite:
               size_gb: 100
               datastore: storage04-nfs-lun0
     domains:
-      - name: demo.lab.msp.redhat.com
+      - name: josh.lab.msp.redhat.com
         organizations:
-          - name: Patching Demo
+          - name: "{{ audience }}"
         locations:
-          - name: Patching Demo
+          - name: "{{ audience }}"
     subnets:
       - name: VLAN146
         network: 10.15.120.0
@@ -143,36 +143,33 @@ satellite:
         ipam: None
         boot_mode: Static
         organizations:
-          - name: Patching Demo
+          - name: "{{ audience }}"
         locations:
-          - name: Patching Demo
+          - name: "{{ audience }}"
         domains:
-          - name: demo.lab.msp.redhat.com
+          - name: josh.lab.msp.redhat.com
     hostgroups:
-      - name: kickstart-rhel8.2-vlan146
+      - name: kickstart-rhel8.4-vlan146
         architecture: x86_64
         compute_profile: general-vlan146
         compute_resource: vcenter02.lab.msp.redhat.com
         content_source: patching-satellite.demo.lab.msp.redhat.com
         content_view: composite-rhel8
-        domain: demo.lab.msp.redhat.com
+        domain: josh.lab.msp.redhat.com
         lifecycle_environment: Production
-        operatingsystem: RedHat-8.2
+        operatingsystem: RedHat-8.4
         ptable: RHEL8 Kickstart Partition Table
-        organization_of_content_source: Patching Demo
+        organization_of_content_source: "{{ audience }}"
         organizations:
-          - Patching Demo
+          - "{{ audience }}"
         locations:
-          - Patching Demo
+          - "{{ audience }}"
         subnet: VLAN146
-#        parameters:
-#          - name: "kt_activation_keys"
-#            value: "ak-rhel8.2-production"
         pxe_loader: None
         root_pass: "{{ ansible_password }}"
-        kickstart_repository: Red Hat Enterprise Linux 8 for x86_64 - BaseOS Kickstart 8.2
+        kickstart_repository: Red Hat Enterprise Linux 8 for x86_64 - BaseOS Kickstart 8.4
     operating_systems:
-      - name: RedHat-8.2
+      - name: RedHat-8.4
         ptable:
           - name: Kickstart default
           - name: RHEL8 Kickstart Partition Table
@@ -183,14 +180,14 @@ satellite:
         file: files/rhel8-ptable.erb
         os_family: Redhat
         organizations:
-          - name: Patching Demo
+          - name: "{{ audience }}"
         locations:
-          - name: Patching Demo
+          - name: "{{ audience }}"
     
   katello:
-    - organization_name: Patching Demo
+    - organization_name: "{{ audience }}"
       state: present
-      manifest: files/satellite-manifest.zip
+      manifest: "{{ playbook_dir }}/files/satellite-manifest.zip"
       repo_sync_attempts: 1
       lifecycle_environments:
         - name: Non_Production
@@ -198,94 +195,94 @@ satellite:
         - name: Production
           prior: Non_Production
       content_views:
-        - name: cv-kickstart-rhel8.2
+        - name: cv-kickstart-rhel8.4
           repos:
             - repo: Red Hat Enterprise Linux 8 for x86_64 - AppStream (Kickstart)
               product: Red Hat Enterprise Linux for x86_64
-              releasever: 8.2
+              releasever: 8.4
             - repo: Red Hat Enterprise Linux 8 for x86_64 - BaseOS (Kickstart)
               product: Red Hat Enterprise Linux for x86_64
-              releasever: 8.2
+              releasever: 8.4
         - name: cv-ansible-rhel8
           repos:
             - repo: Red Hat Ansible Engine 2 for RHEL 8 x86_64 (RPMs)
               product: Red Hat Ansible Engine
           filters:
-            - name: 12-31-2020
+            - name: 06-01-2021
               filter_type: erratum
-              end_date: '2020-12-31'
-        - name: cv-e4s-server-rhel8.2
+              end_date: '2021-06-01'
+        - name: cv-e4s-server-rhel8.4
           repos:
             - repo: Red Hat Enterprise Linux 8 for x86_64 - BaseOS - Update Services for SAP Solutions (RPMs)
               product: Red Hat Enterprise Linux Server - Update Services for SAP Solutions
-              releasever: 8.2
+              releasever: 8.4
           filters:
-            - name: 12-31-2020
+            - name: 06-01-2021
               filter_type: erratum
-              end_date: '2020-12-31'
-        - name: cv-e4s-appstream-rhel8.2
+              end_date: '2021-06-01'
+        - name: cv-e4s-appstream-rhel8.4
           repos:
             - repo: Red Hat Enterprise Linux 8 for x86_64 - AppStream - Update Services for SAP Solutions (RPMs)
               product: Red Hat Enterprise Linux Server - Update Services for SAP Solutions
-              releasever: 8.2       
+              releasever: 8.4       
           filters:
-            - name: 12-31-2020
+            - name: 06-01-2021
               filter_type: erratum
-              end_date: '2020-12-31'  
-        - name: cv-r4s-netweaver-rhel8.2
+              end_date: '2021-06-01'
+        - name: cv-r4s-netweaver-rhel8.4
           repos:
             - repo: Red Hat Enterprise Linux 8 for x86_64 - SAP NetWeaver - Update Services for SAP Solutions (RPMs)
               product: RHEL for SAP - Update Services for SAP Solutions
-              releasever: 8.2
+              releasever: 8.4
           filters:
-            - name: 12-31-2020
+            - name: 06-01-2021
               filter_type: erratum
-              end_date: '2020-12-31'
-        - name: cv-r4h-hana-rhel8.2
+              end_date: '2021-06-01'
+        - name: cv-r4h-hana-rhel8.4
           repos:
             - repo: Red Hat Enterprise Linux 8 for x86_64 - SAP Solutions - Update Services for SAP Solutions (RPMs)
               product: RHEL for SAP HANA - Update Services for SAP Solutions
-              releasever: 8.2
+              releasever: 8.4
           filters:
-            - name: 12-31-2020
+            - name: 06-01-2021
               filter_type: erratum
-              end_date: '2020-12-31'
-        - name: cv-e4s-satellitetools6.9-rhel8.2
+              end_date: '2021-06-01'
+        - name: cv-e4s-satellitetools6.9-rhel8.4
           repos:
             - repo: Red Hat Satellite Tools 6.9 for RHEL 8 x86_64 - Update Services SAP Solutions (RPMs)
               product: Red Hat Enterprise Linux Server - Update Services for SAP Solutions
-              releasever: 8.2
+              releasever: 8.4
           filters:
-            - name: 12-31-2020
+            - name: 06-01-2021
               filter_type: erratum
-              end_date: '2020-12-31'
-        - name: cv-e4s-highavailability-rhel8.2
+              end_date: '2021-06-01'
+        - name: cv-e4s-highavailability-rhel8.4
           repos:
             - repo: Red Hat Enterprise Linux 8 for x86_64 - High Availability - Update Services for SAP Solutions (RPMs)
               product: Red Hat Enterprise Linux High Availability - Update Services for SAP Solutions
-              releasever: 8.2
+              releasever: 8.4
           filters:
-            - name: 12-31-2020
+            - name: 06-01-2021
               filter_type: erratum
-              end_date: '2020-12-31'
+              end_date: '2021-06-01'
         - name: cv-server-rhel8
           repos:
             - repo: Red Hat Enterprise Linux 8 for x86_64 - BaseOS (RPMs)
               product: Red Hat Enterprise Linux for x86_64
               releasever: 8
           filters:
-            - name: 12-31-2020
+            - name: 06-01-2021
               filter_type: erratum
-              end_date: '2020-12-31'
+              end_date: '2021-06-01'
         - name: cv-appstream-rhel8
           repos:
             - repo: Red Hat Enterprise Linux 8 for x86_64 - AppStream (RPMs)
               product: Red Hat Enterprise Linux for x86_64
               releasever: 8
           filters:
-            - name: 12-31-2020
+            - name: 06-01-2021
               filter_type: erratum
-              end_date: '2020-12-31'
+              end_date: '2021-06-01'
         - name: cv-satellitetools6.9-rhel8
           repos:
             - repo: Red Hat Satellite Tools 6.9 for RHEL 8 x86_64 (RPMs)
@@ -295,21 +292,21 @@ satellite:
           auto_publish: false
           component_content_views:
             - name: cv-ansible-rhel8
-            - name: cv-e4s-server-rhel8.2
-            - name: cv-e4s-appstream-rhel8.2
-            - name: cv-r4s-netweaver-rhel8.2
-            - name: cv-r4h-hana-rhel8.2
-            - name: cv-e4s-satellitetools6.9-rhel8.2
-            - name: cv-e4s-highavailability-rhel8.2
+            - name: cv-e4s-server-rhel8.4
+            - name: cv-e4s-appstream-rhel8.4
+            - name: cv-r4s-netweaver-rhel8.4
+            - name: cv-r4h-hana-rhel8.4
+            - name: cv-e4s-satellitetools6.9-rhel8.4
+            - name: cv-e4s-highavailability-rhel8.4
             - name: cv-server-rhel8
             - name: cv-appstream-rhel8
             - name: cv-satellitetools6.9-rhel8
-            - name: cv-kickstart-rhel8.2
+            - name: cv-kickstart-rhel8.4
       activation_keys:
-        - name: ak-sap-rhel8.2-production
+        - name: ak-sap-rhel8.4-production
           lifecycle_environment: Production
           content_view: composite-rhel8
-          release_version: 8.2
+          release_version: 8.4
           content_overrides:
             - label: rhel-8-for-x86_64-baseos-e4s-rpms
             - label: rhel-8-for-x86_64-appstream-e4s-rpms
@@ -321,10 +318,10 @@ satellite:
               override: disabled
             - label: rhel-8-for-x86_64-appstream-rpms
               override: disabled
-        - name: ak-sap-rhel8.2-non_production
+        - name: ak-sap-rhel8.4-non_production
           lifecycle_environment: Non_Production
           content_view: composite-rhel8
-          release_version: 8.2
+          release_version: 8.4
           content_overrides:
             - label: rhel-8-for-x86_64-baseos-e4s-rpms
             - label: rhel-8-for-x86_64-appstream-e4s-rpms
