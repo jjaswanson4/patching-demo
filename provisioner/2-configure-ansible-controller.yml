@@ -1,0 +1,17 @@
+---
+
+- name: configure tower
+  hosts:
+    - all
+  gather_facts: no
+  vars_files:
+    - vars/controller-configuration.yml 
+  roles:
+    - redhat_cop.controller_configuration.organizations
+    - redhat_cop.controller_configuration.credentials
+    - redhat_cop.controller_configuration.teams
+    - redhat_cop.controller_configuration.users
+    - redhat_cop.controller_configuration.inventories
+    - redhat_cop.controller_configuration.hosts
+    - redhat_cop.controller_configuration.groups
+    #- redhat_cop.tower_configuration.job_templates
