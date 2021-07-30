@@ -7,7 +7,8 @@ collections:
   - name: jjaswanson4.utilities
   - name: jjaswanson4.setup_rhel_for_satellite
   - name: jjaswanson4.install_satellite
-    version: '>=1.2.2'
+    version: '>=1.2.3'
+    source: https://galaxy.ansible.com
   - name: jjaswanson4.configure_satellite
   - name: ansible.posix
   - name: redhat_cop.controller_configuration
