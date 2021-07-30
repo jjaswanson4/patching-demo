@@ -1,0 +1,28 @@
+---
+
+- name: provision managed hosts
+  hosts:
+    - all
+  gather_facts: no
+  roles:
+    - jjaswanson4.utilities.idm_dns_records
+    - jjaswanson4.utilities.provision_via_satellite
+    - jjaswanson4.utilities.stop_networkmanager_dns
+    - jjaswanson4.utilities.common_config
+    - redhat.rhel_system_roles.selinux
+    - redhat.rhel_system_roles.timesync
+    - jjaswanson4.utilities.add_virtual_disk
+    - redhat.rhel_system_roles.storage
+    - jjaswanson4.utilities.mount_nfs_shares
+    - sap-preconfigure
+    - redhat_sap.sap_hostagent
+  post_tasks:
+    - name: check if reboot is required
+      ansible.builtin.shell: yum needs-restarting -r
+      changed_when: false
+      ignore_errors: true
+      register: reboot_needed
+    - name: reboot system
+      ansible.builtin.reboot:
+      when:
+        - reboot_needed.rc | int != 0
