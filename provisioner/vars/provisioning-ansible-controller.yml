@@ -1,0 +1,93 @@
+---
+
+controller_hostname: automationcontroller-aap20-ansible-automation-platform.apps.ocp4.lab.msp.redhat.com
+controller_validate_certs: no
+controller_username: admin
+controller_password: "{{ ansible_password }}"
+
+
+controller_credential_types:
+  - name: Patching Demo Provisioner Peripheral Credentials
+    organization: "{{ deploy_from_controller_org }}"
+    kind: cloud
+    injectors:
+      extra_vars: "{{ lookup('file', 'extra-vars.yml') | from_yaml }}"
+
+controller_credentials:
+  - name: Patching Demo Provisioner Peripheral Credentials
+    credential_type: Patching Demo Provisioner Peripheral Credentials
+    organization: "{{ deploy_from_controller_org }}"
+  - name: Patching Demo Provisioner Root Account
+    credential_type: Machine
+    organization: "{{ deploy_from_controller_org }}"
+    inputs:
+      username: root
+      password: "{{ ansible_password }}"
+
+controller_inventories:
+  - name: Patching Demo Infrastructure
+    organization: "{{ deploy_from_controller_org }}"
+    variables: "{{ lookup('file', 'inventory/group_vars/all.yml') | from_yaml }}"
+
+controller_hosts:
+  - name: patching-satellite.josh.lab.msp.redhat.com
+    inventory: Patching Demo Infrastructure
+    variables: "{{ lookup('file', 'inventory/host_vars/patching-satellite.josh.lab.msp.redhat.com.yml') | from_yaml }}"
+
+controller_groups:
+  - name: satellite
+    inventory: Patching Demo Infrastructure
+    hosts:
+      - patching-satellite.josh.lab.msp.redhat.com
+  - name: management_plane
+    inventory: Patching Demo Infrastructure
+    variables: "{{ lookup('file', 'inventory/group_vars/management_plane.yml') | from_yaml }}"
+    children:
+      - satellite
+
+
+controller_projects:
+  - name: Patching Demo
+    organization: "{{ deploy_from_controller_org }}"
+    scm_branch: main
+    scm_type: git
+    scm_url: https://github.com/jjaswanson4/patching-demo.git
+    wait: yes
+
+controller_templates:
+  - name: Setup Red Hat Satellite
+    inventory: Patching Demo Infrastructure
+    limit: satellite
+    project: Patching Demo
+    playbook: provisioner/1-deploy-satellite.yml
+    credentials:
+      - Patching Demo Provisioner Peripheral Credentials
+      - Patching Demo Provisioner Root Account
+  - name: Configure Ansible Controller
+    inventory: Patching Demo Infrastructure
+    limit: localhost
+    project: Patching Demo
+    playbook: provisioner/2-configure-ansible-controller.yml
+    credentials:
+      - Patching Demo Provisioner Peripheral Credentials
+
+controller_workflows:
+  - name: Provision Patching Demo
+    inventory: Patching Demo Infrastructure
+    organization: "{{ deploy_from_controller_org }}"
+    state: "{{ resource_state | default('present') }}"
+    survey_enabled: yes
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - type: text
+          question_name: "Demo Audience?"
+          question_description: "Who is the audience for this demo"
+          variable: audience
+          required: yes
+    simplified_workflow_nodes:
+      - unified_job_template: Setup Red Hat Satellite
+        identifier: node101
+      - unified_job_template: Configure Ansible Controller
+        identifier: node102
