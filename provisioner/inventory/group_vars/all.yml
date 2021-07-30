@@ -58,6 +58,3 @@ base_packages:
     - vim
     - sos
     - redhat-support-tool
-    - "{{ htop_url }}"
-
-remove_cdrom: no
