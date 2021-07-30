@@ -11,6 +11,7 @@ collections:
   - name: jjaswanson4.configure_satellite
   - name: ansible.posix
   - name: redhat_cop.controller_configuration
-  - name: ansible.controller
+#  - name: ansible.controller
+  - name: awx.awx
   - name: redhat.satellite
   - name: community.vmware
