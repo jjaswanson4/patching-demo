@@ -4,32 +4,45 @@
   hosts:
     - all
   gather_facts: no
+  defaults:
+    deploy_satellite: yes
   pre_tasks:
     - name: super secure way to grab the manifest file
       ansible.builtin.get_url:
         url: http://satellite06.lab.msp.redhat.com/pub/satellite-manifest.zip
         dest: "{{ playbook_dir }}/files/satellite-manifest.zip"
       delegate_to: localhost
-  roles:
-    - jjaswanson4.utilities.idm_dns_records
-    - jjaswanson4.utilities.provision_via_satellite
-    - jjaswanson4.utilities.stop_networkmanager_dns
-    - jjaswanson4.utilities.add_virtual_disk
-    - jjaswanson4.utilities.common_config
-    - redhat.rhel_system_roles.selinux
-    - redhat.rhel_system_roles.timesync
-    - jjaswanson4.setup_rhel_for_satellite.setup_storage
-    - jjaswanson4.install_satellite.install_satellite
-    - jjaswanson4.configure_satellite.configure_satellite_foreman
+      when:
+        - deploy_satellite
   tasks:
-    - name: build satellite by organization
-      include_role:
-        name: jjaswanson4.configure_satellite.configure_satellite_katello
-      loop_control:
-        loop_var: organization
-      loop: "{{ satellite.katello }}"
-    - name: do that again but for katello dependent pieces
-      include_role:
-        name: jjaswanson4.configure_satellite.configure_satellite_foreman
-      vars:
-        requires_katello_content: true
+    - name: include provisioning/configuration roles
+      block:
+        - name: include initial roles
+          ansible.builtin.include_role:
+            name: "{{ role }}"
+          loop_control:
+            loop_var: role
+          loop:
+            - jjaswanson4.utilities.idm_dns_records
+            - jjaswanson4.utilities.provision_via_satellite
+            - jjaswanson4.utilities.stop_networkmanager_dns
+            - jjaswanson4.utilities.add_virtual_disk
+            - jjaswanson4.utilities.common_config
+            - redhat.rhel_system_roles.selinux
+            - redhat.rhel_system_roles.timesync
+            - jjaswanson4.setup_rhel_for_satellite.setup_storage
+            - jjaswanson4.install_satellite.install_satellite
+            - jjaswanson4.configure_satellite.configure_satellite_foreman
+        - name: build satellite by organization
+          include_role:
+            name: jjaswanson4.configure_satellite.configure_satellite_katello
+          loop_control:
+            loop_var: organization
+          loop: "{{ satellite.katello }}"
+        - name: do that again but for katello dependent pieces
+          include_role:
+            name: jjaswanson4.configure_satellite.configure_satellite_foreman
+          vars:
+            requires_katello_content: true
+      when:
+        - deploy_satellite
