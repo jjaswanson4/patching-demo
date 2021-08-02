@@ -1,0 +1,11 @@
+---
+
+- name: attempt to unregister from Red Hat Insights for Red Hat Enterprise Linux
+  hosts:
+    - all
+  gather_facts: no
+  tasks:
+    - name: attempt unregister
+      ansible.builtin.shell:
+        cmd: /usr/bin/insights-client --unregister
+      ignore_errors: yes
