@@ -4,6 +4,13 @@
   hosts:
     - all
   gather_facts: no
+  pre_tasks:
+    - name: add host and custom DNS entries
+      ansible.builtin.set_fact:
+        dns:
+          server: "{{ dns.server }}"
+          password: "{{ dns_pass }}"
+          records: "{{ dns.records  + custom_dns_records }}"
   roles:
     - jjaswanson4.utilities.idm_dns_records
     - jjaswanson4.utilities.provision_via_satellite
