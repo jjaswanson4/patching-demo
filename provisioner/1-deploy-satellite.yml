@@ -13,7 +13,7 @@
         dest: "{{ playbook_dir }}/files/satellite-manifest.zip"
       delegate_to: localhost
       when:
-        - deploy_satellite
+        - deploy_satellite | bool
   tasks:
     - name: include provisioning/configuration roles
       block:
@@ -45,4 +45,4 @@
           vars:
             requires_katello_content: true
       when:
-        - deploy_satellite
+        - deploy_satellite | bool
