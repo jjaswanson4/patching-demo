@@ -447,7 +447,7 @@ controller_templates:
     credentials:
       - Patching Demo Provisioner Peripheral Credentials 
   - name: Cleanup DNS Records | Patching Demo Provisioner
-    limit: demo_hosts
+    inventory: Patching Demo Infrastructure
     project: Patching Demo
     playbook: provisioner/999-delete-dns-records.yml
     credentials:
