@@ -426,6 +426,12 @@ controller_templates:
     playbook: provisioner/8-reinstate-hsr.yml
     credentials:
       - Patching Demo Provisioner Root Account
+  - name: Remove Controller Configuration | Patching Demo Provisioner
+    inventory: Local Action Inventory
+    project: Patching Demo
+    playbook: provisioner/996-remove-controller-configuration.yml
+    credentials:
+       - Patching Demo Provisioner Peripheral Credentials
   - name: Unregister from Insights | Patching Demo Provisioner
     inventory: Patching Demo Infrastructure
     project: Patching Demo
@@ -451,7 +457,7 @@ controller_templates:
     project: Patching Demo
     playbook: provisioner/999-delete-dns-records.yml
     credentials:
-      - Patching Demo Provisioner Peripheral Credentials 
+      - Patching Demo Provisioner Peripheral Credentials
 
 controller_workflows:
   - name: Provision Patching Demo
@@ -513,7 +519,21 @@ controller_workflows:
   - name: Teardown Patching Demo
     organization: "{{ deploy_from_controller_org }}"
     state: "{{ resource_state | default('present') }}"
+    survey_enabled: yes
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - type: text
+          question_name: "Demo Audience?"
+          question_description: "Who is the audience for this demo"
+          variable: audience
+          required: yes
     simplified_workflow_nodes:
+      - unified_job_template: Remove Controller Configuration | Patching Demo Provisioner
+        identifier: node995
+        success_nodes:
+          - node997
       - unified_job_template: Unregister from Insights | Patching Demo Provisioner
         identifier: node996
         success_nodes:
