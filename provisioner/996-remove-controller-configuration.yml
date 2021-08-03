@@ -1,0 +1,56 @@
+---
+
+- name: remove appropriate configurations from Ansible Controller
+  hosts:
+    - all
+  gather_facts: no
+  vars_files:
+    - vars/controller-configuration.yml
+  pre_tasks:
+    - name: gather up organizations to remove
+      ansible.builtin.set_fact:
+        controller_organizations_to_remove: "{{ controller_organizations_to_remove | default([]) + [ {'name': item.name, 'state': 'absent'} ] }}"
+      loop: "{{ controller_organizations }}"
+    - name: gather up credentials to remove
+      ansible.builtin.set_fact:
+        controller_credentials_to_remove: "{{ controller_credentials_to_remove | default([]) + [ {'name': item.name, 'state': 'absent'} ] }}"
+      loop: "{{ controller_credentials }}"
+    - name: gather up teams to remove
+      ansible.builtin.set_fact:
+        controller_teams_to_remove: "{{ controller_teams_to_remove | default([]) + [ {'name': item.name, 'organization': item.organization, 'state': 'absent'} ] }}"
+      loop: "{{ controller_teams }}"
+    - name: gather up users to remove
+      ansible.builtin.set_fact:
+        controller_user_accounts_to_remove: "{{ controller_user_accounts_to_remove | default([]) + [ {'username': item.username, 'state': 'absent'} ] }}"
+      loop: "{{ controller_user_accounts }}"
+    - name: gather up inventories to remove
+      ansible.builtin.set_fact:
+        controller_inventories_to_remove: "{{ controller_inventories_to_remove | default([]) + [ {'name': item.name, 'organization': item.organization, 'state': 'absent'} ] }}"
+      loop: "{{ controller_inventories }}"
+    - name: gather up hosts to remove
+      ansible.builtin.set_fact:
+        controller_hosts_to_remove: "{{ controller_hosts_to_remove | default([]) + [ {'name': item.name, 'inventory': item.inventory, 'state': 'absent'} ] }}"
+      loop: "{{ controller_hosts }}"      
+    - name: gather up groups to remove
+      ansible.builtin.set_fact:
+        controller_groups_to_remove: "{{ controller_groups_to_remove | default([]) + [ {'name': item.name, 'inventory': item.inventory, 'state': 'absent'} ] }}"
+      loop: "{{ controller_hosts }}"
+
+    - name: overwrite vars
+      ansible.builtin.set_fact:
+        controller_organizations: "{{ controller_organizations_to_remove }}"
+        controller_credentials: "{{ controller_credentials_to_remove }}"
+        controller_teams: "{{ controller_teams_to_remove }}"
+        controller_user_accounts: "{{ controller_user_accounts_to_remove }}"
+        controller_inventories: "{{ controller_inventories_to_remove }}"
+        controller_hosts: "{{ controller_hosts_to_remove }}"
+        controller_groups: "{{ controller_groups_to_remove }}"
+ 
+  roles:
+    - redhat_cop.controller_configuration.groups
+    - redhat_cop.controller_configuration.hosts
+    - redhat_cop.controller_configuration.inventories
+    - redhat_cop.controller_configuration.users
+    - redhat_cop.controller_configuration.teams
+    - redhat_cop.controller_configuration.credentials
+    - redhat_cop.controller_configuration.organizations
