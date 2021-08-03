@@ -1,4 +1,5 @@
 ---
+
 ansible_host: 10.15.121.1
 ip_address: "{{ ansible_host }}"
 cpus: 8
@@ -153,7 +154,7 @@ satellite:
         architecture: x86_64
         compute_profile: general-vlan146
         compute_resource: vcenter02.lab.msp.redhat.com
-        content_source: patching-satellite.demo.lab.msp.redhat.com
+        content_source: patching-satellite.josh.lab.msp.redhat.com
         content_view: composite-rhel8
         domain: josh.lab.msp.redhat.com
         lifecycle_environment: Production
@@ -203,6 +204,10 @@ satellite:
             - repo: Red Hat Enterprise Linux 8 for x86_64 - BaseOS (Kickstart)
               product: Red Hat Enterprise Linux for x86_64
               releasever: 8.4
+          filters:
+            - name: 06-01-2021
+              filter_type: erratum
+              end_date: '2021-06-01'
         - name: cv-ansible-rhel8
           repos:
             - repo: Red Hat Ansible Engine 2 for RHEL 8 x86_64 (RPMs)
@@ -286,7 +291,11 @@ satellite:
         - name: cv-satellitetools6.9-rhel8
           repos:
             - repo: Red Hat Satellite Tools 6.9 for RHEL 8 x86_64 (RPMs)
-              product: Red Hat Enterprise Linux for x86_64 
+              product: Red Hat Enterprise Linux for x86_64
+          filters:
+            - name: 06-01-2021
+              filter_type: erratum
+              end_date: '2021-06-01'
       composite_content_views:
         - name: composite-rhel8
           auto_publish: false
