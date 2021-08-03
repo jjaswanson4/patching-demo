@@ -6,4 +6,4 @@
   roles:
     - redhat_sap.sap_hana_deployment
     - sap-hana-hsr
-    - redhat_sap.sap_hana_ha_pacemaker
+    - sap_hana_ha_pacemaker

@@ -12,4 +12,4 @@ roles:
     source: https://galaxy.ansible.com
   - src: https://github.com/redhat-sap/sap-hana-hsr.git
     version: 'tower'
-  - src: redhat_sap.sap_hana_ha_pacemaker
+  - src: https://github.com/jjaswanson4/sap-hana-ha-pacemaker.git
