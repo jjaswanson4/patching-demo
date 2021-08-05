@@ -1,0 +1,13 @@
+---
+
+- name: send email to provisioner
+  hosts:
+    - all
+  gather_facts: false
+  tasks:
+    - community.general.mail:
+        host: smtp.redhat.com
+        to: "{{ provisioner }}"
+        from: Patching Demo Provisioner <dont@email.me>
+        subject: Patching Demo Provisioning "{{ provisioning_status }}"
+        body: "Patching demo for {{ audience }} has completed with state: {{ provisioning_status }}"
