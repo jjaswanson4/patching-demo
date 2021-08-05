@@ -3,8 +3,6 @@
 controller_hostname: automationcontroller-aap20-ansible-automation-platform.apps.ocp4.lab.msp.redhat.com
 controller_validate_certs: no
 controller_username: admin
-controller_password: "{{ ansible_password }}"
-
 
 controller_credential_types:
   - name: Patching Demo Provisioner Peripheral Credentials
@@ -78,6 +76,7 @@ controller_inventories:
           - vim
           - sos
           - redhat-support-tool
+          - "{  { htop_url }}"
 
 controller_hosts:
   - name: localhost
@@ -189,6 +188,7 @@ controller_groups:
       sap_hana_deployment_apply_license: false
       sap_hana_hsr_hana_instance_number: "00"
       sap_hana_hsr_hana_db_system_password: "{  { ansible_password }}"
+      sap_hana_preconfigure_fail_if_reboot_required: no
   - name: netweaver
     inventory: Patching Demo Infrastructure
     hosts:
@@ -348,6 +348,8 @@ controller_groups:
       - sap
       - non_production
       - production
+    variables:
+      htop_url: https://dl.fedoraproject.org/pub/epel/8/Everything/x86_64/Packages/h/htop-3.0.5-1.el8.x86_64.rpm
   - name: satellite
     inventory: Patching Demo Infrastructure
     hosts:
@@ -405,9 +407,16 @@ controller_templates:
     playbook: provisioner/5-netweaver-preconfigure.yml
     credentials:
       - Patching Demo Provisioner Root Account
-  - name: Deploy SAP HANA | Patching Demo Provisioner
+  - name: Deploy SAP HANA | Non_Production | Patching Demo Provisioner
     inventory: Patching Demo Infrastructure
-    limit: hana
+    limit: 'hana:&non_production'
+    project: Patching Demo
+    playbook: provisioner/6-deploy-hana.yml
+    credentials:
+      - Patching Demo Provisioner Root Account
+  - name: Deploy SAP HANA | Production | Patching Demo Provisioner
+    inventory: Patching Demo Infrastructure
+    limit: 'hana:&production'
     project: Patching Demo
     playbook: provisioner/6-deploy-hana.yml
     credentials:
@@ -426,6 +435,25 @@ controller_templates:
     playbook: provisioner/8-reinstate-hsr.yml
     credentials:
       - Patching Demo Provisioner Root Account
+  - name: Prepare New Content | Patching Demo Provisioner
+    inventory: Patching Demo Infrastructure
+    limit: satellite
+    project: Patching Demo
+    playbook: provisioner/9-prepare-new-content.yml
+    credentials:
+      - Patching Demo Provisioner Peripheral Credentials
+  - name: Send Provisioner Email | Succeeded | Patching Demo Provisioner
+    inventory: Local Action Inventory
+    project: Patching Demo
+    playbook: provisioner/100-send-email.yml
+    extra_vars:
+      provisioning_status: Succeeded
+  - name: Send Provisioner Email | Failed | Patching Demo Provisioner
+    inventory: Local Action Inventory
+    project: Patching Demo
+    playbook: provisioner/100-send-email.yml
+    extra_vars:
+      provisioning_status: Failed
   - name: Remove Controller Configuration | Patching Demo Provisioner
     inventory: Local Action Inventory
     project: Patching Demo
@@ -445,6 +473,15 @@ controller_templates:
     playbook: provisioner/998-teardown-systems.yml
     credentials:
       - Patching Demo Provisioner Peripheral Credentials
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - type: text
+          question_name: "Demo Audience?"
+          question_description: "Who is the audience for this demo"
+          variable: audience
+          required: yes
   - name: Teardown Red Hat Satellite | Patching Demo Provisioner
     inventory: Patching Demo Infrastructure
     limit: satellite
@@ -470,9 +507,15 @@ controller_workflows:
       spec:
         - type: text
           question_name: "Demo Audience?"
-          question_description: "Who is the audience for this demo"
+          question_description: "Who is the audience for this demo?"
           variable: audience
           required: yes
+        - type: text
+          question_name: "Provisioner?"
+          question_description: "Who is provisioning this demo?"
+          variable: provisioner
+          required: yes
+          default: 'Josh Swanson <joshswanson@redhat.com>'
         - type: multiplechoice
           question_name: Deploy Satellite?
           question_description: Should satellite be deployed?
@@ -483,39 +526,99 @@ controller_workflows:
           default: "yes"
           required: yes
     simplified_workflow_nodes:
+    # Work nodes
       - unified_job_template: Setup Red Hat Satellite | Patching Demo Provisioner
         identifier: node101
         success_nodes:
           - node103
+        failure_nodes:
+          - node201
       - unified_job_template: Configure Ansible Controller | Patching Demo Provisioner
         identifier: node102
         success_nodes:
           - node103
+        failure_nodes:
+          - node202
       - unified_job_template: Provision Demo Hosts | Patching Demo Provisioner
         identifier: node103
         all_parents_must_converge: yes
         success_nodes:
           - node104
           - node105
+        failure_nodes:
+          - node203
       - unified_job_template: Preconfigure for HANA Install | Patching Demo Provisioner
         identifier: node104
         success_nodes:
           - node106
+          - node107
+        failure_nodes:
+          - node204
       - unified_job_template: Preconfigure for Netweaver/S4 Install | Patching Demo Provisioner
         identifier: node105
         success_nodes:
-          - node106
-      - unified_job_template: Deploy SAP HANA | Patching Demo Provisioner
+          - node108
+          - node110
+        failure_nodes:
+          - node205
+      - unified_job_template: Deploy SAP HANA | Non_Production | Patching Demo Provisioner
         identifier: node106
-        all_parents_must_converge: yes
         success_nodes:
-          - node107
-      - unified_job_template: Install Netweaver/S4 | Patching Demo Provisioner
+          - node108
+          - node110
+        failure_nodes:
+          - node206
+      - unified_job_template: Deploy SAP HANA | Production | Patching Demo Provisioner
         identifier: node107
         success_nodes:
           - node108
-      - unified_job_template: Reinstate HSR | Patching Demo Provisioner
+          - node110
+        failure_nodes:
+          - node207
+      - unified_job_template: Install Netweaver/S4 | Patching Demo Provisioner
+        all_parents_must_converge: yes
         identifier: node108
+        success_nodes:
+          - node109
+        failure_nodes:
+          - node208
+      - unified_job_template: Reinstate HSR | Patching Demo Provisioner
+        identifier: node109
+        success_nodes:
+          - node999
+        failure_nodes:
+          - node209
+      - unified_job_template: Prepare New Content | Patching Demo Provisioner
+        identifier: node110
+        all_parents_must_converge: yes
+        success_nodes:
+          - node999
+        failure_nodes:
+          - node210
+    # Notification Nodes
+      - unified_job_template: Send Provisioner Email | Succeeded | Patching Demo Provisioner
+        identifier: node999
+        all_parents_must_converge: yes
+      - unified_job_template: Send Provisioner Email | Failed | Patching Demo Provisioner
+        identifier: node201
+      - unified_job_template: Send Provisioner Email | Failed | Patching Demo Provisioner
+        identifier: node202
+      - unified_job_template: Send Provisioner Email | Failed | Patching Demo Provisioner
+        identifier: node203
+      - unified_job_template: Send Provisioner Email | Failed | Patching Demo Provisioner
+        identifier: node204
+      - unified_job_template: Send Provisioner Email | Failed | Patching Demo Provisioner
+        identifier: node205
+      - unified_job_template: Send Provisioner Email | Failed | Patching Demo Provisioner
+        identifier: node206
+      - unified_job_template: Send Provisioner Email | Failed | Patching Demo Provisioner
+        identifier: node207
+      - unified_job_template: Send Provisioner Email | Failed | Patching Demo Provisioner
+        identifier: node208
+      - unified_job_template: Send Provisioner Email | Failed | Patching Demo Provisioner
+        identifier: node209
+      - unified_job_template: Send Provisioner Email | Failed | Patching Demo Provisioner
+        identifier: node210
   - name: Teardown Patching Demo
     organization: "{{ deploy_from_controller_org }}"
     state: "{{ resource_state | default('present') }}"
