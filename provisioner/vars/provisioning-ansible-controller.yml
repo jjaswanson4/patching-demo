@@ -380,7 +380,7 @@ controller_templates:
     limit: satellite
     project: Patching Demo
     playbook: provisioner/1-deploy-satellite.yml
-    execution_environmet: Patching Demo Provisioner EE
+    execution_environment: Patching Demo Provisioner EE
     credentials:
       - Patching Demo Provisioner Peripheral Credentials
       - Patching Demo Provisioner Root Account
@@ -388,7 +388,7 @@ controller_templates:
     inventory: Local Action Inventory
     project: Patching Demo
     playbook: provisioner/2-configure-ansible-controller.yml
-    execution_environmet: Patching Demo Provisioner EE
+    execution_environment: Patching Demo Provisioner EE
     credentials:
       - Patching Demo Provisioner Peripheral Credentials
   - name: Provision Demo Hosts | Patching Demo Provisioner
@@ -396,7 +396,7 @@ controller_templates:
     limit: demo_hosts
     project: Patching Demo
     playbook: provisioner/3-provision-demo-hosts.yml
-    execution_environmet: Patching Demo Provisioner EE
+    execution_environment: Patching Demo Provisioner EE
     credentials:
       - Patching Demo Provisioner Peripheral Credentials
       - Patching Demo Provisioner Root Account
@@ -407,7 +407,7 @@ controller_templates:
     limit: hana
     project: Patching Demo
     playbook: provisioner/4-hana-preconfigure.yml
-    execution_environmet: Patching Demo Provisioner EE
+    execution_environment: Patching Demo Provisioner EE
     credentials:
       - Patching Demo Provisioner Root Account
   - name: Preconfigure for Netweaver/S4 Install | Patching Demo Provisioner
@@ -415,7 +415,7 @@ controller_templates:
     limit: netweaver
     project: Patching Demo
     playbook: provisioner/5-netweaver-preconfigure.yml
-    execution_environmet: Patching Demo Provisioner EE
+    execution_environment: Patching Demo Provisioner EE
     credentials:
       - Patching Demo Provisioner Root Account
   - name: Deploy SAP HANA | Non_Production | Patching Demo Provisioner
@@ -423,7 +423,7 @@ controller_templates:
     limit: 'hana:&non_production'
     project: Patching Demo
     playbook: provisioner/6-deploy-hana.yml
-    execution_environmet: Patching Demo Provisioner EE
+    execution_environment: Patching Demo Provisioner EE
     credentials:
       - Patching Demo Provisioner Root Account
   - name: Deploy SAP HANA | Production | Patching Demo Provisioner
@@ -431,7 +431,7 @@ controller_templates:
     limit: 'hana:&production'
     project: Patching Demo
     playbook: provisioner/6-deploy-hana.yml
-    execution_environmet: Patching Demo Provisioner EE
+    execution_environment: Patching Demo Provisioner EE
     credentials:
       - Patching Demo Provisioner Root Account
   - name: Install Netweaver/S4 | Patching Demo Provisioner
@@ -439,7 +439,7 @@ controller_templates:
     limit: netweaver
     project: Patching Demo
     playbook: provisioner/7-install-s4.yml
-    execution_environmet: Patching Demo Provisioner EE
+    execution_environment: Patching Demo Provisioner EE
     credentials:
       - Patching Demo Provisioner Root Account
   - name: Reinstate HSR | Patching Demo Provisioner
@@ -447,7 +447,7 @@ controller_templates:
     limit: 'hana:&primary'
     project: Patching Demo
     playbook: provisioner/8-reinstate-hsr.yml
-    execution_environmet: Patching Demo Provisioner EE
+    execution_environment: Patching Demo Provisioner EE
     credentials:
       - Patching Demo Provisioner Root Account
   - name: Prepare New Content | Patching Demo Provisioner
@@ -455,35 +455,35 @@ controller_templates:
     limit: satellite
     project: Patching Demo
     playbook: provisioner/9-prepare-new-content.yml
-    execution_environmet: Patching Demo Provisioner EE
+    execution_environment: Patching Demo Provisioner EE
     credentials:
       - Patching Demo Provisioner Peripheral Credentials
   - name: Send Provisioner Email | Succeeded | Patching Demo Provisioner
     inventory: Local Action Inventory
     project: Patching Demo
     playbook: provisioner/100-send-email.yml
-    execution_environmet: Patching Demo Provisioner EE
+    execution_environment: Patching Demo Provisioner EE
     extra_vars:
       provisioning_status: Succeeded
   - name: Send Provisioner Email | Failed | Patching Demo Provisioner
     inventory: Local Action Inventory
     project: Patching Demo
     playbook: provisioner/100-send-email.yml
-    execution_environmet: Patching Demo Provisioner EE
+    execution_environment: Patching Demo Provisioner EE
     extra_vars:
       provisioning_status: Failed
   - name: Remove Controller Configuration | Patching Demo Provisioner
     inventory: Local Action Inventory
     project: Patching Demo
     playbook: provisioner/996-remove-controller-configuration.yml
-    execution_environmet: Patching Demo Provisioner EE
+    execution_environment: Patching Demo Provisioner EE
     credentials:
        - Patching Demo Provisioner Peripheral Credentials
   - name: Unregister from Insights | Patching Demo Provisioner
     inventory: Patching Demo Infrastructure
     project: Patching Demo
     playbook: provisioner/997-attempt-insights-unregister.yml
-    execution_environmet: Patching Demo Provisioner EE
+    execution_environment: Patching Demo Provisioner EE
     credentials:
       - Patching Demo Provisioner Root Account
   - name: Teardown Demo Hosts | Patching Demo Provisioner
@@ -491,7 +491,7 @@ controller_templates:
     limit: demo_hosts
     project: Patching Demo
     playbook: provisioner/998-teardown-systems.yml
-    execution_environmet: Patching Demo Provisioner EE
+    execution_environment: Patching Demo Provisioner EE
     credentials:
       - Patching Demo Provisioner Peripheral Credentials
     survey:
