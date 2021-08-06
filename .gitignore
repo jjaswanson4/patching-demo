@@ -3,3 +3,4 @@ ansible.cfg*
 extra-vars.yml
 *manifest.zip
 scratch
+**/context
