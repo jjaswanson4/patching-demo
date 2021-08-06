@@ -1,9 +1,8 @@
 ---
 
-controller_hostname: automationcontroller-aap20-ansible-automation-platform.apps.ocp4.lab.msp.redhat.com
+controller_hostnamme: aap20-controller.josh.lab.msp.redhat.com
 controller_validate_certs: no
 controller_username: admin
-controller_password: "{{ controller_password }}"
 
 controller_organizations:
   - name: "{{ audience }}"
@@ -314,13 +313,69 @@ controller_groups:
           zone: "{  { sap_hana_ha_pacemaker_vip.split('.')[2] }}.15.10.in-addr.arpa."
           type: PTR
           value: "{  { sap_s4hana_deployment_db_host }}."
+  - name: kpatch_patch
+    inventory: "{{ audience }} Infrastructure"
+    children:
+      - hana
+    variables:
+      patching_strategy: kpatch
+  - name: normal_patch
+    inventory: "{{ audience }} Infrastructure"
+    children:
+      - netweaver
+    variables:
+      patching_strategy: normal
   - name: satellite
     inventory: "{{ audience }} Infrastructure"
     hosts:
       - patching-satellite.josh.lab.msp.redhat.com
 
 controller_templates:
+  - name: Run Insights Report
+    inventory: "{{ audience }} Infrastructure"
+    limit: demo_hosts
+    project: Patching Demo
+    credentials:
+      - Patching Credentials
+  - name: Check for Updates
+    inventory: Patching Demo
+    limit: demo_hosts
+    project: Patching Demo
+    playbook: playbooks/check-for-updates.yml
+    credentials:
+      - Patching Credentials      
+  - name: Install Tracer
+    inventory: Patching Demo
+    limit: normal_patch
+    project: Patching Demo
+    playbook: playbooks/install-tracer.yml
+    credentials:
+      - Patching Credentials
+  - name: Promote Content to Non Production
+    inventory: Patching Demo
+    limit: satellite
+    project: Patching Demo
+    playbook: playbooks/promote-content.yml
+    extra_vars:
+      current_lifecycle_environment: Library
+      new_lifecycle_environment:
+        - Non_Production
+  
 
+controller_workflows:
+  - name: Pre-Patching Workflow
+    organization: "{{ audience }}"
+    simplified_workflow_nodes:
+      - unified_job_template: Run Insights Report
+        identifier: node101
+        success_nodes:
+          - node102
+      - unified_job_template: Check for Updates
+        identifier: node102
+        success_nodes:
+          - node103
+      - unified_job_template: Install Tracer
+        identifier: node103
 
   # - name: 1 - Run Insights Report
   #   inventory: Patching Demo
@@ -336,15 +391,7 @@ controller_templates:
   #   playbook: playbooks/check-for-updates.yml
   #   credentials:
   #     - Patching Credentials
-  # - name: 3 - Promote Content | Non_Production
-  #   inventory: Patching Demo
-  #   limit: satellite
-  #   project: Patching Demo
-  #   playbook: playbooks/promote-content.yml
-  #   extra_vars:
-  #     current_lifecycle_environment: Library
-  #     new_lifecycle_environment:
-  #       - Non_Production
+
   # - name: 4 - Recheck for Updates
   #   inventory: Patching Demo
   #   limit: sap
