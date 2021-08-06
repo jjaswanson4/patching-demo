@@ -1,6 +1,7 @@
 ---
 
-controller_hostname: automationcontroller-aap20-ansible-automation-platform.apps.ocp4.lab.msp.redhat.com
+#controller_hostname: automationcontroller-aap20-ansible-automation-platform.apps.ocp4.lab.msp.redhat.com
+controller_hostname: aap20-controller.josh.lab.msp.redhat.com
 controller_validate_certs: no
 controller_username: admin
 
