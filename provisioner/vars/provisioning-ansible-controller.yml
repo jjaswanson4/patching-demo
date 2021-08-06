@@ -24,7 +24,7 @@ controller_credentials:
 
 controller_execution_environments:
   - name: Patching Demo Provisioner EE
-    image: aap20-hub.josh.lab.msp.redhat.com/patching-demo-provisioner-ee:latest
+    image: 'aap20-hub.josh.lab.msp.redhat.com/patching-demo-provisioner-ee:latest'
     organization: "{{ deploy_from_controller_org }}"
     credential: MSP Lab AAP20 Automation Hub
 
@@ -508,12 +508,14 @@ controller_templates:
     limit: satellite
     project: Patching Demo
     playbook: provisioner/998-teardown-systems.yml
+    execution_environment: Patching Demo Provisioner EE
     credentials:
       - Patching Demo Provisioner Peripheral Credentials 
   - name: Cleanup DNS Records | Patching Demo Provisioner
     inventory: Patching Demo Infrastructure
     project: Patching Demo
     playbook: provisioner/999-delete-dns-records.yml
+    execution_environment: Patching Demo Provisioner EE
     credentials:
       - Patching Demo Provisioner Peripheral Credentials
 
