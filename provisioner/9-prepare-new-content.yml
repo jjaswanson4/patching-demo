@@ -18,7 +18,7 @@
             username: "{{ satellite.admin_username }}"
             password: "{{ satellite.admin_password }}"
             validate_certs: false
-            server_url: "https://{{ ansible_fqdn }}"
+            server_url: "https://{{ inventory_hostname }}"
             organization: "{{ audience }}"
             name: "{{ content_view_filter }}"
             filter_state: absent
@@ -32,7 +32,7 @@
             username: "{{ satellite.admin_username }}"
             password: "{{ satellite.admin_password }}"
             validate_certs: false
-            server_url: "https://{{ ansible_fqdn }}"
+            server_url: "https://{{ inventory_hostname }}"
             organization: "{{ audience }}"
             content_view: "{{ content_view }}"
             version: 2.0
@@ -46,7 +46,7 @@
             username: "{{ satellite.admin_username }}"
             password: "{{ satellite.admin_password }}"
             validate_certs: false
-            server_url: "https://{{ ansible_fqdn }}"
+            server_url: "https://{{ inventory_hostname }}"
             organization: "{{ audience }}"
             content_view: "{{ composite_content_view }}"
             version: 2.0
