@@ -150,7 +150,7 @@ satellite:
         domains:
           - name: josh.lab.msp.redhat.com
     hostgroups:
-      - name: kickstart-rhel8.4-vlan146
+      - name: rhel8.4
         architecture: x86_64
         compute_profile: general-vlan146
         compute_resource: vcenter02.lab.msp.redhat.com
@@ -184,7 +184,6 @@ satellite:
           - name: "{{ audience }}"
         locations:
           - name: "{{ audience }}"
-    
   katello:
     - organization_name: "{{ audience }}"
       state: present
