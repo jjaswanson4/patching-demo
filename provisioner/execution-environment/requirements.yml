@@ -1,0 +1,35 @@
+---
+
+roles:
+  - name: redhat_sap.sap_hostagent
+    source: https://galaxy.ansible.com
+  - name: sap-preconfigure
+    src: https://github.com/linux-system-roles/sap-preconfigure/releases/download/3.0.1/sap-preconfigure.tar.gz
+  - name: sap-hana-preconfigure
+    src: https://github.com/linux-system-roles/sap-hana-preconfigure/releases/download/3.0.1/sap-hana-preconfigure.tar.gz
+  - name: redhat_sap.sap_hana_deployment
+    source: https://galaxy.ansible.com
+  - name: sap-netweaver-preconfigure
+    src: https://github.com/linux-system-roles/sap-netweaver-preconfigure/releases/download/3.0.0/sap-netweaver-preconfigure.tar.gz
+  - name: redhat_sap.sap_s4hana_deployment
+    source: https://galaxy.ansible.com
+  - name: sap-hana-hsr
+    src: https://github.com/jjaswanson4/sap-hana-hsr/archive/refs/tags/v1.3.0.tar.gz
+  - name: sap-hana-ha-pacemaker
+    src: https://github.com/jjaswanson4/sap-hana-ha-pacemaker/archive/refs/tags/v2.0.0.tar.gz
+
+collections:
+  - name: community.general
+  - name: vmware.vmware_rest
+  - name: redhat.rhel_system_roles
+  - name: jjaswanson4.utilities
+    version: '>=1.6.3'
+  - name: jjaswanson4.setup_rhel_for_satellite
+  - name: jjaswanson4.install_satellite
+    version: '>=1.2.4'
+  - name: jjaswanson4.configure_satellite
+  - name: ansible.posix
+  - name: redhat_cop.controller_configuration
+  - name: awx.awx
+  - name: redhat.satellite
+  - name: community.vmware
