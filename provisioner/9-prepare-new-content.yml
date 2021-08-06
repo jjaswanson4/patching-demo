@@ -4,6 +4,12 @@
   hosts:
     - all
   gather_facts: false
+  pre_tasks:
+    - name: determine content views
+      ansible.builtin.set_fact:
+        content_views: "{{ satellite.katello[0].content_views | json_query('[*].name') }}"
+        content_view_filter: "{{ satellite.katello[0].content_views[0].filters[0].name }}"
+        composite_content_view: composite-rhel8
   tasks:
     - name: update content views for this patch cycle
       block:
@@ -13,35 +19,37 @@
             password: "{{ satellite.admin_password }}"
             validate_certs: false
             server_url: "https://{{ ansible_fqdn }}"
-            organization: "{{ satellite.organization }}"
-            name: "{{ satellite.content_view_filter_name }}"
+            organization: "{{ audience }}"
+            name: "{{ content_view_filter }}"
             filter_state: absent
             filter_type: erratum
-            content_view: "{{ content_view.name }}"
+            content_view: "{{ content_view }}"
           loop_control:
             loop_var: content_view
-          loop: "{{ satellite.content_views }}"
+          loop: "{{ content_views }}"
         - name: "publish content view to the library"
           redhat.satellite.content_view_version:
-            username: "{{ satellite.username }}"
-            password: "{{ satellite.password }}"
+            username: "{{ satellite.admin_username }}"
+            password: "{{ satellite.admin_password }}"
             validate_certs: false
-            server_url: "{{ satellite.url }}"
-            organization: "{{ satellite.organization }}"
-            content_view: "{{ content_view.name }}"
+            server_url: "https://{{ ansible_fqdn }}"
+            organization: "{{ audience }}"
+            content_view: "{{ content_view }}"
+            version: 2.0
             lifecycle_environments:
               - Library
           loop_control:
             loop_var: content_view
-          loop: "{{ satellite.content_views }}"
-        - name: "publish new version of composite content view {{ satellite.composite_content_view }}"
+          loop: "{{ content_views }}"
+        - name: "publish new version of composite content view {{ composite_content_view }}"
           redhat.satellite.content_view_version:
-            username: "{{ satellite.username }}"
-            password: "{{ satellite.password }}"
+            username: "{{ satellite.admin_username }}"
+            password: "{{ satellite.admin_password }}"
             validate_certs: false
-            server_url: "{{ satellite.url }}"
-            organization: "{{ satellite.organization }}"
-            content_view: "{{ satellite.composite_content_view }}"
+            server_url: "https://{{ ansible_fqdn }}"
+            organization: "{{ audience }}"
+            content_view: "{{ composite_content_view }}"
+            version: 2.0
             lifecycle_environments:
               - Library
               - Non_Production
