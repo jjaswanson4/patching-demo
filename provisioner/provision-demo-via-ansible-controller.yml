@@ -11,6 +11,7 @@
   roles:
     - redhat_cop.controller_configuration.credential_types
     - redhat_cop.controller_configuration.credentials
+    - redhat_cop.controller_configuration.execution_environments
     - redhat_cop.controller_configuration.inventories
     - redhat_cop.controller_configuration.hosts
     - redhat_cop.controller_configuration.groups
