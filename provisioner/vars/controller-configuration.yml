@@ -1,6 +1,6 @@
 ---
 
-controller_hostnamme: aap20-controller.josh.lab.msp.redhat.com
+controller_hostname: aap20-controller.josh.lab.msp.redhat.com
 controller_validate_certs: no
 controller_username: admin
 
