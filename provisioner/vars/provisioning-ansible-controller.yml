@@ -561,9 +561,9 @@ controller_workflows:
           default: "yes"
           required: yes
         - type: multiplechoice
-          question_name: Deploy demo hosts?
-          question_description: Should the demo hosts be deployed?
-          variable: deploy_demo_hosts
+          question_name: Provision demo hosts?
+          question_description: Should the demo hosts be provisioned?
+          variable: provision_demo_hosts
           choices:
             - "yes"
             - "no"
