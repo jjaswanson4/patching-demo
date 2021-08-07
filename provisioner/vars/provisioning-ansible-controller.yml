@@ -24,9 +24,10 @@ controller_credentials:
 
 controller_execution_environments:
   - name: Patching Demo Provisioner EE
-    image: 'aap20-hub.josh.lab.msp.redhat.com/patching-demo-provisioner-ee:latest'
+    image: aap20-hub.josh.lab.msp.redhat.com/patching-demo-provisioner-ee
     organization: "{{ deploy_from_controller_org }}"
     credential: MSP Lab AAP20 Automation Hub
+    pull: always
 
 controller_inventories:
   - name: Local Action Inventory
@@ -83,6 +84,8 @@ controller_inventories:
           - sos
           - redhat-support-tool
           - "{  { htop_url }}"
+      ignore_virtual_disk_errors: yes
+      remove_cdrom: no
 
 controller_hosts:
   - name: localhost
@@ -548,6 +551,24 @@ controller_workflows:
             - "no"
           default: "yes"
           required: yes
+        - type: multiplechoice
+          question_name: Configure controller?
+          question_description: Should controller be configured?
+          variable: deploy_satellite
+          choices:
+            - "yes"
+            - "no"
+          default: "yes"
+          required: yes
+        - type: multiplechoice
+          question_name: Deploy demo hosts?
+          question_description: Should the demo hosts be deployed?
+          variable: deploy_demo_hosts
+          choices:
+            - "yes"
+            - "no"
+          default: "yes"
+          required: yes          
     simplified_workflow_nodes:
     # Work nodes
       - unified_job_template: Setup Red Hat Satellite | Patching Demo Provisioner
