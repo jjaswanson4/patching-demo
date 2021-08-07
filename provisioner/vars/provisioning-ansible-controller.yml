@@ -554,7 +554,7 @@ controller_workflows:
         - type: multiplechoice
           question_name: Configure controller?
           question_description: Should controller be configured?
-          variable: deploy_satellite
+          variable: configure_controller
           choices:
             - "yes"
             - "no"
