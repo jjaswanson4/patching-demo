@@ -6,7 +6,7 @@ roles:
   - name: sap-preconfigure
     src: https://github.com/linux-system-roles/sap-preconfigure/releases/download/3.0.1/sap-preconfigure.tar.gz
   - name: sap-hana-preconfigure
-    src: https://github.com/linux-system-roles/sap-hana-preconfigure/releases/download/3.0.1/sap-hana-preconfigure.tar.gz
+    src: https://github.com/jjaswanson4/sap-hana-preconfigure/archive/refs/tags/3.0.2.tar.gz
   - name: redhat_sap.sap_hana_deployment
     source: https://galaxy.ansible.com
   - name: sap-netweaver-preconfigure
@@ -23,7 +23,7 @@ collections:
   - name: vmware.vmware_rest
   - name: redhat.rhel_system_roles
   - name: jjaswanson4.utilities
-    version: '>=1.6.3'
+    version: '>=1.6.5'
   - name: jjaswanson4.setup_rhel_for_satellite
   - name: jjaswanson4.install_satellite
     version: '>=1.2.4'
