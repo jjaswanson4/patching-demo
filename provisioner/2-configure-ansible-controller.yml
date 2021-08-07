@@ -11,7 +11,7 @@
       ansible.builtin.include_role:
         name: "{{ role }}"
       loop_control:
-        loop: role
+        loop_var: role
       loop:
         - redhat_cop.controller_configuration.organizations
         - redhat_cop.controller_configuration.credentials
