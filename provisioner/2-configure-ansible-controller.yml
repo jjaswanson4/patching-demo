@@ -10,7 +10,7 @@
     - name: include roles
       ansible.builtin.include_role:
         name: "{{ role }}"
-      loop_conrol:
+      loop_control:
         loop: role
       loop:
         - redhat_cop.controller_configuration.organizations
