@@ -187,7 +187,7 @@ satellite:
   katello:
     - organization_name: "{{ audience }}"
       state: present
-      manifest: "{{ playbook_dir }}/files/satellite-manifest.zip"
+      manifest: "/tmp/satellite-manifest.zip"
       repo_sync_attempts: 1
       lifecycle_environments:
         - name: Non_Production

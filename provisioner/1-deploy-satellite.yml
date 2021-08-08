@@ -10,7 +10,7 @@
     - name: super secure way to grab the manifest file
       ansible.builtin.get_url:
         url: http://satellite06.lab.msp.redhat.com/pub/satellite-manifest.zip
-        dest: "{{ playbook_dir }}/files/satellite-manifest.zip"
+        dest: /tmp/satellite-manifest.zip
       delegate_to: localhost
       when:
         - deploy_satellite | bool
