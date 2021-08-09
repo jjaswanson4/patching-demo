@@ -15,8 +15,9 @@
             path: "/software/{{ sap_s4hana_deployment_sid }}/"
             state: absent
         - name: ensure {{ sap_s4hana_deployment_sid }} directory exists
-          ansible.builtin.file: "/software/{{ sap_s4hana_deployment_sid }}"
-          state: directory
+          ansible.builtin.file:
+            path: "/software/{{ sap_s4hana_deployment_sid }}"
+            state: directory
         - name: link {{ sap_s4hana_deployment_sapcar_file_name }} into the directory
           ansible.builtin.file:
             src: "/software/SAPCAR/{{ sap_s4hana_deployment_sapcar_file_name }}"
