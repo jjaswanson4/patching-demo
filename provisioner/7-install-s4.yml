@@ -3,5 +3,26 @@
 - name: install s4 app server
   hosts:
     - all
+  pre_tasks:
+    - name: check if /software/{{ sap_s4hana_deployment_sid }} exists
+      ansible.builtin.stat:
+        path: "/software/{{ sap_s4hana_deployment_sid }}"
+      register: sid_folder
+    - name: perpare clean install environment
+      block:
+        - name: remove {{ sap_s4hana_deployment_sid }} directory
+          ansible.builtin.file:
+            path: "/software/{{ sap_s4hana_deployment_sid }}/"
+            state: absent
+        - name: ensure {{ sap_s4hana_deployment_sid }} directory exists
+          ansible.builtin.file: "/software/{{ sap_s4hana_deployment_sid }}"
+          state: directory
+        - name: link {{ sap_s4hana_deployment_sapcar_file_name }} into the directory
+          ansible.builtin.file:
+            src: "/software/SAPCAR/{{ sap_s4hana_deployment_sapcar_file_name }}"
+            dest: "/software/{{ sap_s4hana_deployment_sid }}/{{ sap_s4hana_deployment_sapcar_file_name }}"
+            state: link
+      when:
+        - sid_folder.stat.exists      
   roles:
     - redhat_sap.sap_s4hana_deployment
