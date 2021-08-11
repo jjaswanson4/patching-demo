@@ -43,6 +43,10 @@ controller_user_accounts:
     password: "{{ ansible_password }}"
     email: dont@email.me
     update_secrets: no
+  - username: "{{ audience }}_admin"
+    password: "{{ ansible_password }}"
+    email: dont@email.me
+    update_secrets: no
 
 controller_inventories:
   - name: "{{ audience }} Infrastructure"
@@ -168,68 +172,86 @@ controller_groups:
     hosts:
       - patching-satellite.josh.lab.msp.redhat.com
 
+controller_projects:
+  - name: "{{ audience }} Patching Code"
+    organization: "{{ audience }}"
+    scm_branch: main
+    scm_type: git
+    scm_url: https://github.com/jjaswanson4/patching-demo.git
+    wait: yes
+
 controller_templates:
   - name: Run Insights Report | Non_Production | Security
     inventory: "{{ audience }} Infrastructure"
     limit: non_production
-    project: Patching Demo
+    project: "{{ audience }} Patching Code"
+    organization: "{{ audience }}"
+    playbook: playbooks/run-insights-report.yml
     credentials:
       - Patching Credentials
   - name: Check for Updates | Non_Production | Security
-    inventory: Patching Demo
+    inventory: "{{ audience }} Infrastructure"
     limit: non_production
-    project: Patching Demo
+    project: "{{ audience }} Patching Code"
+    organization: "{{ audience }}"
     playbook: playbooks/check-for-updates.yml
     credentials:
       - Patching Credentials
   - name: Install Tracer | Non_Production | Infrastructure
-    inventory: Patching Demo
+    inventory: "{{ audience }} Infrastructure"
     limit: 'non_production:&normal_patch'
-    project: Patching Demo
+    project: "{{ audience }} Patching Code"
+    organization: "{{ audience }}"
     playbook: playbooks/install-tracer.yml
     credentials:
       - Patching Credentials
   - name: Standby Secondary Database | Non_Production | BASIS (Application Team)
-    inventory: Patching Demo
+    inventory: "{{ audience }} Infrastructure"
     limit: 'non_production:&secondary'
-    project: Patching Demo
+    project: "{{ audience }} Patching Code"
+    organization: "{{ audience }}"
     playbook: playbooks/pacemaker-node-control.yml
     credentials:
       - Patching Credentials
     extra_vars:
       pcs_node_status: standby
   - name: Update All Packages | Non_Production | Infrastructure
-    inventory: Patching Demo
+    inventory: "{{ audience }} Infrastructure"
     limit: 'non_production:&normal_patch'
-    project: Patching Demo
-    playbook: playbooks/update-all-packates.yml
+    project: "{{ audience }} Patching Code"
+    organization: "{{ audience }}"
+    playbook: playbooks/update-all-packages.yml
     credentials:
       - Patching Credentials
   - name: Run Tracer Report | Non_Production | Infrastructure
-    inventory: Patching Demo
+    inventory: "{{ audience }} Infrastructure"
     limit: 'non_production:&normal_patch'
-    project: Patching Demo
+    project: "{{ audience }} Patching Code"
+    organization: "{{ audience }}"
     playbook: playbooks/run-tracer-report.yml
     credentials:
       - Patching Credentials
   - name: Reboot Server | Non_Production | Infrastructure
-    inventory: Patching Demo
+    inventory: "{{ audience }} Infrastructure"
     limit: 'non_production:&normal_patch'
-    project: Patching Demo
+    project: "{{ audience }} Patching Code"
+    organization: "{{ audience }}"
     playbook: playbooks/reboot-server.yml
     credentials:
       - Patching Credentials  
   - name: Kpatch Server | Non_Production | Infrastructure
-    inventory: Patching Demo
+    inventory: "{{ audience }} Infrastructure"
     limit: 'non_production:&kpatch'
-    project: Patching Demo
+    project: "{{ audience }} Patching Code"
+    organization: "{{ audience }}"
     playbook: playbooks/kpatch-server.yml
     credentials:
       - Patching Credentials
   - name: Unstandby Secondary Database | Non_Production | BASIS (Application Team)
-    inventory: Patching Demo
+    inventory: "{{ audience }} Infrastructure"
     limit: 'non_production:&secondary'
-    project: Patching Demo
+    project: "{{ audience }} Patching Code"
+    organization: "{{ audience }}"
     playbook: playbooks/pacemaker-node-control.yml
     credentials:
       - Patching Credentials
@@ -242,6 +264,7 @@ controller_workflows:
     simplified_workflow_nodes:
       - unified_job_template: Run Insights Report | Non_Production | Security
         identifier: node101
+        state: present
       - unified_job_template: Check for Updates | Non_Production | Security
         identifier: node102
   - name: Pre-Patching | Non_Production | Infrastructure
@@ -306,3 +329,8 @@ controller_workflows:
           - node106
       - unified_job_template: Post-Patching | Non_Production | BASIS (Application Team)
         identifier: node106
+
+controller_roles:
+  - user: "{{ audience }}_admin"
+    organization: "{{ audience }}"
+    role: admin
