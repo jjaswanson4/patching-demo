@@ -273,7 +273,7 @@ controller_workflows:
       - approval_node:
           name: Approve 'Run Insights Report | Non_Production | Security'
         identifier: node101
-        success_node:
+        success_nodes:
           - node102
       - unified_job_template: Run Insights Report | Non_Production | Security
         identifier: node102
