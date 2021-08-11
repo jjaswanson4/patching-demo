@@ -184,7 +184,7 @@ controller_groups:
       sap_hana_deployment_bundle_path: /software/HANA_installation
       sap_hana_deployment_bundle_sar_file_name: IMDB_SERVER20_046_0-80002031.SAR
       sap_hana_deployment_sapcar_path: /software/SAPCAR
-      sap_hana_deployment_sapcar_file_name: SAPCAR_1311-80000935.EXE
+      sap_hana_deployment_sapcar_file_name: SAPCAR_1010-70006178.EXE
       sap_hana_deployment_root_password: "{  { ansible_password }}"
       sap_hana_deployment_sapadm_password: "{  { ansible_password }}"
       sap_hana_deployment_hana_instance_number: "00"
@@ -230,8 +230,8 @@ controller_groups:
               state: present
       sap_netweaver_preconfigure_fail_if_not_enough_swap_space_configured: no
       sap_s4hana_deployment_product_id: "NW_ABAP_OneHost:S4HANA1909.CORE.HDB.ABAP"
-      sap_s4hana_deployment_sapcar_path: "/software/SAPCAR"
-      sap_s4hana_deployment_sapcar_file_name: "SAPCAR_1311-80000935.EXE"
+      sap_s4hana_deployment_sapcar_path: "/software/{  { sap_s4hana_deployment_sid }}"
+      sap_s4hana_deployment_sapcar_file_name: "SAPCAR_1010-70006178.EXE"
       sap_s4hana_deployment_swpm_path: "/software/S4HANA_installation"
       sap_s4hana_deployment_swpm_sar_file_name: "SWPM20SP04_6-80003424.SAR"
       sap_s4hana_deployment_db_schema_password: "{  { ansible_password }}"
@@ -437,9 +437,17 @@ controller_templates:
     execution_environment: Patching Demo Provisioner EE
     credentials:
       - Patching Demo Provisioner Root Account
-  - name: Install Netweaver/S4 | Patching Demo Provisioner
+  - name: Install Netweaver/S4 | Non_Production | Patching Demo Provisioner
     inventory: Patching Demo Infrastructure
-    limit: netweaver
+    limit: 'netweaver:&non_production'
+    project: Patching Demo
+    playbook: provisioner/7-install-s4.yml
+    execution_environment: Patching Demo Provisioner EE
+    credentials:
+      - Patching Demo Provisioner Root Account
+  - name: Install Netweaver/S4 | Production | Patching Demo Provisioner
+    inventory: Patching Demo Infrastructure
+    limit: 'netweaver:&production'
     project: Patching Demo
     playbook: provisioner/7-install-s4.yml
     execution_environment: Patching Demo Provisioner EE
@@ -596,49 +604,57 @@ controller_workflows:
         success_nodes:
           - node106
           - node107
+          - node111
         failure_nodes:
           - node204
       - unified_job_template: Preconfigure for Netweaver/S4 Install | Patching Demo Provisioner
         identifier: node105
         success_nodes:
           - node108
-          - node110
+          - node109
+          - node111
         failure_nodes:
           - node205
       - unified_job_template: Deploy SAP HANA | Non_Production | Patching Demo Provisioner
         identifier: node106
         success_nodes:
           - node108
-          - node110
         failure_nodes:
           - node206
       - unified_job_template: Deploy SAP HANA | Production | Patching Demo Provisioner
         identifier: node107
         success_nodes:
-          - node108
-          - node110
-        failure_nodes:
-          - node207
-      - unified_job_template: Install Netweaver/S4 | Patching Demo Provisioner
-        all_parents_must_converge: yes
-        identifier: node108
-        success_nodes:
           - node109
         failure_nodes:
-          - node208
-      - unified_job_template: Reinstate HSR | Patching Demo Provisioner
-        identifier: node109
+          - node207
+      - unified_job_template: Install Netweaver/S4 | Non_Production | Patching Demo Provisioner
+        identifier: node108
+        all_parents_must_converge: yes
         success_nodes:
-          - node999
+          - node110
+        failure_nodes:
+          - node208
+      - unified_job_template: Install Netweaver/S4 | Production | Patching Demo Provisioner
+        identifier: node109
+        all_parents_must_converge: yes
+        success_nodes:
+          - node110
         failure_nodes:
           - node209
-      - unified_job_template: Prepare New Content | Patching Demo Provisioner
+      - unified_job_template: Reinstate HSR | Patching Demo Provisioner
         identifier: node110
         all_parents_must_converge: yes
         success_nodes:
           - node999
         failure_nodes:
           - node210
+      - unified_job_template: Prepare New Content | Patching Demo Provisioner
+        identifier: node111
+        all_parents_must_converge: yes
+        success_nodes:
+          - node999
+        failure_nodes:
+          - node211
     # Notification Nodes
       - unified_job_template: Send Provisioner Email | Succeeded | Patching Demo Provisioner
         identifier: node999
@@ -663,6 +679,8 @@ controller_workflows:
         identifier: node209
       - unified_job_template: Send Provisioner Email | Failed | Patching Demo Provisioner
         identifier: node210
+      - unified_job_template: Send Provisioner Email | Failed | Patching Demo Provisioner
+        identifier: node211
   - name: Teardown Patching Demo
     organization: "{{ deploy_from_controller_org }}"
     state: "{{ resource_state | default('present') }}"
