@@ -118,49 +118,6 @@ controller_groups:
     variables:
       cpus: 8
       memory_mb: 73728
-      additional_storage:
-        - capacity: 805306368000
-          type: SCSI
-          scsi:
-            bus: 0
-            unit: 1
-      storage_pools:
-        - name: sap
-          disks:
-            - sdb
-          volumes:
-            - name: data
-              size: "128 GiB"
-              mount_point: "/hana/data"
-              state: present
-            - name: log
-              size: "100 GiB"
-              mount_point: "/hana/log"
-              state: present
-            - name: shared
-              size: "256 GiB"
-              mount_point: "/hana/shared"
-              state: present
-            - name: sap
-              size: "50 GiB"
-              mount_point: "/usr/sap"
-              state: present
-      sap_hana_deployment_bundle_path: /software/HANA_installation
-      sap_hana_deployment_bundle_sar_file_name: IMDB_SERVER20_046_0-80002031.SAR
-      sap_hana_deployment_sapcar_path: /software/SAPCAR
-      sap_hana_deployment_sapcar_file_name: SAPCAR_1311-80000935.EXE
-      sap_hana_deployment_root_password: "{  { ansible_password }}"
-      sap_hana_deployment_sapadm_password: "{  { ansible_password }}"
-      sap_hana_deployment_hana_instance_number: "00"
-      sap_hana_deployment_hana_env_type: development
-      sap_hana_deployment_hana_mem_restrict: "n"
-      sap_hana_deployment_common_master_password: "{  { ansible_password }}"
-      sap_hana_deployment_sidadm_password: "{  { ansible_password }}"
-      sap_hana_deployment_hana_db_system_password: "{  { ansible_password }}"
-      sap_hana_deployment_ase_user_password: "{  { ansible_password }}"
-      sap_hana_deployment_apply_license: false
-      sap_hana_hsr_hana_instance_number: "00"
-      sap_hana_hsr_hana_db_system_password: "{  { ansible_password }}"
   - name: netweaver
     inventory: "{{ audience }} Infrastructure"
     hosts:
@@ -169,53 +126,6 @@ controller_groups:
     variables:
       cpus: 4
       memory_mb: 16384
-      additional_storage:
-        - capacity: 107374182400
-          type: SCSI
-          scsi:
-            bus: 0
-            unit: 1
-      storage_pools:
-        - name: sap
-          disks:
-            - sdb
-          volumes:
-            - name: sap
-              size: "50 GiB"
-              mount_point: "/usr/sap"
-              state: present
-            - name: sapmnt
-              size: "20 GiB"
-              mount_point: "/usr/sapmnt"
-              state: present
-            - name: swap
-              size: "20 GiB"
-              state: present
-      sap_netweaver_preconfigure_fail_if_not_enough_swap_space_configured: no
-      sap_s4hana_deployment_product_id: "NW_ABAP_OneHost:S4HANA1909.CORE.HDB.ABAP"
-      sap_s4hana_deployment_sapcar_path: "/software/SAPCAR"
-      sap_s4hana_deployment_sapcar_file_name: "SAPCAR_1311-80000935.EXE"
-      sap_s4hana_deployment_swpm_path: "/software/S4HANA_installation"
-      sap_s4hana_deployment_swpm_sar_file_name: "SWPM20SP04_6-80003424.SAR"
-      sap_s4hana_deployment_db_schema_password: "{  { ansible_password }}"
-      sap_s4hana_deployment_db_schema_abap_password: "{  { ansible_password }}"
-      sap_s4hana_deployment_master_password: "{  { ansible_password }}"
-      sap_s4hana_deployment_hana_systemdb_password: "{  { ansible_password }}"
-      sap_s4hana_deployment_hana_instance_nr: "00"
-      sap_s4hana_deployment_hana_system_password: "{  { ansible_password }}"
-      sap_s4hana_deployment_parallel_jobs_nr: "30"
-      sap_s4hana_deployment_db_sidadm_password: "{  { ansible_password }}"
-      sap_s4hana_deployment_igs_path: "/software/S4HANA_installation"
-      sap_s4hana_deployment_igs_file_name: "igsexe_9-80003187.sar"
-      sap_s4hana_deployment_igs_helper_path: "/software/S4HANA_installation"
-      sap_s4hana_deployment_igs_helper_file_name: "igshelper_17-10010245.sar"
-      sap_s4hana_deployment_kernel_dependent_path: "/software/S4HANA_installation"
-      sap_s4hana_deployment_kernel_dependent_file_name: "SAPEXEDB_201-80003385.SAR"
-      sap_s4hana_deployment_kernel_independent_path: "/software/S4HANA_installation"
-      sap_s4hana_deployment_kernel_independent_file_name: "SAPEXE_201-80003386.SAR"
-      sap_s4hana_deployment_software_path: "/software/S4HANA_installation"
-      sap_s4hana_deployment_sapadm_password: "{  { ansible_password }}"
-      sap_s4hana_deployment_sap_sidadm_password: "{  { ansible_password }}"
   - name: sap
     inventory: "{{ audience }} Infrastructure"
     children:
@@ -224,29 +134,6 @@ controller_groups:
     variables:
       os: rhel8.4
       application: sap
-      sap_preconfigure_modify_etc_hosts: yes
-      sap_domain: "josh.lab.msp.redhat.com"
-      sap_hostagent_installation_type: "rpm"
-      sap_hostagent_rpm_remote_path: "/software/SAPHOSTAGENT"
-      sap_hostagent_rpm_file_name: "saphostagentrpm_44-20009394.rpm"
-      sap_preconfigure_fail_if_reboot_required: no
-      sap_preconfigure_selinux_state: permissive
-      nfs_shares:
-        - src: 10.15.108.14:/mnt/data01/sap
-          path: /software
-      provisioning:
-        satellite:
-          server: patching-satellite.josh.lab.msp.redhat.com
-          username: admin
-          password: "{  { ansible_password }}"
-        host_group: "kickstart-{  { os }}-vlan146"
-        organization: "{{ audience }} Infrastructure"
-        location: "{{ audience }} Infrastructure"
-        method: bootdisk
-        dns_domain: josh.lab.msp.redhat.com
-        cpus: "{  { cpus }}"
-        memory_mb: "{  { memory_mb }}"
-        activation_keys: "ak-{  { application }}-{  { os }}-{  { lifecycle_environment }}"
   - name: non_production
     inventory: "{{ audience }} Infrastructure"
     hosts:
@@ -255,31 +142,6 @@ controller_groups:
       - sapdnhdb2.josh.lab.msp.redhat.com
     variables:
       lifecycle_environment: non_production
-      sap_hana_deployment_hana_sid: NS4
-      sap_hana_hsr_hana_sid: NS4
-      sap_hana_hsr_hana_primary_hostname: sapdnhdb1
-      sap_hana_hsr_full_primary_hostname: sapdnhdb1.josh.lab.msp.redhat.com
-      sap_hana_hsr_full_secondary_hostname: sapdnhdb2.josh.lab.msp.redhat.com
-      sap_hana_ha_pacemaker_hana_sid: NS4
-      sap_hana_ha_pacemaker_hana_instance_number: "00"
-      sap_hana_ha_pacemaker_vip: 10.15.121.33
-      sap_hana_ha_pacemaker_hacluster_password: "{  { ansible_password }}"
-      sap_hana_ha_pacemaker_node1_fqdn: sapdnhdb1.josh.lab.msp.redhat.com
-      sap_hana_ha_pacemaker_node2_fqdn: sapdnhdb2.josh.lab.msp.redhat.com
-      sap_hana_ha_pacemaker_node1_ip: 10.15.121.31
-      sap_hana_ha_pacemaker_node2_ip: 10.15.121.32
-      sap_s4hana_deployment_sid: NS4
-      sap_s4hana_deployment_db_host: sapdnhdb.josh.lab.msp.redhat.com
-      sap_s4hana_deployment_db_sid: NS4
-      custom_dns_records:
-        - name: "{  { sap_s4hana_deployment_db_host.split('.')[0] }}"
-          zone: josh.lab.msp.redhat.com
-          type: A
-          value: "{  { sap_hana_ha_pacemaker_vip }}"
-        - name: "{  { sap_hana_ha_pacemaker_vip.split('.')[-1] }}"
-          zone: "{  { sap_hana_ha_pacemaker_vip.split('.')[2] }}.15.10.in-addr.arpa."
-          type: PTR
-          value: "{  { sap_s4hana_deployment_db_host }}."
   - name: production
     inventory: "{{ audience }} Infrastructure"
     hosts:
@@ -288,41 +150,17 @@ controller_groups:
       - sapdphdb2.josh.lab.msp.redhat.com
     variables:
       lifecycle_environment: production
-      sap_hana_deployment_hana_sid: PS4
-      sap_hana_hsr_hana_sid: PS4
-      sap_hana_hsr_hana_primary_hostname: sapdphdb1
-      sap_hana_hsr_full_primary_hostname: sapdphdb1.josh.lab.msp.redhat.com
-      sap_hana_hsr_full_secondary_hostname: sapdphdb2.josh.lab.msp.redhat.com
-      sap_hana_ha_pacemaker_hana_sid: PS4
-      sap_hana_ha_pacemaker_hana_instance_number: "00"
-      sap_hana_ha_pacemaker_vip: 10.15.121.37
-      sap_hana_ha_pacemaker_hacluster_password: "{  { ansible_password }}"
-      sap_hana_ha_pacemaker_node1_fqdn: sapdphdb1.josh.lab.msp.redhat.com
-      sap_hana_ha_pacemaker_node2_fqdn: sapdphdb2.josh.lab.msp.redhat.com
-      sap_hana_ha_pacemaker_node1_ip: 10.15.121.35
-      sap_hana_ha_pacemaker_node2_ip: 10.15.121.36
-      sap_s4hana_deployment_sid: PS4
-      sap_s4hana_deployment_db_host: sapdphdb.josh.lab.msp.redhat.com
-      sap_s4hana_deployment_db_sid: PS4
-      custom_dns_records:
-        - name: "{  { sap_s4hana_deployment_db_host.split('.')[0] }}"
-          zone: josh.lab.msp.redhat.com
-          type: A
-          value: "{  { sap_hana_ha_pacemaker_vip }}"
-        - name: "{  { sap_hana_ha_pacemaker_vip.split('.')[-1] }}"
-          zone: "{  { sap_hana_ha_pacemaker_vip.split('.')[2] }}.15.10.in-addr.arpa."
-          type: PTR
-          value: "{  { sap_s4hana_deployment_db_host }}."
   - name: kpatch_patch
     inventory: "{{ audience }} Infrastructure"
     children:
-      - hana
+      - primary
     variables:
       patching_strategy: kpatch
   - name: normal_patch
     inventory: "{{ audience }} Infrastructure"
     children:
       - netweaver
+      - secondary
     variables:
       patching_strategy: normal
   - name: satellite
@@ -331,164 +169,140 @@ controller_groups:
       - patching-satellite.josh.lab.msp.redhat.com
 
 controller_templates:
-  - name: Run Insights Report
+  - name: Run Insights Report | Non_Production | Security
     inventory: "{{ audience }} Infrastructure"
-    limit: demo_hosts
+    limit: non_production
     project: Patching Demo
     credentials:
       - Patching Credentials
-  - name: Check for Updates
+  - name: Check for Updates | Non_Production | Security
     inventory: Patching Demo
-    limit: demo_hosts
+    limit: non_production
     project: Patching Demo
     playbook: playbooks/check-for-updates.yml
     credentials:
-      - Patching Credentials      
-  - name: Install Tracer
+      - Patching Credentials
+  - name: Install Tracer | Non_Production | Infrastructure
     inventory: Patching Demo
-    limit: normal_patch
+    limit: 'non_production:&normal_patch'
     project: Patching Demo
     playbook: playbooks/install-tracer.yml
     credentials:
       - Patching Credentials
-  - name: Promote Content to Non Production
+  - name: Standby Secondary Database | Non_Production | BASIS (Application Team)
     inventory: Patching Demo
-    limit: satellite
+    limit: 'non_production:&secondary'
     project: Patching Demo
-    playbook: playbooks/promote-content.yml
+    playbook: playbooks/pacemaker-node-control.yml
+    credentials:
+      - Patching Credentials
     extra_vars:
-      current_lifecycle_environment: Library
-      new_lifecycle_environment:
-        - Non_Production
-  
+      pcs_node_status: standby
+  - name: Update All Packages | Non_Production | Infrastructure
+    inventory: Patching Demo
+    limit: 'non_production:&normal_patch'
+    project: Patching Demo
+    playbook: playbooks/update-all-packates.yml
+    credentials:
+      - Patching Credentials
+  - name: Run Tracer Report | Non_Production | Infrastructure
+    inventory: Patching Demo
+    limit: 'non_production:&normal_patch'
+    project: Patching Demo
+    playbook: playbooks/run-tracer-report.yml
+    credentials:
+      - Patching Credentials
+  - name: Reboot Server | Non_Production | Infrastructure
+    inventory: Patching Demo
+    limit: 'non_production:&normal_patch'
+    project: Patching Demo
+    playbook: playbooks/reboot-server.yml
+    credentials:
+      - Patching Credentials  
+  - name: Kpatch Server | Non_Production | Infrastructure
+    inventory: Patching Demo
+    limit: 'non_production:&kpatch'
+    project: Patching Demo
+    playbook: playbooks/kpatch-server.yml
+    credentials:
+      - Patching Credentials
+  - name: Unstandby Secondary Database | Non_Production | BASIS (Application Team)
+    inventory: Patching Demo
+    limit: 'non_production:&secondary'
+    project: Patching Demo
+    playbook: playbooks/pacemaker-node-control.yml
+    credentials:
+      - Patching Credentials
+    extra_vars:
+      pcs_node_status: unstandby
 
 controller_workflows:
-  - name: Pre-Patching Workflow
+  - name: Pre-Patching | Non_Production | Security
     organization: "{{ audience }}"
     simplified_workflow_nodes:
-      - unified_job_template: Run Insights Report
+      - unified_job_template: Run Insights Report | Non_Production | Security
+        identifier: node101
+      - unified_job_template: Check for Updates | Non_Production | Security
+        identifier: node102
+  - name: Pre-Patching | Non_Production | Infrastructure
+    organization: "{{ audience }}"
+    simplified_workflow_nodes:
+      - unified_job_template: Install Tracer | Non_Production | Infrastructure
+        identifier: node101
+  - name: Pre-Patching | Non_Production | BASIS (Application Team)
+    organization: "{{ audience }}"
+    simplified_workflow_nodes:
+      - unified_job_template: Standby Secondary Database | Non_Production | BASIS (Application Team)
+        identifier: node101
+  - name: Patching | Non_Production | Infrastructure
+    organization: "{{ audience }}"
+    simplified_workflow_nodes:
+      - unified_job_template: Update All Packages | Non_Production | Infrastructure
         identifier: node101
         success_nodes:
           - node102
-      - unified_job_template: Check for Updates
+      - unified_job_template: Run Tracer Report | Non_Production | Infrastructure
         identifier: node102
         success_nodes:
           - node103
-      - unified_job_template: Install Tracer
+      - unified_job_template: Reboot Server | Non_Production | Infrastructure
         identifier: node103
-
-  # - name: 1 - Run Insights Report
-  #   inventory: Patching Demo
-  #   limit: sap
-  #   project: Patching Demo
-  #   playbook: playbooks/run-insights-report.yml
-  #   credentials:
-  #     - Patching Credentials
-  # - name: 2 - Check for Updates
-  #   inventory: Patching Demo
-  #   limit: sap
-  #   project: Patching Demo
-  #   playbook: playbooks/check-for-updates.yml
-  #   credentials:
-  #     - Patching Credentials
-
-  # - name: 4 - Recheck for Updates
-  #   inventory: Patching Demo
-  #   limit: sap
-  #   project: Patching Demo
-  #   playbook: playbooks/check-for-updates.yml
-  #   credentials:
-  #     - Patching Credentials
-  # - name: 5 - Install Tracer | Netweaver
-  #   inventory: Patching Demo
-  #   limit: netweaver
-  #   project: Patching Demo
-  #   playbook: playbooks/install-tracer.yml
-  #   credentials:
-  #     - Patching Credentials
-  # - name: 6 - Update All Packages | Netweaver | Non Production
-  #   inventory: Patching Demo
-  #   limit: 'netweaver:&non_production'
-  #   project: Patching Demo
-  #   playbook: playbooks/update-all-packages.yml
-  #   credentials:
-  #     - Patching Credentials
-  # - name: 7 - kpatch Databases | HANA | Non Production
-  #   inventory: Patching Demo
-  #   limit: 'hana:&non_production'
-  #   project: Patching Demo
-  #   playbook: playbooks/kpatch-server.yml
-  #   credentials:
-  #     - Patching Credentials
-  # - name: 8 - Run Tracer Report | Netweaver | Non Production
-  #   inventory: Patching Demo
-  #   limit: 'netweaver:&non_production'
-  #   project: Patching Demo
-  #   playbook: playbooks/run-tracer-report.yml
-  #   credentials:
-  #     - Patching Credentials
-  # - name: 9 - Get Tracer Information | Netweaver | Non Production
-  #   inventory: Patching Demo
-  #   limit: 'netweaver:&non_production'
-  #   project: Patching Demo
-  #   playbook: playbooks/get-tracer-report.yml
-  #   credentials:
-  #     - Patching Credentials
-  # - name: 10 - Reboot Server | Netweaver | Non Production
-  #   inventory: Patching Demo
-  #   limit: 'netweaver:&non_production'
-  #   project: Patching Demo
-  #   playbook: playbooks/reboot-server.yml
-  #   credentials:
-  #     - Patching Credentials
-  # - name: 11 - Promote Content to Production
-  #   inventory: Patching Demo
-  #   limit: satellite
-  #   project: Patching Demo
-  #   playbook: playbooks/promote-content.yml
-  #   extra_vars:
-  #     current_lifecycle_environment: Non_Production
-  #     new_lifecycle_environment:
-  #       - Production
-  # - name: 12 - Check for Updates
-  #   inventory: Patching Demo
-  #   limit: sap
-  #   project: Patching Demo
-  #   playbook: playbooks/check-for-updates.yml
-  #   credentials:
-  #     - Patching Credentials
-  # - name: 13 - Update All Packages | Netweaver | Production
-  #   inventory: Patching Demo
-  #   limit: 'netweaver:&production'
-  #   project: Patching Demo
-  #   playbook: playbooks/update-all-packages.yml
-  #   credentials:
-  #     - Patching Credentials
-  # - name: 14 - kpatch Databases | HANA | Production
-  #   inventory: Patching Demo
-  #   limit: 'hana:&production'
-  #   project: Patching Demo
-  #   playbook: playbooks/kpatch-server.yml
-  #   credentials:
-  #     - Patching Credentials
-  # - name: 15 - Run Tracer Report | Netweaver | Production
-  #   inventory: Patching Demo
-  #   limit: 'netweaver:&production'
-  #   project: Patching Demo
-  #   playbook: playbooks/run-tracer-report.yml
-  #   credentials:
-  #     - Patching Credentials
-  # - name: 16 - Get Tracer Information | Netweaver | Production
-  #   inventory: Patching Demo
-  #   limit: 'netweaver:&production'
-  #   project: Patching Demo
-  #   playbook: playbooks/get-tracer-report.yml
-  #   credentials:
-  #     - Patching Credentials
-  # - name: 17 - Reboot Server | Netweaver | Production
-  #   inventory: Patching Demo
-  #   limit: 'netweaver:&production'
-  #   project: Patching Demo
-  #   playbook: playbooks/reboot-server.yml
-  #   credentials:
-  #     - Patching Credentials
+      - unified_job_template: Kpatch Server | Non_Production | Infrastructure
+        identifier: node201
+  - name: Post-Patching | Non_Production | Security
+    organization: "{{ audience }}"
+    simplified_workflow_nodes:
+      - unified_job_template: Run Insights Report | Non_Production | Security
+        identifier: node101
+      - unified_job_template: Check for Updates | Non_Production | Security
+        identifier: node102
+  - name: Post-Patching | Non_Production | BASIS (Application Team)
+    organization: "{{ audience }}"
+    simplified_workflow_nodes:
+      - unified_job_template: Unstandby Secondary Database | Non_Production | BASIS (Application Team)
+        identifier: node101
+  - name: Patch Non_Production
+    organization: "{{ audience }}"
+    simplified_workflow_nodes:
+      - unified_job_template: Pre-Patching | Non_Production | Security
+        identifier: node101
+        success_nodes:
+          - node102
+      - unified_job_template: Pre-Patching | Non_Production | Infrastructure
+        identifier: node102
+        success_nodes:
+          - node103
+      - unified_job_template: Pre-Patching | Non_Production | BASIS (Application Team)
+        identifier: node103
+        success_nodes:
+          - node104
+      - unified_job_template: Patching | Non_Production | Infrastructure
+        identifier: node104
+        success_nodes:
+          - node105
+      - unified_job_template: Post-Patching | Non_Production | Security
+        identifier: node105
+        success_nodes:
+          - node106
+      - unified_job_template: Post-Patching | Non_Production | BASIS (Application Team)
+        identifier: node106
