@@ -19,6 +19,12 @@ controller_credentials:
       username: root
       password: "{{ ansible_password }}"
 
+controller_execution_environments:
+  - name: Patching Demo EE
+    image: 'aap20-hub.josh.lab.msp.redhat.com/patching-demo-ee:latest'
+    organization: "{{ audience }}"
+    credential: MSP Lab AAP20 Automation Hub
+
 controller_teams:
   - name: "{{ audience }} Application Team"
     description: application team
@@ -67,8 +73,8 @@ controller_hosts:
       satellite:
         username: admin
         password: "{  { ansible_password }}"
-        url: https://patching-satellite.demo.lab.msp.redhat.com
-        organization: Patching Demo
+        url: "https://{  { inventory_hostname }}"
+        organization: "{{ audience }}"
         composite_content_view: composite-rhel8
         content_view_filter_name: '06-01-2021'
   - name: sapdnhdb1.josh.lab.msp.redhat.com
@@ -194,6 +200,7 @@ controller_templates:
     project: "{{ audience }} Patching Code"
     organization: "{{ audience }}"
     playbook: playbooks/run-insights-report.yml
+    execution_environment: Patching Demo EE
     credentials:
       - Patching Credentials
   - name: Check for Updates | Non_Production | Security
@@ -202,6 +209,7 @@ controller_templates:
     project: "{{ audience }} Patching Code"
     organization: "{{ audience }}"
     playbook: playbooks/check-for-updates.yml
+    execution_environment: Patching Demo EE
     credentials:
       - Patching Credentials
   - name: Install Tracer | Non_Production | Infrastructure
@@ -210,6 +218,7 @@ controller_templates:
     project: "{{ audience }} Patching Code"
     organization: "{{ audience }}"
     playbook: playbooks/install-tracer.yml
+    execution_environment: Patching Demo EE
     credentials:
       - Patching Credentials
   - name: Standby Secondary Database | Non_Production | BASIS (Application Team)
@@ -218,6 +227,7 @@ controller_templates:
     project: "{{ audience }} Patching Code"
     organization: "{{ audience }}"
     playbook: playbooks/pacemaker-node-control.yml
+    execution_environment: Patching Demo EE
     credentials:
       - Patching Credentials
     extra_vars:
@@ -228,6 +238,7 @@ controller_templates:
     project: "{{ audience }} Patching Code"
     organization: "{{ audience }}"
     playbook: playbooks/update-all-packages.yml
+    execution_environment: Patching Demo EE
     credentials:
       - Patching Credentials
   - name: Run Tracer Report | Non_Production | Infrastructure
@@ -236,6 +247,7 @@ controller_templates:
     project: "{{ audience }} Patching Code"
     organization: "{{ audience }}"
     playbook: playbooks/run-tracer-report.yml
+    execution_environment: Patching Demo EE
     credentials:
       - Patching Credentials
   - name: Reboot Server | Non_Production | Infrastructure
@@ -244,14 +256,16 @@ controller_templates:
     project: "{{ audience }} Patching Code"
     organization: "{{ audience }}"
     playbook: playbooks/reboot-server.yml
+    execution_environment: Patching Demo EE
     credentials:
       - Patching Credentials  
   - name: Kpatch Server | Non_Production | Infrastructure
     inventory: "{{ audience }} Infrastructure"
-    limit: 'non_production:&kpatch'
+    limit: 'non_production:&kpatch_patch'
     project: "{{ audience }} Patching Code"
     organization: "{{ audience }}"
     playbook: playbooks/kpatch-server.yml
+    execution_environment: Patching Demo EE
     credentials:
       - Patching Credentials
   - name: Unstandby Secondary Database | Non_Production | BASIS (Application Team)
@@ -260,10 +274,22 @@ controller_templates:
     project: "{{ audience }} Patching Code"
     organization: "{{ audience }}"
     playbook: playbooks/pacemaker-node-control.yml
+    execution_environment: Patching Demo EE
     credentials:
       - Patching Credentials
     extra_vars:
       pcs_node_status: unstandby
+  - name: Promote Content to Production | Infrastructure
+    inventory: "{{ audience }} Infrastructure"
+    limit: satellite
+    project: "{{ audience }} Patching Code"
+    playbook: playbooks/promote-content.yml
+    extra_vars:
+      current_lifecycle_environment: Non_Production
+      new_lifecycle_environment:
+        - Production
+    credentials:
+      - Patching Credentials
 
 controller_workflows:
   - name: Pre-Patching | Non_Production | Security
@@ -336,7 +362,7 @@ controller_workflows:
       - unified_job_template: Reboot Server | Non_Production | Infrastructure
         identifier: node106
       - approval_node:
-          name: Approve 'Reboot Server | Non_Production | Infrastructure'
+          name: Approve 'Kpatch Server | Non_Production | Infrastructure'
         identifier: node201
         success_nodes:
           - node202
@@ -349,7 +375,7 @@ controller_workflows:
       - approval_node:
           name: Approve 'Run Insights Report | Non_Production | Security'
         identifier: node101
-        success_node:
+        success_nodes:
           - node102
       - unified_job_template: Run Insights Report | Non_Production | Security
         identifier: node102
@@ -367,7 +393,7 @@ controller_workflows:
       - approval_node:
           name: Approve 'Unstandby Secondary Database | Non_Production | BASIS (Application Team)'
         identifier: node101
-        success_node:
+        success_nodes:
           - node102
       - unified_job_template: Unstandby Secondary Database | Non_Production | BASIS (Application Team)
         identifier: node102
@@ -375,58 +401,37 @@ controller_workflows:
     organization: "{{ audience }}"
     state: present
     simplified_workflow_nodes:
-      - approval_node:
-          name: Approve 'Pre-Patching | Non_Production | Security'
-        identifier: node101
-        success_node:
-          - node102
       - unified_job_template: Pre-Patching | Non_Production | Security
+        identifier: node101
+        success_nodes:
+          - node102
+      - unified_job_template: Pre-Patching | Non_Production | Infrastructure
         identifier: node102
         success_nodes:
           - node103
-      - approval_node:
-          name: Approve 'Pre-Patching | Non_Production | Infrastructure'
+      - unified_job_template: Pre-Patching | Non_Production | BASIS (Application Team)
         identifier: node103
-        success_node:
+        success_nodes:
           - node104
-      - unified_job_template: Pre-Patching | Non_Production | Infrastructure
+      - unified_job_template: Patching | Non_Production | Infrastructure
         identifier: node104
         success_nodes:
           - node105
-      - approval_node:
-          name: Approve 'Pre-Patching | Non_Production | BASIS (Application Team)'
+      - unified_job_template: Post-Patching | Non_Production | Security
         identifier: node105
-        success_node:
+        success_nodes:
           - node106
-      - unified_job_template: Pre-Patching | Non_Production | BASIS (Application Team)
+      - unified_job_template: Post-Patching | Non_Production | BASIS (Application Team)
         identifier: node106
         success_nodes:
           - node107
       - approval_node:
-          name: Approve 'Patching | Non_Production | Infrastructure'
+          name: Approve 'Promote Content to Production | Infrastructure'
         identifier: node107
-        success_node:
+        success_nodes:
           - node108
-      - unified_job_template: Patching | Non_Production | Infrastructure
+      - unified_job_template: Promote Content to Production | Infrastructure
         identifier: node108
-        success_nodes:
-          - node109
-      - approval_node:
-          name: Approve 'Post-Patching | Non_Production | Security'
-        identifier: node109
-        success_node:
-          - node110
-      - unified_job_template: Post-Patching | Non_Production | Security
-        identifier: node110
-        success_nodes:
-          - node111
-      - approval_node:
-          name: Approve 'Post-Patching | Non_Production | BASIS (Application Team)'
-        identifier: node111
-        success_node:
-          - node112
-      - unified_job_template: Post-Patching | Non_Production | BASIS (Application Team)
-        identifier: node112
 
 controller_roles:
   # admin account
