@@ -15,6 +15,7 @@
       loop:
         - redhat_cop.controller_configuration.organizations
         - redhat_cop.controller_configuration.credentials
+        - redhat_cop.controller_configuration.execution_environments
         - redhat_cop.controller_configuration.teams
         - redhat_cop.controller_configuration.users
         - redhat_cop.controller_configuration.inventories
