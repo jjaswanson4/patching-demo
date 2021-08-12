@@ -1,6 +1,10 @@
 ---
 
 roles:
+  - name: linux-system-roles.cockpit
+    source: https://galaxy.ansible.com
+  - name: linux-system-roles.metrics
+    source: https://galaxy.ansible.com
   - name: redhat_sap.sap_hostagent
     source: https://galaxy.ansible.com
   - name: sap-preconfigure
