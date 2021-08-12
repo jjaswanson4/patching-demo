@@ -60,14 +60,6 @@ controller_inventories:
           iburst: yes
         - hostname: 3.rhel.pool.ntp.org
           iburst: yes
-      cockpit_packages:
-        - cockpit-storaged
-        - cockpit-pcp
-        - cockpit-sosreport    
-        - cockpit-networkmanager
-        - cockpit-packagekit
-      metrics_graph_service: yes
-      metrics_rention_days: 14
       vcenter:
         server: vcenter02.lab.msp.redhat.com
         username: 'Administrator@vsphere.local'
@@ -367,6 +359,14 @@ controller_groups:
       - production
     variables:
       htop_url: https://dl.fedoraproject.org/pub/epel/8/Everything/x86_64/Packages/h/htop-3.0.5-1.el8.x86_64.rpm
+      cockpit_packages:
+        - cockpit-storaged
+        - cockpit-pcp
+        - cockpit-sosreport    
+        - cockpit-networkmanager
+        - cockpit-packagekit
+      metrics_graph_service: yes
+      metrics_rention_days: 14
   - name: satellite
     inventory: Patching Demo Infrastructure
     hosts:
