@@ -18,6 +18,13 @@ controller_credentials:
     inputs:
       username: root
       password: "{{ ansible_password }}"
+  - name: Red Hat Satellite Credentials
+    organization: "{{ audience }}"
+    credential_type: Red Hat Satellite 6
+    inputs:
+      host: https://patching-satellite.josh.lab.msp.redhat.com
+      username: admin
+      password: "{{ satellite_password }}"
 
 controller_execution_environments:
   - name: Patching Demo EE
@@ -65,52 +72,12 @@ controller_inventories:
   - name: "{{ audience }} Infrastructure"
     organization: "{{ audience }}"
 
-controller_hosts:
-  - name: patching-satellite.josh.lab.msp.redhat.com
+controller_inventory_sources:
+  - name: Patching Satellite Inventory Source
+    source: satellite6
     inventory: "{{ audience }} Infrastructure"
-    variables:
-      ansible_host: 10.15.121.1
-      satellite:
-        username: admin
-        password: "{  { ansible_password }}"
-        url: "https://{  { inventory_hostname }}"
-        organization: "{{ audience }}"
-        composite_content_view: composite-rhel8
-        content_view_filter_name: '06-01-2021'
-  - name: sapdnhdb1.josh.lab.msp.redhat.com
-    inventory: "{{ audience }} Infrastructure"
-    variables:
-      ansible_host: 10.15.121.31
-      ip_address: "{  { ansible_host }}"
-      sap_hana_hsr_alias: DC1
-  - name: sapdnhdb2.josh.lab.msp.redhat.com
-    inventory: "{{ audience }} Infrastructure"
-    variables:
-      ansible_host: 10.15.121.32
-      ip_address: "{  { ansible_host }}"
-      sap_hana_hsr_alias: DC2
-  - name: sapdnapp1.josh.lab.msp.redhat.com
-    inventory: "{{ audience }} Infrastructure"
-    variables:
-      ansible_host: 10.15.121.34
-      ip_address: "{  { ansible_host }}"
-  - name: sapdphdb1.josh.lab.msp.redhat.com
-    inventory: "{{ audience }} Infrastructure"
-    variables:
-      ansible_host: 10.15.121.35
-      ip_address: "{  { ansible_host }}"
-      sap_hana_hsr_alias: DC1
-  - name: sapdphdb2.josh.lab.msp.redhat.com
-    inventory: "{{ audience }} Infrastructure"
-    variables:
-      ansible_host: 10.15.121.36
-      ip_address: "{  { ansible_host }}"
-      sap_hana_hsr_alias: DC2
-  - name: sapdpapp1.josh.lab.msp.redhat.com
-    inventory: "{{ audience }} Infrastructure"
-    variables:
-      ansible_host: 10.15.121.38
-      ip_address: "{  { ansible_host }}"
+    credential: Red Hat Satellite Credentials
+    organization: "{{ audience }}"
 
 controller_groups:
   - name: primary
@@ -132,17 +99,11 @@ controller_groups:
     children:
       - primary
       - secondary
-    variables:
-      cpus: 8
-      memory_mb: 73728
   - name: netweaver
     inventory: "{{ audience }} Infrastructure"
     hosts:
       - sapdnapp1.josh.lab.msp.redhat.com
       - sapdpapp1.josh.lab.msp.redhat.com
-    variables:
-      cpus: 4
-      memory_mb: 16384
   - name: sap
     inventory: "{{ audience }} Infrastructure"
     children:
@@ -184,6 +145,14 @@ controller_groups:
     inventory: "{{ audience }} Infrastructure"
     hosts:
       - patching-satellite.josh.lab.msp.redhat.com
+    variables:
+      satellite:
+        username: admin
+        password: "{  { satellite_password }}"
+        url: "https://{  { inventory_hostname }}"
+        organization: "{{ audience }}"
+        composite_content_view: composite-rhel8
+        content_view_filter_name: '06-01-2021'
 
 controller_projects:
   - name: "{{ audience }} Patching Code"

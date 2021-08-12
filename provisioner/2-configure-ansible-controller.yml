@@ -19,7 +19,8 @@
         - redhat_cop.controller_configuration.teams
         - redhat_cop.controller_configuration.users
         - redhat_cop.controller_configuration.inventories
-        - redhat_cop.controller_configuration.hosts
+        - redhat_cop.controller_configuration.inventory_sources
+        - redhat_cop.controller_configuration.inventory_source_update
         - redhat_cop.controller_configuration.groups
         - redhat_cop.controller_configuration.projects
         - redhat_cop.controller_configuration.job_templates
