@@ -9,7 +9,10 @@ build_arg_defaults:
 
 dependencies:
   galaxy: requirements.yml
+  system: bindep.txt
 
 additional_build_steps:
   prepend:
     - RUN pip3 install --upgrade pip setuptools
+  append:
+    - RUN pip3 list installed
