@@ -60,6 +60,14 @@ controller_inventories:
           iburst: yes
         - hostname: 3.rhel.pool.ntp.org
           iburst: yes
+      cockpit_packages:
+        - cockpit-storaged
+        - cockpit-pcp
+        - cockpit-sosreport    
+        - cockpit-networkmanager
+        - cockpit-packagekit
+      metrics_graph_service: yes
+      metrics_rention_days: 14
       vcenter:
         server: vcenter02.lab.msp.redhat.com
         username: 'Administrator@vsphere.local'
@@ -397,6 +405,7 @@ controller_templates:
   - name: Provision Demo Hosts | Patching Demo Provisioner
     inventory: Patching Demo Infrastructure
     limit: demo_hosts
+    forks: 6
     project: Patching Demo
     playbook: provisioner/3-provision-demo-hosts.yml
     execution_environment: Patching Demo Provisioner EE
