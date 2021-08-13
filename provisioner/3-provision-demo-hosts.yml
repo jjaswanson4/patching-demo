@@ -12,7 +12,7 @@
           password: "{{ dns_pass }}"
           records: "{{ dns.records  + custom_dns_records }}"
   tasks:
-    - name: include roles
+    - name: include provisioning roles
       ansible.builtin.include_role:
         name: "{{ role }}"
       loop_control:
@@ -27,10 +27,10 @@
         - redhat.rhel_system_roles.storage
         - redhat.rhel_system_roles.selinux
         - redhat.rhel_system_roles.timesync
-        - linux-system-roles.cockpit
-        - linux-system-roles.metrics
         - sap-preconfigure
         - redhat_sap.sap_hostagent
+        - linux-system-roles.cockpit
+        - linux-system-roles.metrics
       when:
         - provision_demo_hosts | bool
   handlers:
