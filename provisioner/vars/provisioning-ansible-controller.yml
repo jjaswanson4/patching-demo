@@ -363,6 +363,10 @@ controller_groups:
       - peripheral
     variables:
       htop_url: https://dl.fedoraproject.org/pub/epel/8/Everything/x86_64/Packages/h/htop-3.0.5-1.el8.x86_64.rpm
+      firewall:
+        name: firewalld
+        state: stopped
+        enabled: no
       cockpit_packages:
         - cockpit-storaged
         - cockpit-pcp
