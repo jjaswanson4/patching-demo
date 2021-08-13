@@ -11,6 +11,8 @@
           server: "{{ dns.server }}"
           password: "{{ dns_pass }}"
           records: "{{ dns.records  + custom_dns_records }}"
+      when:
+        - custome_dns_records is defined
   tasks:
     - name: include provisioning roles
       ansible.builtin.include_role:
