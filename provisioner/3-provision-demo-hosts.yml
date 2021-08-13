@@ -22,6 +22,7 @@
       loop:
         - jjaswanson4.utilities.idm_dns_records
         - jjaswanson4.utilities.provision_via_satellite
+        - jjaswanson4.utilities.manage_firewall_state
         - jjaswanson4.utilities.stop_networkmanager_dns
         - jjaswanson4.utilities.common_config
         - redhat.rhel_system_roles.selinux
