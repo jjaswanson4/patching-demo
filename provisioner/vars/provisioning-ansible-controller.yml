@@ -27,6 +27,7 @@ controller_execution_environments:
     image: aap20-hub.josh.lab.msp.redhat.com/patching-demo-provisioner-ee
     organization: "{{ deploy_from_controller_org }}"
     credential: MSP Lab AAP20 Automation Hub
+    pull: always
 
 controller_inventories:
   - name: Local Action Inventory
