@@ -9,12 +9,12 @@
   vars:
     deploy_from_controller_org: Default
   roles:
-    - redhat_cop.controller_configuration.credential_types
-    - redhat_cop.controller_configuration.credentials
-    - redhat_cop.controller_configuration.execution_environments
-    - redhat_cop.controller_configuration.inventories
-    - redhat_cop.controller_configuration.hosts
-    - redhat_cop.controller_configuration.groups
-    - redhat_cop.controller_configuration.projects
-    - redhat_cop.controller_configuration.job_templates
+    #- redhat_cop.controller_configuration.credential_types
+    #- redhat_cop.controller_configuration.credentials
+    #- redhat_cop.controller_configuration.execution_environments
+    #- redhat_cop.controller_configuration.inventories
+    #- redhat_cop.controller_configuration.hosts
+    #- redhat_cop.controller_configuration.groups
+    #- redhat_cop.controller_configuration.projects
+    #- redhat_cop.controller_configuration.job_templates
     - redhat_cop.controller_configuration.workflow_job_templates
