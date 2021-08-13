@@ -27,7 +27,6 @@ controller_execution_environments:
     image: aap20-hub.josh.lab.msp.redhat.com/patching-demo-provisioner-ee
     organization: "{{ deploy_from_controller_org }}"
     credential: MSP Lab AAP20 Automation Hub
-    pull: missing
 
 controller_inventories:
   - name: Local Action Inventory
@@ -160,11 +159,10 @@ controller_groups:
       cpus: 8
       memory_mb: 73728
       additional_storage:
-        - capacity: 805306368000
-          type: SCSI
-          scsi:
-            bus: 0
-            unit: 1
+        - size: 600Gb
+          type: thin
+          scsi_controller: 0
+          unit_number: 1
       storage_pools:
         - name: sap
           disks:
@@ -212,11 +210,10 @@ controller_groups:
       cpus: 4
       memory_mb: 16384
       additional_storage:
-        - capacity: 107374182400
-          type: SCSI
-          scsi:
-            bus: 0
-            unit: 1
+        - size: 100Gb
+          type: thin
+          scsi_controller: 0
+          unit_number: 1
       storage_pools:
         - name: sap
           disks:
@@ -431,12 +428,20 @@ controller_templates:
       - Patching Demo Provisioner Peripheral Credentials
       - Patching Demo Provisioner Root Account
     extra_vars:
-      ansible_become: no  
+      ansible_become: no
+  - name: Preconfigure for SAP | Patching Demo Provisioner
+    inventory: Patching Demo Infrastructure
+    limit: hana
+    project: Patching Demo
+    playbook: provisioner/4-sap-preconfigure.yml
+    execution_environment: Patching Demo Provisioner EE
+    credentials:
+      - Patching Demo Provisioner Root Account
   - name: Preconfigure for HANA Install | Patching Demo Provisioner
     inventory: Patching Demo Infrastructure
     limit: hana
     project: Patching Demo
-    playbook: provisioner/4-hana-preconfigure.yml
+    playbook: provisioner/5-hana-preconfigure.yml
     execution_environment: Patching Demo Provisioner EE
     credentials:
       - Patching Demo Provisioner Root Account
@@ -444,7 +449,7 @@ controller_templates:
     inventory: Patching Demo Infrastructure
     limit: netweaver
     project: Patching Demo
-    playbook: provisioner/5-netweaver-preconfigure.yml
+    playbook: provisioner/6-netweaver-preconfigure.yml
     execution_environment: Patching Demo Provisioner EE
     credentials:
       - Patching Demo Provisioner Root Account
@@ -452,7 +457,7 @@ controller_templates:
     inventory: Patching Demo Infrastructure
     limit: 'hana:&non_production'
     project: Patching Demo
-    playbook: provisioner/6-deploy-hana.yml
+    playbook: provisioner/7-deploy-hana.yml
     execution_environment: Patching Demo Provisioner EE
     credentials:
       - Patching Demo Provisioner Root Account
@@ -460,7 +465,7 @@ controller_templates:
     inventory: Patching Demo Infrastructure
     limit: 'hana:&production'
     project: Patching Demo
-    playbook: provisioner/6-deploy-hana.yml
+    playbook: provisioner/7-deploy-hana.yml
     execution_environment: Patching Demo Provisioner EE
     credentials:
       - Patching Demo Provisioner Root Account
@@ -468,7 +473,7 @@ controller_templates:
     inventory: Patching Demo Infrastructure
     limit: 'netweaver:&non_production'
     project: Patching Demo
-    playbook: provisioner/7-install-s4.yml
+    playbook: provisioner/8-install-s4.yml
     execution_environment: Patching Demo Provisioner EE
     credentials:
       - Patching Demo Provisioner Root Account
@@ -476,7 +481,7 @@ controller_templates:
     inventory: Patching Demo Infrastructure
     limit: 'netweaver:&production'
     project: Patching Demo
-    playbook: provisioner/7-install-s4.yml
+    playbook: provisioner/8-install-s4.yml
     execution_environment: Patching Demo Provisioner EE
     credentials:
       - Patching Demo Provisioner Root Account
@@ -484,7 +489,7 @@ controller_templates:
     inventory: Patching Demo Infrastructure
     limit: 'hana:&primary'
     project: Patching Demo
-    playbook: provisioner/8-reinstate-hsr.yml
+    playbook: provisioner/9-reinstate-hsr.yml
     execution_environment: Patching Demo Provisioner EE
     credentials:
       - Patching Demo Provisioner Root Account
@@ -492,7 +497,7 @@ controller_templates:
     inventory: Patching Demo Infrastructure
     limit: satellite
     project: Patching Demo
-    playbook: provisioner/9-prepare-new-content.yml
+    playbook: provisioner/10-prepare-new-content.yml
     execution_environment: Patching Demo Provisioner EE
     credentials:
       - Patching Demo Provisioner Peripheral Credentials
@@ -623,65 +628,72 @@ controller_workflows:
         all_parents_must_converge: yes
         success_nodes:
           - node104
-          - node105
         failure_nodes:
           - node203
-      - unified_job_template: Preconfigure for HANA Install | Patching Demo Provisioner
+      - unified_job_template: Preconfigure for SAP | Patching Demo Provisioner
         identifier: node104
+        all_parents_must_converge: yes
         success_nodes:
+          - node105
           - node106
-          - node107
-          - node111
         failure_nodes:
           - node204
-      - unified_job_template: Preconfigure for Netweaver/S4 Install | Patching Demo Provisioner
+      - unified_job_template: Preconfigure for HANA Install | Patching Demo Provisioner
         identifier: node105
         success_nodes:
+          - node107
           - node108
-          - node109
-          - node111
+          - node112
         failure_nodes:
           - node205
-      - unified_job_template: Deploy SAP HANA | Non_Production | Patching Demo Provisioner
+      - unified_job_template: Preconfigure for Netweaver/S4 Install | Patching Demo Provisioner
         identifier: node106
         success_nodes:
-          - node108
+          - node109
+          - node110
+          - node112
         failure_nodes:
           - node206
-      - unified_job_template: Deploy SAP HANA | Production | Patching Demo Provisioner
+      - unified_job_template: Deploy SAP HANA | Non_Production | Patching Demo Provisioner
         identifier: node107
         success_nodes:
           - node109
         failure_nodes:
           - node207
-      - unified_job_template: Install Netweaver/S4 | Non_Production | Patching Demo Provisioner
+      - unified_job_template: Deploy SAP HANA | Production | Patching Demo Provisioner
         identifier: node108
-        all_parents_must_converge: yes
         success_nodes:
           - node110
         failure_nodes:
           - node208
-      - unified_job_template: Install Netweaver/S4 | Production | Patching Demo Provisioner
+      - unified_job_template: Install Netweaver/S4 | Non_Production | Patching Demo Provisioner
         identifier: node109
         all_parents_must_converge: yes
         success_nodes:
-          - node110
+          - node111
         failure_nodes:
           - node209
-      - unified_job_template: Reinstate HSR | Patching Demo Provisioner
+      - unified_job_template: Install Netweaver/S4 | Production | Patching Demo Provisioner
         identifier: node110
         all_parents_must_converge: yes
         success_nodes:
-          - node999
+          - node111
         failure_nodes:
           - node210
-      - unified_job_template: Prepare New Content | Patching Demo Provisioner
+      - unified_job_template: Reinstate HSR | Patching Demo Provisioner
         identifier: node111
         all_parents_must_converge: yes
         success_nodes:
           - node999
         failure_nodes:
           - node211
+      - unified_job_template: Prepare New Content | Patching Demo Provisioner
+        identifier: node112
+        all_parents_must_converge: yes
+        success_nodes:
+          - node999
+        failure_nodes:
+          - node212
     # Notification Nodes
       - unified_job_template: Send Provisioner Email | Succeeded | Patching Demo Provisioner
         identifier: node999
@@ -708,6 +720,8 @@ controller_workflows:
         identifier: node210
       - unified_job_template: Send Provisioner Email | Failed | Patching Demo Provisioner
         identifier: node211
+      - unified_job_template: Send Provisioner Email | Failed | Patching Demo Provisioner
+        identifier: node212
   - name: Teardown Patching Demo
     organization: "{{ deploy_from_controller_org }}"
     state: "{{ resource_state | default('present') }}"
