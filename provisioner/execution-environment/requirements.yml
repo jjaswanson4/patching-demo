@@ -27,7 +27,7 @@ collections:
   - name: vmware.vmware_rest
   - name: redhat.rhel_system_roles
   - name: jjaswanson4.utilities
-    version: '>=1.7.0'
+    version: '>=1.7.2'
   - name: jjaswanson4.setup_rhel_for_satellite
   - name: jjaswanson4.install_satellite
     version: '>=1.2.4'
