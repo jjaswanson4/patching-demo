@@ -436,11 +436,13 @@ controller_templates:
       ansible_become: no
   - name: Preconfigure for SAP | Patching Demo Provisioner
     inventory: Patching Demo Infrastructure
-    limit: hana
+    limit: sap
+    forks: 6
     project: Patching Demo
     playbook: provisioner/4-sap-preconfigure.yml
     execution_environment: Patching Demo Provisioner EE
     credentials:
+      - Patching Demo Provisioner Peripheral Credentials
       - Patching Demo Provisioner Root Account
   - name: Preconfigure for HANA Install | Patching Demo Provisioner
     inventory: Patching Demo Infrastructure
