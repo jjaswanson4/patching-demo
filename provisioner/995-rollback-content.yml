@@ -17,7 +17,7 @@
         server_url: "https://{{ inventory_hostname }}"
         organization: "{{ audience }}"
         content_view: "{{ composite_content_view }}"
-        force_promote: yes
+        force: yes
         version: 1.0
         lifecycle_environments:
           - Non_Production
