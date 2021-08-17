@@ -393,7 +393,21 @@ controller_groups:
       - patching-satellite.josh.lab.msp.redhat.com
   - name: management_plane
     inventory: Patching Demo Infrastructure
-    variables: "{{ lookup('file', 'inventory/group_vars/management_plane.yml') | from_yaml }}"
+    variables:
+      lifecycle_environment: production
+      provisioning:
+        satellite:
+          server: satellite06.lab.msp.redhat.com
+          username: admin
+          password: "{  { satellite_password }}"
+        host_group: "{  { os }}"
+        organization: MSP Lab
+        location: MSP Lab
+        method: bootdisk
+        dns_domain: josh.lab.msp.redhat.com
+        cpus: "{  { cpus }}"
+        memory_mb: "{  { memory_mb }}"
+        activation_keys: "ak-{  { application }}-{  { os }}-{  { lifecycle_environment }}"
     children:
       - satellite
 
