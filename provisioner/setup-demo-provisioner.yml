@@ -5,7 +5,7 @@
     - localhost
   gather_facts: false
   vars_files:
-    - vars/provisioning-ansible-controller.yml
+    - vars/provisioner-configuration.yml
   vars:
     deploy_from_controller_org: Default
   roles:
