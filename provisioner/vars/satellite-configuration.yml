@@ -154,7 +154,7 @@ satellite:
         architecture: x86_64
         compute_profile: general-vlan146
         compute_resource: vcenter02.lab.msp.redhat.com
-        content_source: patching-satellite.josh.lab.msp.redhat.com
+        content_source: "{{ ansible_fqdn }}"
         content_view: composite-rhel8
         domain: josh.lab.msp.redhat.com
         lifecycle_environment: Production
@@ -173,7 +173,7 @@ satellite:
         architecture: x86_64
         compute_profile: general-vlan146
         compute_resource: vcenter02.lab.msp.redhat.com
-        content_source: patching-satellite.josh.lab.msp.redhat.com
+        content_source: "{{ ansible_fqdn }}"
         content_view: composite-rhel8
         domain: josh.lab.msp.redhat.com
         lifecycle_environment: Production
