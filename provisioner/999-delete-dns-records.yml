@@ -11,6 +11,8 @@
           server: "{{ dns.server }}"
           password: "{{ dns_pass }}"
           records: "{{ dns.records  + custom_dns_records }}"
+      when:
+        - custom_dns_records is defined
   tasks:
     - name: delete DNS records
       community.general.ipa_dnsrecord:
