@@ -252,19 +252,11 @@ satellite:
             - repo: Red Hat Enterprise Linux 8 for x86_64 - SAP NetWeaver - Update Services for SAP Solutions (RPMs)
               product: RHEL for SAP - Update Services for SAP Solutions
               releasever: 8.4
-          filters:
-            - name: 07-01-2021
-              filter_type: erratum
-              end_date: '2021-07-01'
         - name: cv-r4h-hana-rhel8.4
           repos:
             - repo: Red Hat Enterprise Linux 8 for x86_64 - SAP Solutions - Update Services for SAP Solutions (RPMs)
               product: RHEL for SAP HANA - Update Services for SAP Solutions
               releasever: 8.4
-          filters:
-            - name: 07-01-2021
-              filter_type: erratum
-              end_date: '2021-07-01'
         - name: cv-e4s-satellitetools6.9-rhel8.4
           repos:
             - repo: Red Hat Satellite Tools 6.9 for RHEL 8 x86_64 - Update Services SAP Solutions (RPMs)
