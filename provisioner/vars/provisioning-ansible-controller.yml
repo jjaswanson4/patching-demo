@@ -536,6 +536,15 @@ controller_templates:
     execution_environment: Patching Demo Provisioner EE
     credentials:
       - Patching Demo Provisioner Root Account
+  - name: Unregister Demo Hosts from Insights | Patching Demo Provisioner
+    inventory: Patching Demo Infrastructure
+    limit: demo_hosts
+    forks: 7
+    project: Patching Demo
+    playbook: provisioner/997-attempt-insights-unregister.yml
+    execution_environment: Patching Demo Provisioner EE
+    credentials:
+      - Patching Demo Provisioner Root Account
   - name: Teardown Demo Hosts | Patching Demo Provisioner
     inventory: Patching Demo Infrastructure
     limit: demo_hosts
@@ -544,15 +553,6 @@ controller_templates:
     execution_environment: Patching Demo Provisioner EE
     credentials:
       - Patching Demo Provisioner Peripheral Credentials
-    survey:
-      name: ''
-      description: ''
-      spec:
-        - type: text
-          question_name: "Demo Audience?"
-          question_description: "Who is the audience for this demo"
-          variable: audience
-          required: yes
   - name: Teardown Red Hat Satellite | Patching Demo Provisioner
     inventory: Patching Demo Infrastructure
     limit: satellite
@@ -565,6 +565,22 @@ controller_templates:
     inventory: Patching Demo Infrastructure
     project: Patching Demo
     playbook: provisioner/999-delete-dns-records.yml
+    execution_environment: Patching Demo Provisioner EE
+    credentials:
+      - Patching Demo Provisioner Peripheral Credentials
+  - name: Cleanup Demo Hosts DNS Records | Patching Demo Provisioner
+    inventory: Patching Demo Infrastructure
+    limit: demo_hosts
+    project: Patching Demo
+    playbook: provisioner/999-delete-dns-records.yml
+    execution_environment: Patching Demo Provisioner EE
+    credentials:
+      - Patching Demo Provisioner Peripheral Credentials
+  - name: Roll Back Content | Patching Demo Provisioner
+    inventory: Patching Demo Infrastructure
+    limit: satellite
+    project: Patching Demo
+    playbook: provisioner/995-rollback-content.yml
     execution_environment: Patching Demo Provisioner EE
     credentials:
       - Patching Demo Provisioner Peripheral Credentials
@@ -761,3 +777,29 @@ controller_workflows:
           - node999
       - unified_job_template: Cleanup DNS Records | Patching Demo Provisioner
         identifier: node999
+  - name: Reset Patching Demo
+    organization: "{{ deploy_from_controller_org }}"
+    state: "{{ resource_state | default('present') }}"
+    survey_enabled: yes
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - type: text
+          question_name: "Demo Audience?"
+          question_description: "Who is the audience for this demo"
+          variable: audience
+          required: yes
+    simplified_workflow_nodes:
+      - unified_job_template: Unregister Demo Hosts from Insights | Patching Demo Provisioner
+        identifier: node101
+        always_nodes:
+          - node102
+          - node103
+          - node104
+      - unified_job_template: Teardown Demo Hosts | Patching Demo Provisioner
+        identifier: node102
+      - unified_job_template: Roll Back Content | Patching Demo Provisioner
+        identifier: node103
+      - unified_job_template: Cleanup Demo Hosts DNS Records | Patching Demo Provisioner
+        identifier: node104
