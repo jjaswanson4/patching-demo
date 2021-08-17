@@ -1,0 +1,14 @@
+
+[galaxy]
+server_list = rh-certified_repo,community_repo,community_galaxy
+
+[galaxy_server.community_repo]
+url=https://automationhub01.lab.msp.redhat.com/api/galaxy/content/community/
+token=1234-your-token-here
+
+[galaxy_server.rh-certified_repo]
+url=https://automationhub01.lab.msp.redhat.com/api/galaxy/content/rh-certified/
+token=1234-your-token-here
+
+[galaxy_server.community_galaxy]
+url=https://galaxy.ansible.com
