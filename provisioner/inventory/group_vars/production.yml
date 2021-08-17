@@ -1,9 +1,0 @@
----
-
-lifecycle_environment: production
-
-sap_hana_deployment_hana_sid: "PS4"
-
-sap_s4hana_deployment_sid: "PS4"
-sap_s4hana_deployment_db_host: "sapdphdb1.demo.lab.msp.redhat.com"
-sap_s4hana_deployment_db_sid: "PS4"

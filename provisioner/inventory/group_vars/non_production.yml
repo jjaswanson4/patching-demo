@@ -1,9 +1,0 @@
----
-
-lifecycle_environment: non_production
-
-sap_hana_deployment_hana_sid: "NS4"
-
-sap_s4hana_deployment_sid: "NS4"
-sap_s4hana_deployment_db_host: "sapdnhdb1.demo.lab.msp.redhat.com"
-sap_s4hana_deployment_db_sid: "NS4"
