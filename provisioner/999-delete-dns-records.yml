@@ -26,6 +26,6 @@
         state: absent
       loop_control:
         loop_var: record
-      loop: "{{ dns.records + custom_dns_records }}"
+      loop: "{{ dns.records }}"
       delegate_to: "{{ delegate_host | default('localhost') }}"
       throttle: 1
