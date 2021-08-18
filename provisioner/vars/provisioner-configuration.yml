@@ -675,7 +675,6 @@ controller_workflows:
           - node203
       - unified_job_template: Preconfigure for SAP | Patching Demo Provisioner
         identifier: node104
-        all_parents_must_converge: yes
         success_nodes:
           - node105
           - node106
