@@ -618,6 +618,7 @@ controller_workflows:
           question_description: "Who is provisioning this demo?"
           variable: provisioner
           required: yes
+          default: 'Josh Swanson'
         - type: text
           question_name: "Provisioner's Email?"
           question_description: "What is the provisioner's email address?"
