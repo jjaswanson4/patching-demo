@@ -4,7 +4,7 @@
   hosts:
     - all
   roles:
-    - sap-hana-preconfigure
+    - linux.sap.hana_preconfigure
   handlers:
     - name: reboot system
       ansible.builtin.reboot:
