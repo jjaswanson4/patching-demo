@@ -6,9 +6,14 @@
   gather_facts: false
   tasks:
     - name: send email with the provisioner status of "{{ provisioning_status }}"
-      community.general.mail:
+      community.general.mail: 
         host: smtp.redhat.com
-        to: "{{ provisioner }}"
+        to: "{{ provisioner }} <{{ provisioner_email }}>"
         from: Patching Demo Provisioner <dont@email.me>
         subject: Patching Demo Provisioning {{ provisioning_status }}
-        body: "Patching demo for {{ audience }} has completed with state: {{ provisioning_status }}"
+        body: >
+          Hello {{ provisioner }},
+
+          Patching demo for {{ audience }} has completed with state: {{ provisioning_status }}
+
+          - The Patching Demo Provisioner

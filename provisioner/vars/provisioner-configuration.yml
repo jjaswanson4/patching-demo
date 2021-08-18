@@ -618,7 +618,12 @@ controller_workflows:
           question_description: "Who is provisioning this demo?"
           variable: provisioner
           required: yes
-          default: 'Josh Swanson <joshswanson@redhat.com>'
+        - type: text
+          question_name: "Provisioner's Email?"
+          question_description: "What is the provisioner's email address?"
+          variable: provisioner_email
+          required: yes
+          default: 'joshswanson@redhat.com'
         - type: multiplechoice
           question_name: Deploy Satellite?
           question_description: Should satellite be deployed?
