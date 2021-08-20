@@ -31,10 +31,6 @@
       ansible.builtin.set_fact:
         controller_inventories_to_remove: "{{ controller_inventories_to_remove | default([]) + [ {'name': item.name, 'organization': item.organization, 'state': 'absent'} ] }}"
       loop: "{{ controller_inventories }}"   
-    - name: gather up groups to remove
-      ansible.builtin.set_fact:
-        controller_groups_to_remove: "{{ controller_groups_to_remove | default([]) + [ {'name': item.name, 'inventory': item.inventory, 'state': 'absent'} ] }}"
-      loop: "{{ controller_hosts }}"
 
     - name: overwrite vars
       ansible.builtin.set_fact:
@@ -43,10 +39,8 @@
         controller_teams: "{{ controller_teams_to_remove }}"
         controller_user_accounts: "{{ controller_user_accounts_to_remove }}"
         controller_inventories: "{{ controller_inventories_to_remove }}"
-        controller_groups: "{{ controller_groups_to_remove }}"
  
   roles:
-    - redhat_cop.controller_configuration.groups
     - redhat_cop.controller_configuration.inventories
     - redhat_cop.controller_configuration.users
     - redhat_cop.controller_configuration.teams
