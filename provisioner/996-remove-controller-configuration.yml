@@ -15,6 +15,10 @@
       ansible.builtin.set_fact:
         controller_credentials_to_remove: "{{ controller_credentials_to_remove | default([]) + [ {'name': item.name, 'state': 'absent'} ] }}"
       loop: "{{ controller_credentials }}"
+    #- name: gather up execution environments to remove
+    #  ansible.builtin.set_fact:
+    #    controller_execution_environments_to_remove: "{{ controller_execution_environments_to_remove | default([]) + [ {'name': item.name, 'state': 'absent'} ] }}"
+    #  loop: "{{ controller_credentials }}"
     - name: gather up teams to remove
       ansible.builtin.set_fact:
         controller_teams_to_remove: "{{ controller_teams_to_remove | default([]) + [ {'name': item.name, 'organization': item.organization, 'state': 'absent'} ] }}"
@@ -26,11 +30,7 @@
     - name: gather up inventories to remove
       ansible.builtin.set_fact:
         controller_inventories_to_remove: "{{ controller_inventories_to_remove | default([]) + [ {'name': item.name, 'organization': item.organization, 'state': 'absent'} ] }}"
-      loop: "{{ controller_inventories }}"
-    - name: gather up hosts to remove
-      ansible.builtin.set_fact:
-        controller_hosts_to_remove: "{{ controller_hosts_to_remove | default([]) + [ {'name': item.name, 'inventory': item.inventory, 'state': 'absent'} ] }}"
-      loop: "{{ controller_hosts }}"      
+      loop: "{{ controller_inventories }}"   
     - name: gather up groups to remove
       ansible.builtin.set_fact:
         controller_groups_to_remove: "{{ controller_groups_to_remove | default([]) + [ {'name': item.name, 'inventory': item.inventory, 'state': 'absent'} ] }}"
@@ -48,9 +48,10 @@
  
   roles:
     - redhat_cop.controller_configuration.groups
-    - redhat_cop.controller_configuration.hosts
     - redhat_cop.controller_configuration.inventories
     - redhat_cop.controller_configuration.users
     - redhat_cop.controller_configuration.teams
     - redhat_cop.controller_configuration.credentials
     - redhat_cop.controller_configuration.organizations
+
+    
