@@ -11,14 +11,6 @@
       ansible.builtin.set_fact:
         controller_organizations_to_remove: "{{ controller_organizations_to_remove | default([]) + [ {'name': item.name, 'state': 'absent'} ] }}"
       loop: "{{ controller_organizations }}"
-    - name: gather up credentials to remove
-      ansible.builtin.set_fact:
-        controller_credentials_to_remove: "{{ controller_credentials_to_remove | default([]) + [ {'name': item.name, 'state': 'absent'} ] }}"
-      loop: "{{ controller_credentials }}"
-    #- name: gather up execution environments to remove
-    #  ansible.builtin.set_fact:
-    #    controller_execution_environments_to_remove: "{{ controller_execution_environments_to_remove | default([]) + [ {'name': item.name, 'state': 'absent'} ] }}"
-    #  loop: "{{ controller_credentials }}"
     - name: gather up teams to remove
       ansible.builtin.set_fact:
         controller_teams_to_remove: "{{ controller_teams_to_remove | default([]) + [ {'name': item.name, 'organization': item.organization, 'state': 'absent'} ] }}"
@@ -35,7 +27,6 @@
     - name: overwrite vars
       ansible.builtin.set_fact:
         controller_organizations: "{{ controller_organizations_to_remove }}"
-        controller_credentials: "{{ controller_credentials_to_remove }}"
         controller_teams: "{{ controller_teams_to_remove }}"
         controller_user_accounts: "{{ controller_user_accounts_to_remove }}"
         controller_inventories: "{{ controller_inventories_to_remove }}"
@@ -44,7 +35,6 @@
     - redhat_cop.controller_configuration.inventories
     - redhat_cop.controller_configuration.users
     - redhat_cop.controller_configuration.teams
-    - redhat_cop.controller_configuration.credentials
     - redhat_cop.controller_configuration.organizations
 
     
