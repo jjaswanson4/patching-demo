@@ -43,7 +43,6 @@
         controller_teams: "{{ controller_teams_to_remove }}"
         controller_user_accounts: "{{ controller_user_accounts_to_remove }}"
         controller_inventories: "{{ controller_inventories_to_remove }}"
-        controller_hosts: "{{ controller_hosts_to_remove }}"
         controller_groups: "{{ controller_groups_to_remove }}"
  
   roles:
