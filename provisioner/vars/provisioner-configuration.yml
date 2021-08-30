@@ -436,6 +436,8 @@ controller_templates:
     execution_environment: Patching Demo Provisioner EE
     credentials:
       - Patching Demo Provisioner Peripheral Credentials
+    extra_vars:
+      controller_state: present
   - name: Provision Demo Hosts | Patching Demo Provisioner
     inventory: Patching Demo Infrastructure
     limit: demo_hosts
@@ -543,6 +545,8 @@ controller_templates:
     execution_environment: Patching Demo Provisioner EE
     credentials:
        - Patching Demo Provisioner Peripheral Credentials
+    extra_vars:
+      controller_state: absent
   - name: Unregister from Insights | Patching Demo Provisioner
     inventory: Patching Demo Infrastructure
     project: Patching Demo
@@ -780,19 +784,19 @@ controller_workflows:
     simplified_workflow_nodes:
       - unified_job_template: Remove Controller Configuration | Patching Demo Provisioner
         identifier: node995
-        success_nodes:
+        always_nodes:
           - node997
       - unified_job_template: Unregister from Insights | Patching Demo Provisioner
         identifier: node996
-        success_nodes:
+        always_nodes:
           - node997
       - unified_job_template: Teardown Demo Hosts | Patching Demo Provisioner
         identifier: node997
-        success_nodes:
+        always_nodes:
           - node998
       - unified_job_template: Teardown Red Hat Satellite | Patching Demo Provisioner
         identifier: node998
-        success_nodes:
+        always_nodes:
           - node999
       - unified_job_template: Cleanup DNS Records | Patching Demo Provisioner
         identifier: node999
