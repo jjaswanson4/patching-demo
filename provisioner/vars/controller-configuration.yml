@@ -252,6 +252,7 @@ controller_templates:
     inventory: "{{ audience }} Infrastructure"
     limit: satellite
     project: "{{ audience }} Patching Code"
+    organization: "{{ audience }}"
     playbook: playbooks/promote-content.yml
     extra_vars:
       current_lifecycle_environment: Non_Production
@@ -263,7 +264,7 @@ controller_templates:
 controller_workflows:
   - name: Pre-Patching | Non_Production | Security
     organization: "{{ audience }}"
-    state: present
+    state: "{{ controller_state }}"
     simplified_workflow_nodes:
       - approval_node:
           name: Approve 'Run Insights Report | Non_Production | Security'
@@ -281,7 +282,7 @@ controller_workflows:
         identifier: node202
   - name: Pre-Patching | Non_Production | Infrastructure
     organization: "{{ audience }}"
-    state: present
+    state: "{{ controller_state }}"
     simplified_workflow_nodes:
       - approval_node:
           name: Approve 'Install Tracer | Non_Production | Infrastructure'
@@ -292,7 +293,7 @@ controller_workflows:
         identifier: node102
   - name: Pre-Patching | Non_Production | BASIS (Application Team)
     organization: "{{ audience }}"
-    state: present
+    state: "{{ controller_state }}"
     simplified_workflow_nodes:
       - approval_node:
           name: Approve 'Standby Secondary Database | Non_Production | BASIS (Application Team)'
@@ -303,7 +304,7 @@ controller_workflows:
         identifier: node102
   - name: Patching | Non_Production | Infrastructure
     organization: "{{ audience }}"
-    state: present
+    state: "{{ controller_state }}"
     simplified_workflow_nodes:
       - approval_node:
           name: Approve 'Update All Packages | Non_Production | Infrastructure'
@@ -339,7 +340,7 @@ controller_workflows:
         identifier: node202
   - name: Post-Patching | Non_Production | Security
     organization: "{{ audience }}"
-    state: present
+    state: "{{ controller_state }}"
     simplified_workflow_nodes:
       - approval_node:
           name: Approve 'Run Insights Report | Non_Production | Security'
@@ -357,7 +358,7 @@ controller_workflows:
         identifier: node202
   - name: Post-Patching | Non_Production | BASIS (Application Team)
     organization: "{{ audience }}"
-    state: present
+    state: "{{ controller_state }}"
     simplified_workflow_nodes:
       - approval_node:
           name: Approve 'Unstandby Secondary Database | Non_Production | BASIS (Application Team)'
@@ -368,7 +369,7 @@ controller_workflows:
         identifier: node102
   - name: Patch Non_Production
     organization: "{{ audience }}"
-    state: present
+    state: "{{ controller_state }}"
     simplified_workflow_nodes:
       - unified_job_template: Pre-Patching | Non_Production | Security
         identifier: node101
