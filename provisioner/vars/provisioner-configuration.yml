@@ -664,13 +664,14 @@ controller_workflows:
       - unified_job_template: Setup Red Hat Satellite | Patching Demo Provisioner
         identifier: node101
         success_nodes:
+          - node102
           - node103
         failure_nodes:
           - node201
       - unified_job_template: Configure Ansible Controller | Patching Demo Provisioner
         identifier: node102
         success_nodes:
-          - node103
+          - node112
         failure_nodes:
           - node202
       - unified_job_template: Provision Demo Hosts | Patching Demo Provisioner
