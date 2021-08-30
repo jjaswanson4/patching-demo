@@ -5,7 +5,7 @@
     - all
   gather_facts: no
   vars_files:
-    - vars/controller-configuration.yml
+    - vars/provisioner-configuration.yml
   roles:
     - redhat_cop.controller_configuration.workflow_job_templates
     - redhat_cop.controller_configuration.job_templates
