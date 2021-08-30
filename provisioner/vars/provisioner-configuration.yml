@@ -4,6 +4,9 @@ controller_hostname: aap20-controller.josh.lab.msp.redhat.com
 controller_validate_certs: no
 controller_username: admin
 
+# Change this if you'd like to use an org other than the Default one in Ansible Controller
+deploy_from_controller_org: Default
+
 controller_credential_types:
   - name: Patching Demo Provisioner Peripheral Credentials
     organization: "{{ deploy_from_controller_org }}"
@@ -606,7 +609,7 @@ controller_templates:
 controller_workflows:
   - name: Provision Patching Demo
     organization: "{{ deploy_from_controller_org }}"
-    state: "{{ resource_state | default('present') }}"
+    state: "{{ controller_state | default('present') }}"
     survey_enabled: yes
     survey:
       name: ''
@@ -770,7 +773,7 @@ controller_workflows:
         identifier: node212
   - name: Teardown Patching Demo
     organization: "{{ deploy_from_controller_org }}"
-    state: "{{ resource_state | default('present') }}"
+    state: "{{ controller_state | default('present') }}"
     survey_enabled: yes
     survey:
       name: ''
@@ -802,7 +805,7 @@ controller_workflows:
         identifier: node999
   - name: Reset Patching Demo
     organization: "{{ deploy_from_controller_org }}"
-    state: "{{ resource_state | default('present') }}"
+    state: "{{ controller_state | default('present') }}"
     survey_enabled: yes
     survey:
       name: ''
