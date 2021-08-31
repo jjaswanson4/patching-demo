@@ -829,7 +829,7 @@ controller_workflows:
           variable: audience
           required: yes
     simplified_workflow_nodes:
-      - unified_job_template: Unregister Demo Hosts from Insights
+      - unified_job_template: Unregister Demo Hosts from Insights | Patching Demo
         identifier: node101
         always_nodes:
           - node102
