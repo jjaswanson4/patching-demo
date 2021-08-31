@@ -1,0 +1,7 @@
+---
+
+available_demos:
+  - patching
+  - s4hana-deployment
+
+deploy_from_controller_org: Default

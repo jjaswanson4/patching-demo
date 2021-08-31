@@ -4,10 +4,8 @@
   hosts:
     - localhost
   gather_facts: false
-  vars:
-    available_demos:
-      - patching
-    deploy_from_controller_org: Default
+  vars_files:
+    - vars/demos.yml
   pre_tasks:
     - name: validate selected demo is available
       ansible.builtin.assert:
