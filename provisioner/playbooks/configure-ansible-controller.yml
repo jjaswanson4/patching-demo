@@ -23,11 +23,21 @@
             - redhat_cop.controller_configuration.teams
             - redhat_cop.controller_configuration.users
             - redhat_cop.controller_configuration.inventories
+        - name: include roles to setup inventory source if defined
+          ansible.builtin.include_role:
+            name: "{{ role }}"
+          loop_control:
+            loop_var: role
+          loop:        
             - redhat_cop.controller_configuration.inventory_sources
             - redhat_cop.controller_configuration.inventory_source_update
+          when:
+            controller_inventory_sources is defined
         - name: pause for inventory sync
           ansible.builtin.pause:
             seconds: 30
+          when:
+            controller_inventory_sources is defined
         - name: include post-inventory sync configuration roles
           ansible.builtin.include_role:
             name: "{{ role }}"
