@@ -6,9 +6,9 @@
   gather_facts: no
   vars:
     available_demos:
-      - all
       - patching
     deploy_from_controller_org: Default
+    controller_state: absent
   pre_tasks:
     - name: validate selected demo is available
       ansible.builtin.assert:
@@ -19,15 +19,6 @@
     - name: include provisioner configuration for {{ demo }} demo
       ansible.builtin.include_vars:
         file: "vars/{{ demo }}/provisioner-configuration.yml"
-      when:
-        - demo != 'all'
-    - name: include provisioner configuration for all demos
-      ansible.builtin.include_vars:
-        file: "vars/{{ item }}/provisioner-configuration.yml"
-      loop: "{{ available_demos }}"
-      when:
-        - demo == 'all'
-        - item != 'all'
   roles:
     - redhat_cop.controller_configuration.workflow_job_templates
     - redhat_cop.controller_configuration.job_templates
