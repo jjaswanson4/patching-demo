@@ -432,7 +432,7 @@ controller_templates:
     inventory: Patching Demo Inventory
     limit: satellite
     project: Patching Demo
-    playbook: provisioner/deploy-satellite.yml
+    playbook: provisioner/playbooks/deploy-satellite.yml
     execution_environment: Demo Provisioner EE
     credentials:
       - Patching Demo Provisioner Peripheral Credentials
@@ -440,7 +440,7 @@ controller_templates:
   - name: Configure Ansible Controller | Patching Demo
     inventory: Local Action Inventory
     project: Patching Demo
-    playbook: provisioner/configure-ansible-controller.yml
+    playbook: provisioner/playbooks/configure-ansible-controller.yml
     execution_environment: Demo Provisioner EE
     credentials:
       - Patching Demo Provisioner Peripheral Credentials
@@ -451,7 +451,7 @@ controller_templates:
     limit: demo_hosts
     forks: 7
     project: Patching Demo
-    playbook: provisioner/provision-demo-hosts.yml
+    playbook: provisioner/playbooks/provision-demo-hosts.yml
     execution_environment: Demo Provisioner EE
     credentials:
       - Patching Demo Provisioner Peripheral Credentials
@@ -463,7 +463,7 @@ controller_templates:
     limit: sap
     forks: 6
     project: Patching Demo
-    playbook: provisioner/sap-preconfigure.yml
+    playbook: provisioner/playbooks/sap-preconfigure.yml
     execution_environment: Demo Provisioner EE
     credentials:
       - Patching Demo Provisioner Peripheral Credentials
@@ -472,7 +472,7 @@ controller_templates:
     inventory: Patching Demo Inventory
     limit: hana
     project: Patching Demo
-    playbook: provisioner/hana-preconfigure.yml
+    playbook: provisioner/playbooks/hana-preconfigure.yml
     execution_environment: Demo Provisioner EE
     credentials:
       - Patching Demo Provisioner Root Account
@@ -480,7 +480,7 @@ controller_templates:
     inventory: Patching Demo Inventory
     limit: netweaver
     project: Patching Demo
-    playbook: provisioner/netweaver-preconfigure.yml
+    playbook: provisioner/playbooks/netweaver-preconfigure.yml
     execution_environment: Demo Provisioner EE
     credentials:
       - Patching Demo Provisioner Root Account
@@ -488,7 +488,7 @@ controller_templates:
     inventory: Patching Demo Inventory
     limit: 'hana:&non_production'
     project: Patching Demo
-    playbook: provisioner/deploy-hana.yml
+    playbook: provisioner/playbooks/deploy-hana.yml
     execution_environment: Demo Provisioner EE
     credentials:
       - Patching Demo Provisioner Root Account
@@ -496,7 +496,7 @@ controller_templates:
     inventory: Patching Demo Inventory
     limit: 'hana:&production'
     project: Patching Demo
-    playbook: provisioner/deploy-hana.yml
+    playbook: provisioner/playbooks/deploy-hana.yml
     execution_environment: Demo Provisioner EE
     credentials:
       - Patching Demo Provisioner Root Account
@@ -504,7 +504,7 @@ controller_templates:
     inventory: Patching Demo Inventory
     limit: 'netweaver:&non_production'
     project: Patching Demo
-    playbook: provisioner/install-s4.yml
+    playbook: provisioner/playbooks/install-s4.yml
     execution_environment: Demo Provisioner EE
     credentials:
       - Patching Demo Provisioner Root Account
@@ -512,7 +512,7 @@ controller_templates:
     inventory: Patching Demo Inventory
     limit: 'netweaver:&production'
     project: Patching Demo
-    playbook: provisioner/install-s4.yml
+    playbook: provisioner/playbooks/install-s4.yml
     execution_environment: Demo Provisioner EE
     credentials:
       - Patching Demo Provisioner Root Account
@@ -520,7 +520,7 @@ controller_templates:
     inventory: Patching Demo Inventory
     limit: 'hana:&primary'
     project: Patching Demo
-    playbook: provisioner/reinstate-hsr.yml
+    playbook: provisioner/playbooks/reinstate-hsr.yml
     execution_environment: Demo Provisioner EE
     credentials:
       - Patching Demo Provisioner Root Account
@@ -528,28 +528,28 @@ controller_templates:
     inventory: Patching Demo Inventory
     limit: satellite
     project: Patching Demo
-    playbook: provisioner/prepare-new-content.yml
+    playbook: provisioner/playbooks/prepare-new-content.yml
     execution_environment: Demo Provisioner EE
     credentials:
       - Patching Demo Provisioner Peripheral Credentials
   - name: Send Provisioner Email | Succeeded
     inventory: Local Action Inventory
     project: Patching Demo
-    playbook: provisioner/send-email.yml
+    playbook: provisioner/playbooks/send-email.yml
     execution_environment: Demo Provisioner EE
     extra_vars:
       provisioning_status: Succeeded
   - name: Send Provisioner Email | Failed
     inventory: Local Action Inventory
     project: Patching Demo
-    playbook: provisioner/send-email.yml
+    playbook: provisioner/playbooks/send-email.yml
     execution_environment: Demo Provisioner EE
     extra_vars:
       provisioning_status: Failed
   - name: Remove Controller Configuration
     inventory: Local Action Inventory
     project: Patching Demo
-    playbook: provisioner/remove-controller-configuration.yml
+    playbook: provisioner/playbooks/remove-controller-configuration.yml
     execution_environment: Demo Provisioner EE
     credentials:
        - Patching Demo Provisioner Peripheral Credentials
@@ -558,7 +558,7 @@ controller_templates:
   - name: Unregister from Insights | Patching Demo
     inventory: Patching Demo Inventory
     project: Patching Demo
-    playbook: provisioner/attempt-insights-unregister.yml
+    playbook: provisioner/playbooks/attempt-insights-unregister.yml
     execution_environment: Demo Provisioner EE
     credentials:
       - Patching Demo Provisioner Root Account
@@ -567,7 +567,7 @@ controller_templates:
     limit: demo_hosts
     forks: 7
     project: Patching Demo
-    playbook: provisioner/attempt-insights-unregister.yml
+    playbook: provisioner/playbooks/attempt-insights-unregister.yml
     execution_environment: Demo Provisioner EE
     credentials:
       - Patching Demo Provisioner Root Account
@@ -575,7 +575,7 @@ controller_templates:
     inventory: Patching Demo Inventory
     limit: demo_hosts
     project: Patching Demo
-    playbook: provisioner/teardown-systems.yml
+    playbook: provisioner/playbooks/teardown-systems.yml
     execution_environment: Demo Provisioner EE
     credentials:
       - Patching Demo Provisioner Peripheral Credentials
@@ -583,14 +583,14 @@ controller_templates:
     inventory: Patching Demo Inventory
     limit: satellite
     project: Patching Demo
-    playbook: provisioner/teardown-systems.yml
+    playbook: provisioner/playbooks/teardown-systems.yml
     execution_environment: Demo Provisioner EE
     credentials:
       - Patching Demo Provisioner Peripheral Credentials 
   - name: Cleanup DNS Records | Patching Demo
     inventory: Patching Demo Inventory
     project: Patching Demo
-    playbook: provisioner/delete-dns-records.yml
+    playbook: provisioner/playbooks/delete-dns-records.yml
     execution_environment: Demo Provisioner EE
     credentials:
       - Patching Demo Provisioner Peripheral Credentials
@@ -598,7 +598,7 @@ controller_templates:
     inventory: Patching Demo Inventory
     limit: demo_hosts
     project: Patching Demo
-    playbook: provisioner/delete-dns-records.yml
+    playbook: provisioner/playbooks/delete-dns-records.yml
     execution_environment: Demo Provisioner EE
     credentials:
       - Patching Demo Provisioner Peripheral Credentials
@@ -606,7 +606,7 @@ controller_templates:
     inventory: Patching Demo Inventory
     limit: satellite
     project: Patching Demo
-    playbook: provisioner/rollback-content.yml
+    playbook: provisioner/playbooks/rollback-content.yml
     execution_environment: Demo Provisioner EE
     credentials:
       - Patching Demo Provisioner Peripheral Credentials
