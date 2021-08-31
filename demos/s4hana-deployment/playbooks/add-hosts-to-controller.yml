@@ -1,0 +1,262 @@
+---
+
+- name: add hosts to Ansible Controller
+  hosts:
+    - all
+  gather_facts: no
+  vars:
+    controller_groups:
+      - name: secondary
+        inventory: "{{ company }} SAP Infrastructure"
+        hosts:
+          - sapddhdb2.josh.lab.msp.redhat.com
+        variables:
+          sap_hana_hsr_role: secondary
+          sap_hana_hsr_alias: DC2
+      - name: primary
+        inventory: "{{ company }} SAP Infrastructure"
+        hosts:
+          - sapddhdb1.josh.lab.msp.redhat.com
+        variables:
+          sap_hana_hsr_role: primary
+          sap_hana_hsr_alias: DC1
+      - name: hana
+        inventory: "{{ company }} SAP Infrastructure"
+        children:
+          - primary
+          - secondary
+        variables:
+          cpus: 8
+          memory_mb: 73728
+          additional_storage:
+            - size: 600Gb
+              type: thin
+              scsi_controller: 0
+              unit_number: 1
+          storage_pools:
+            - name: sap
+              disks:
+                - sdb
+              volumes:
+                - name: data
+                  size: "128 GiB"
+                  mount_point: "/hana/data"
+                  state: present
+                - name: log
+                  size: "100 GiB"
+                  mount_point: "/hana/log"
+                  state: present
+                - name: shared
+                  size: "256 GiB"
+                  mount_point: "/hana/shared"
+                  state: present
+                - name: sap
+                  size: "50 GiB"
+                  mount_point: "/usr/sap"
+                  state: present
+          sap_hana_deployment_bundle_path: /software/HANA_installation
+          sap_hana_deployment_bundle_sar_file_name: "{{ sap_hana_deployment_bundle_sar_file_name }}"
+          sap_hana_deployment_sapcar_path: /software/SAPCAR
+          sap_hana_deployment_sapcar_file_name: "{{ sap_hana_deployment_sapcar_file_name }}"
+          sap_hana_deployment_root_password: "{  { ansible_password }}"
+          sap_hana_deployment_sapadm_password: "{  { ansible_password }}"
+          sap_hana_deployment_hana_instance_number: "{{ sap_hana_deployment_hana_instance_number }}"
+          sap_hana_deployment_hana_env_type: "{{ sap_hana_deployment_hana_env_type }}"
+          sap_hana_deployment_hana_mem_restrict: "n"
+          sap_hana_deployment_common_master_password: "{  { ansible_password }}"
+          sap_hana_deployment_sidadm_password: "{  { ansible_password }}"
+          sap_hana_deployment_hana_db_system_password: "{  { ansible_password }}"
+          sap_hana_deployment_ase_user_password: "{  { ansible_password }}"
+          sap_hana_deployment_apply_license: false
+          sap_hana_hsr_hana_instance_number: "{{ sap_hana_deployment_hana_instance_number }}"
+          sap_hana_hsr_hana_db_system_password: "{  { ansible_password }}"
+          sap_hana_preconfigure_fail_if_reboot_required: no
+          sap_hana_deployment_hana_sid: "{{ sid }}"
+          sap_hana_hsr_hana_sid: "{{ sid }}"
+          sap_hana_hsr_hana_primary_hostname: sapddhdb1
+          sap_hana_hsr_full_primary_hostname: sapddhdb1.josh.lab.msp.redhat.com
+          sap_hana_hsr_full_secondary_hostname: sapddhdb2.josh.lab.msp.redhat.com
+          sap_hana_ha_pacemaker_hana_sid: "{{ sid }}"
+          sap_hana_ha_pacemaker_hana_instance_number: "{{ sap_hana_deployment_hana_instance_number }}"
+          sap_hana_ha_pacemaker_vip: 10.15.121.43
+          sap_hana_ha_pacemaker_hacluster_password: "{  { ansible_password }}"
+          sap_hana_ha_pacemaker_node1_fqdn: sapddhdb1.josh.lab.msp.redhat.com
+          sap_hana_ha_pacemaker_node2_fqdn: sapddhdb2.josh.lab.msp.redhat.com
+          sap_hana_ha_pacemaker_node1_ip: 10.15.121.41
+          sap_hana_ha_pacemaker_node2_ip: 10.15.121.42
+          custom_dns_records:
+            - name: "{  { sap_s4hana_deployment_db_host.split('.')[0] }}"
+              zone: josh.lab.msp.redhat.com
+              type: A
+              value: "{  { sap_hana_ha_pacemaker_vip }}"
+            - name: "{  { sap_hana_ha_pacemaker_vip.split('.')[-1] }}"
+              zone: "{  { sap_hana_ha_pacemaker_vip.split('.')[2] }}.15.10.in-addr.arpa."
+              type: PTR
+              value: "{  { sap_s4hana_deployment_db_host }}."
+      - name: netweaver
+        inventory: "{{ company }} SAP Infrastructure"
+        hosts:
+          - sapddapp1.josh.lab.msp.redhat.com
+        variables:
+          sap_s4hana_deployment_sid: "{{ sid }}"
+          sap_s4hana_deployment_db_host: sapdphdb.josh.lab.msp.redhat.com
+          sap_s4hana_deployment_db_sid: "{{ sid }}"
+          sap_netweaver_preconfigure_fail_if_not_enough_swap_space_configured: no
+          sap_s4hana_deployment_product_id: "NW_ABAP_OneHost:S4HANA1909.CORE.HDB.ABAP"
+          sap_s4hana_deployment_sapcar_path: "/software/{  { sap_s4hana_deployment_sid }}"
+          sap_s4hana_deployment_sapcar_file_name: "SAPCAR_1010-70006178.EXE"
+          sap_s4hana_deployment_swpm_path: "/software/S4HANA_installation"
+          sap_s4hana_deployment_swpm_sar_file_name: "SWPM20SP04_6-80003424.SAR"
+          sap_s4hana_deployment_db_schema_password: "{  { ansible_password }}"
+          sap_s4hana_deployment_db_schema_abap_password: "{  { ansible_password }}"
+          sap_s4hana_deployment_master_password: "{  { ansible_password }}"
+          sap_s4hana_deployment_hana_systemdb_password: "{  { ansible_password }}"
+          sap_s4hana_deployment_hana_instance_nr: "00"
+          sap_s4hana_deployment_hana_system_password: "{  { ansible_password }}"
+          sap_s4hana_deployment_parallel_jobs_nr: "30"
+          sap_s4hana_deployment_db_sidadm_password: "{  { ansible_password }}"
+          sap_s4hana_deployment_igs_path: "/software/S4HANA_installation"
+          sap_s4hana_deployment_igs_file_name: "igsexe_9-80003187.sar"
+          sap_s4hana_deployment_igs_helper_path: "/software/S4HANA_installation"
+          sap_s4hana_deployment_igs_helper_file_name: "igshelper_17-10010245.sar"
+          sap_s4hana_deployment_kernel_dependent_path: "/software/S4HANA_installation"
+          sap_s4hana_deployment_kernel_dependent_file_name: "SAPEXEDB_201-80003385.SAR"
+          sap_s4hana_deployment_kernel_independent_path: "/software/S4HANA_installation"
+          sap_s4hana_deployment_kernel_independent_file_name: "SAPEXE_201-80003386.SAR"
+          sap_s4hana_deployment_software_path: "/software/S4HANA_installation"
+          sap_s4hana_deployment_sapadm_password: "{  { ansible_password }}"
+          sap_s4hana_deployment_sap_sidadm_password: "{  { ansible_password }}"
+          cpus: 4
+          memory_mb: 16384
+          additional_storage:
+            - size: 100Gb
+              type: thin
+              scsi_controller: 0
+              unit_number: 1
+          storage_pools:
+            - name: sap
+              disks:
+                - sdb
+              volumes:
+                - name: sap
+                  size: "50 GiB"
+                  mount_point: "/usr/sap"
+                  state: present
+                - name: sapmnt
+                  size: "20 GiB"
+                  mount_point: "/usr/sapmnt"
+                  state: present
+                - name: swap
+                  size: "20 GiB"
+                  state: present
+      - name: sap
+        inventory: "{{ company }} SAP Infrastructure"
+        children:
+          - hana
+          - netweaver
+        variables:
+          lifecycle_environment: production
+          os: rhel8.4
+          application: sap
+          sap_preconfigure_modify_etc_hosts: yes
+          sap_domain: "josh.lab.msp.redhat.com"
+          sap_hostagent_installation_type: "rpm"
+          sap_hostagent_rpm_remote_path: "/software/SAPHOSTAGENT"
+          sap_hostagent_rpm_file_name: "saphostagentrpm_44-20009394.rpm"
+          sap_preconfigure_fail_if_reboot_required: no
+          sap_preconfigure_selinux_state: permissive
+          manage_lvm: no
+          nfs_shares:
+            - src: 10.15.108.14:/mnt/data01/sap
+              path: /software
+          dns_zone: josh.lab.msp.redhat.com
+          dns:
+            server: idm05.lab.msp.redhat.com
+            password: "{  { dns_pass }}"
+            records:
+              - name: "{  { inventory_hostname.split('.')[0] }}"
+                zone: josh.lab.msp.redhat.com
+                type: A
+                value: "{  { ip_address }}"
+              - name: "{  { ip_address.split('.')[-1] }}"
+                zone: "{  { ip_address.split('.')[2] }}.15.10.in-addr.arpa."
+                type: PTR
+                value: "{  { inventory_hostname }}."
+          config_files:
+            - hosts
+            - resolv.conf
+          timesync_ntp_servers:
+            - hostname: 0.rhel.pool.ntp.org
+              iburst: yes
+            - hostname: 1.rhel.pool.ntp.org
+              iburst: yes
+            - hostname: 2.rhel.pool.ntp.org
+              iburst: yes
+            - hostname: 3.rhel.pool.ntp.org
+              iburst: yes
+          vcenter:
+            server: vcenter02.lab.msp.redhat.com
+            username: 'Administrator@vsphere.local'
+            password: "{  { vcenter_password }}"
+            datacenter: MSP Lab
+          selinux_policy: targeted
+          selinux_state: permissive
+          dns_resolv:
+            search_domains:
+              - josh.lab.msp.redhat.com
+              - lab.msp.redhat.com
+            nameservers:
+              - 10.15.120.4
+              - 10.15.108.5
+            options:
+              - 'timeout:1'
+          base_packages:
+            disable_gpg_check: yes
+            packages:
+              - lsof
+              - vim
+              - sos
+              - redhat-support-tool
+          firewall:
+            name: firewalld
+            state: stopped
+            enabled: no
+          provisioning:
+            satellite:
+              server: patching-satellite.josh.lab.msp.redhat.com
+              username: admin
+              password: "{  { ansible_password }}"
+            host_group: "{  { os }}"
+            organization: "{  { audience }}"
+            location: "{  { audience }}"
+            method: bootdisk
+            dns_domain: josh.lab.msp.redhat.com
+            cpus: "{  { cpus }}"
+            memory_mb: "{  { memory_mb }}"
+            activation_keys: "ak-{  { application }}-{  { os }}-{  { lifecycle_environment }}"
+      ignore_virtual_disk_errors: yes
+      remove_cdrom: no
+    controller_hosts:
+      - name: sapddhdb1.josh.lab.msp.redhat.com
+        organization: "{{ company }}"
+        inventory: "{{ company }} SAP Infrastructure"
+        variables:
+          ansible_host: 10.15.121.41
+          ip_address: "{  { ansible_host }}"
+          sap_hana_hsr_alias: DC1
+      - name: sapddhdb2.josh.lab.msp.redhat.com
+        organization: "{{ company }}"
+        inventory: "{{ company }} SAP Infrastructure"
+        variables:
+          ansible_host: 10.15.121.42
+          ip_address: "{  { ansible_host }}"
+          sap_hana_hsr_alias: DC2
+      - name: sapddapp1.josh.lab.msp.redhat.com
+        organization: "{{ company }}"
+        inventory: "{{ company }} SAP Infrastructure"
+        variables:
+          ansible_host: 10.15.121.44
+          ip_address: "{  { ansible_host }}"
+  roles:
+    - redhat_cop.controller_configuration.groups
+    - redhat_cop.controller_configuration.hosts
