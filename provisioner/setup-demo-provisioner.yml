@@ -6,7 +6,6 @@
   gather_facts: false
   vars:
     available_demos:
-      - all
       - patching
     deploy_from_controller_org: Default
   pre_tasks:
@@ -14,20 +13,11 @@
       ansible.builtin.assert:
         that:
           - demo in available_demos
-        success_msg: "{{ demo }} demo(s) selected"
+        success_msg: "{{ demo }} demo selected"
         fail_msg: "selected demo {{ demo }} is not available, please select one of: {{ available_demos | join(', ') }}"
     - name: include provisioner configuration for {{ demo }} demo
       ansible.builtin.include_vars:
         file: "vars/{{ demo }}/provisioner-configuration.yml"
-      when:
-        - demo != 'all'
-    - name: include provisioner configuration for all demos
-      ansible.builtin.include_vars:
-        file: "vars/{{ item }}/provisioner-configuration.yml"
-      loop: "{{ available_demos }}"
-      when:
-        - demo == 'all'
-        - item != 'all'
   roles:
     - redhat_cop.controller_configuration.credential_types
     - redhat_cop.controller_configuration.credentials
