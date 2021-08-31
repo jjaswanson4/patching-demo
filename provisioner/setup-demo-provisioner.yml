@@ -27,6 +27,7 @@
       loop: "{{ available_demos }}"
       when:
         - demo == 'all'
+        - item != 'all'
   roles:
     - redhat_cop.controller_configuration.credential_types
     - redhat_cop.controller_configuration.credentials
