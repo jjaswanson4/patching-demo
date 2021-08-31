@@ -4,6 +4,8 @@
   hosts:
     - all
   gather_facts: no
+  vars:
+    run_additional_roles: yes
   pre_tasks:
     - name: add host and custom DNS entries
       ansible.builtin.set_fact:
@@ -27,7 +29,16 @@
         - jjaswanson4.utilities.common_config
         - redhat.rhel_system_roles.selinux
         - redhat.rhel_system_roles.timesync
+      when:
+        - provision_demo_hosts | bool
+    - name: run additional roles when requested
+      ansible.builtin.include_role:
+        name: "{{ role }}"
+      loop_control:
+        loop_var: role
+      loop:    
         - linux-system-roles.cockpit
         - linux-system-roles.metrics
       when:
         - provision_demo_hosts | bool
+        - run_additional_roles | bool
