@@ -12,7 +12,12 @@ controller_credential_types:
     organization: "{{ deploy_from_controller_org }}"
     kind: cloud
     injectors:
-      extra_vars: "{{ lookup('file', 'extra-vars.yml') | from_yaml }}"
+      extra_vars:
+        dns_pass: "{{ dns_pass }}"
+        ansible_password: "{{ ansible_password }}"
+        satellite_password: "{{ satellite_password }}"
+        vcenter_password: "{{ vcenter_password }}"
+        controller_password: "{{ controller_password }}"
 
 controller_credentials:
   - name: Patching Demo Provisioner Peripheral Credentials
@@ -98,7 +103,7 @@ controller_hosts:
       ansible_python_interpreter: '{  { ansible_playbook_python }}'
   - name: patching-satellite.josh.lab.msp.redhat.com
     inventory: Patching Demo Infrastructure
-    variables: "{{ lookup('file', 'vars/satellite-configuration.yml') | from_yaml }}"
+    variables: "{{ lookup('file', 'vars/patching/satellite-configuration.yml') | from_yaml }}"
   - name: sapdnhdb1.josh.lab.msp.redhat.com
     inventory: Patching Demo Infrastructure
     variables:
