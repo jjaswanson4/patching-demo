@@ -31,7 +31,7 @@ controller_credentials:
       password: "{{ ansible_password }}"
 
 controller_execution_environments:
-  - name: Patching Demo Provisioner EE
+  - name: Demo Provisioner EE
     image: aap20-hub.josh.lab.msp.redhat.com/patching-demo-provisioner-ee
     organization: "{{ deploy_from_controller_org }}"
     credential: MSP Lab AAP20 Automation Hub
@@ -40,7 +40,7 @@ controller_execution_environments:
 controller_inventories:
   - name: Local Action Inventory
     organization: "{{ deploy_from_controller_org }}"
-  - name: Patching Demo Infrastructure
+  - name: Patching Demo Inventory
     organization: "{{ deploy_from_controller_org }}"
     variables:
       dns_zone: josh.lab.msp.redhat.com
@@ -102,65 +102,65 @@ controller_hosts:
       ansible_connection: local
       ansible_python_interpreter: '{  { ansible_playbook_python }}'
   - name: patching-satellite.josh.lab.msp.redhat.com
-    inventory: Patching Demo Infrastructure
+    inventory: Patching Demo Inventory
     variables: "{{ lookup('file', 'vars/patching/satellite-configuration.yml') | from_yaml }}"
   - name: sapdnhdb1.josh.lab.msp.redhat.com
-    inventory: Patching Demo Infrastructure
+    inventory: Patching Demo Inventory
     variables:
       ansible_host: 10.15.121.31
       ip_address: "{  { ansible_host }}"
       sap_hana_hsr_alias: DC1
   - name: sapdnhdb2.josh.lab.msp.redhat.com
-    inventory: Patching Demo Infrastructure
+    inventory: Patching Demo Inventory
     variables:
       ansible_host: 10.15.121.32
       ip_address: "{  { ansible_host }}"
       sap_hana_hsr_alias: DC2
   - name: sapdnapp1.josh.lab.msp.redhat.com
-    inventory: Patching Demo Infrastructure
+    inventory: Patching Demo Inventory
     variables:
       ansible_host: 10.15.121.34
       ip_address: "{  { ansible_host }}"
   - name: sapdphdb1.josh.lab.msp.redhat.com
-    inventory: Patching Demo Infrastructure
+    inventory: Patching Demo Inventory
     variables:
       ansible_host: 10.15.121.35
       ip_address: "{  { ansible_host }}"
       sap_hana_hsr_alias: DC1
   - name: sapdphdb2.josh.lab.msp.redhat.com
-    inventory: Patching Demo Infrastructure
+    inventory: Patching Demo Inventory
     variables:
       ansible_host: 10.15.121.36
       ip_address: "{  { ansible_host }}"
       sap_hana_hsr_alias: DC2
   - name: sapdpapp1.josh.lab.msp.redhat.com
-    inventory: Patching Demo Infrastructure
+    inventory: Patching Demo Inventory
     variables:
       ansible_host: 10.15.121.38
       ip_address: "{  { ansible_host }}"
   - name: sap-metrics.josh.lab.msp.redhat.com
-    inventory: Patching Demo Infrastructure
+    inventory: Patching Demo Inventory
     variables:
       ansible_host: 10.15.121.39
       ip_address: "{  { ansible_host }}"
 
 controller_groups:
   - name: primary
-    inventory: Patching Demo Infrastructure
+    inventory: Patching Demo Inventory
     hosts:
       - sapdnhdb1.josh.lab.msp.redhat.com
       - sapdphdb1.josh.lab.msp.redhat.com
     variables:
       sap_hana_hsr_role: primary
   - name: secondary
-    inventory: Patching Demo Infrastructure
+    inventory: Patching Demo Inventory
     hosts:
       - sapdnhdb2.josh.lab.msp.redhat.com
       - sapdphdb2.josh.lab.msp.redhat.com
     variables:
       sap_hana_hsr_role: secondary
   - name: hana
-    inventory: Patching Demo Infrastructure
+    inventory: Patching Demo Inventory
     children:
       - primary
       - secondary
@@ -211,7 +211,7 @@ controller_groups:
       sap_hana_hsr_hana_db_system_password: "{  { ansible_password }}"
       sap_hana_preconfigure_fail_if_reboot_required: no
   - name: netweaver
-    inventory: Patching Demo Infrastructure
+    inventory: Patching Demo Inventory
     hosts:
       - sapdnapp1.josh.lab.msp.redhat.com
       - sapdpapp1.josh.lab.msp.redhat.com
@@ -265,7 +265,7 @@ controller_groups:
       sap_s4hana_deployment_sapadm_password: "{  { ansible_password }}"
       sap_s4hana_deployment_sap_sidadm_password: "{  { ansible_password }}"
   - name: non_production
-    inventory: Patching Demo Infrastructure
+    inventory: Patching Demo Inventory
     hosts:
       - sapdnapp1.josh.lab.msp.redhat.com
       - sapdnhdb1.josh.lab.msp.redhat.com
@@ -298,7 +298,7 @@ controller_groups:
           type: PTR
           value: "{  { sap_s4hana_deployment_db_host }}."
   - name: production
-    inventory: Patching Demo Infrastructure
+    inventory: Patching Demo Inventory
     hosts:
       - sapdpapp1.josh.lab.msp.redhat.com
       - sapdphdb1.josh.lab.msp.redhat.com
@@ -331,7 +331,7 @@ controller_groups:
           type: PTR
           value: "{  { sap_s4hana_deployment_db_host }}."
   - name: sap
-    inventory: Patching Demo Infrastructure
+    inventory: Patching Demo Inventory
     children:
       - hana
       - netweaver
@@ -350,7 +350,7 @@ controller_groups:
         - src: 10.15.108.14:/mnt/data01/sap
           path: /software
   - name: peripheral
-    inventory: Patching Demo Infrastructure
+    inventory: Patching Demo Inventory
     hosts:
       - sap-metrics.josh.lab.msp.redhat.com
     variables:
@@ -364,7 +364,7 @@ controller_groups:
       metrics_rention_days: 14
       metrics_monitored_hosts:  "{  { groups['sap'] }}"
   - name: demo_hosts
-    inventory: Patching Demo Infrastructure
+    inventory: Patching Demo Inventory
     children:
       - sap
       - non_production
@@ -396,11 +396,11 @@ controller_groups:
         memory_mb: "{  { memory_mb }}"
         activation_keys: "ak-{  { application }}-{  { os }}-{  { lifecycle_environment }}"
   - name: satellite
-    inventory: Patching Demo Infrastructure
+    inventory: Patching Demo Inventory
     hosts:
       - patching-satellite.josh.lab.msp.redhat.com
   - name: management_plane
-    inventory: Patching Demo Infrastructure
+    inventory: Patching Demo Inventory
     variables:
       lifecycle_environment: production
       provisioning:
@@ -428,186 +428,186 @@ controller_projects:
     wait: yes
 
 controller_templates:
-  - name: Setup Red Hat Satellite | Patching Demo Provisioner
-    inventory: Patching Demo Infrastructure
+  - name: Setup Red Hat Satellite | Patching Demo
+    inventory: Patching Demo Inventory
     limit: satellite
     project: Patching Demo
-    playbook: provisioner/1-deploy-satellite.yml
-    execution_environment: Patching Demo Provisioner EE
+    playbook: provisioner/deploy-satellite.yml
+    execution_environment: Demo Provisioner EE
     credentials:
       - Patching Demo Provisioner Peripheral Credentials
       - Patching Demo Provisioner Root Account
-  - name: Configure Ansible Controller | Patching Demo Provisioner
+  - name: Configure Ansible Controller | Patching Demo
     inventory: Local Action Inventory
     project: Patching Demo
-    playbook: provisioner/2-configure-ansible-controller.yml
-    execution_environment: Patching Demo Provisioner EE
+    playbook: provisioner/configure-ansible-controller.yml
+    execution_environment: Demo Provisioner EE
     credentials:
       - Patching Demo Provisioner Peripheral Credentials
     extra_vars:
       controller_state: present
-  - name: Provision Demo Hosts | Patching Demo Provisioner
-    inventory: Patching Demo Infrastructure
+  - name: Provision Demo Hosts | Patching Demo
+    inventory: Patching Demo Inventory
     limit: demo_hosts
     forks: 7
     project: Patching Demo
-    playbook: provisioner/3-provision-demo-hosts.yml
-    execution_environment: Patching Demo Provisioner EE
+    playbook: provisioner/provision-demo-hosts.yml
+    execution_environment: Demo Provisioner EE
     credentials:
       - Patching Demo Provisioner Peripheral Credentials
       - Patching Demo Provisioner Root Account
     extra_vars:
       ansible_become: no
-  - name: Preconfigure for SAP | Patching Demo Provisioner
-    inventory: Patching Demo Infrastructure
+  - name: Preconfigure for SAP | Patching Demo
+    inventory: Patching Demo Inventory
     limit: sap
     forks: 6
     project: Patching Demo
-    playbook: provisioner/4-sap-preconfigure.yml
-    execution_environment: Patching Demo Provisioner EE
+    playbook: provisioner/sap-preconfigure.yml
+    execution_environment: Demo Provisioner EE
     credentials:
       - Patching Demo Provisioner Peripheral Credentials
       - Patching Demo Provisioner Root Account
-  - name: Preconfigure for HANA Install | Patching Demo Provisioner
-    inventory: Patching Demo Infrastructure
+  - name: Preconfigure for HANA Install | Patching Demo
+    inventory: Patching Demo Inventory
     limit: hana
     project: Patching Demo
-    playbook: provisioner/5-hana-preconfigure.yml
-    execution_environment: Patching Demo Provisioner EE
+    playbook: provisioner/hana-preconfigure.yml
+    execution_environment: Demo Provisioner EE
     credentials:
       - Patching Demo Provisioner Root Account
-  - name: Preconfigure for Netweaver/S4 Install | Patching Demo Provisioner
-    inventory: Patching Demo Infrastructure
+  - name: Preconfigure for Netweaver/S4 Install | Patching Demo
+    inventory: Patching Demo Inventory
     limit: netweaver
     project: Patching Demo
-    playbook: provisioner/6-netweaver-preconfigure.yml
-    execution_environment: Patching Demo Provisioner EE
+    playbook: provisioner/netweaver-preconfigure.yml
+    execution_environment: Demo Provisioner EE
     credentials:
       - Patching Demo Provisioner Root Account
-  - name: Deploy SAP HANA | Non_Production | Patching Demo Provisioner
-    inventory: Patching Demo Infrastructure
+  - name: Deploy SAP HANA | Non_Production | Patching Demo
+    inventory: Patching Demo Inventory
     limit: 'hana:&non_production'
     project: Patching Demo
-    playbook: provisioner/7-deploy-hana.yml
-    execution_environment: Patching Demo Provisioner EE
+    playbook: provisioner/deploy-hana.yml
+    execution_environment: Demo Provisioner EE
     credentials:
       - Patching Demo Provisioner Root Account
-  - name: Deploy SAP HANA | Production | Patching Demo Provisioner
-    inventory: Patching Demo Infrastructure
+  - name: Deploy SAP HANA | Production | Patching Demo
+    inventory: Patching Demo Inventory
     limit: 'hana:&production'
     project: Patching Demo
-    playbook: provisioner/7-deploy-hana.yml
-    execution_environment: Patching Demo Provisioner EE
+    playbook: provisioner/deploy-hana.yml
+    execution_environment: Demo Provisioner EE
     credentials:
       - Patching Demo Provisioner Root Account
-  - name: Install Netweaver/S4 | Non_Production | Patching Demo Provisioner
-    inventory: Patching Demo Infrastructure
+  - name: Install Netweaver/S4 | Non_Production | Patching Demo
+    inventory: Patching Demo Inventory
     limit: 'netweaver:&non_production'
     project: Patching Demo
-    playbook: provisioner/8-install-s4.yml
-    execution_environment: Patching Demo Provisioner EE
+    playbook: provisioner/install-s4.yml
+    execution_environment: Demo Provisioner EE
     credentials:
       - Patching Demo Provisioner Root Account
-  - name: Install Netweaver/S4 | Production | Patching Demo Provisioner
-    inventory: Patching Demo Infrastructure
+  - name: Install Netweaver/S4 | Production | Patching Demo
+    inventory: Patching Demo Inventory
     limit: 'netweaver:&production'
     project: Patching Demo
-    playbook: provisioner/8-install-s4.yml
-    execution_environment: Patching Demo Provisioner EE
+    playbook: provisioner/install-s4.yml
+    execution_environment: Demo Provisioner EE
     credentials:
       - Patching Demo Provisioner Root Account
-  - name: Reinstate HSR | Patching Demo Provisioner
-    inventory: Patching Demo Infrastructure
+  - name: Reinstate HSR | Patching Demo
+    inventory: Patching Demo Inventory
     limit: 'hana:&primary'
     project: Patching Demo
-    playbook: provisioner/9-reinstate-hsr.yml
-    execution_environment: Patching Demo Provisioner EE
+    playbook: provisioner/reinstate-hsr.yml
+    execution_environment: Demo Provisioner EE
     credentials:
       - Patching Demo Provisioner Root Account
-  - name: Prepare New Content | Patching Demo Provisioner
-    inventory: Patching Demo Infrastructure
+  - name: Prepare New Content | Patching Demo
+    inventory: Patching Demo Inventory
     limit: satellite
     project: Patching Demo
-    playbook: provisioner/10-prepare-new-content.yml
-    execution_environment: Patching Demo Provisioner EE
+    playbook: provisioner/prepare-new-content.yml
+    execution_environment: Demo Provisioner EE
     credentials:
       - Patching Demo Provisioner Peripheral Credentials
-  - name: Send Provisioner Email | Succeeded | Patching Demo Provisioner
+  - name: Send Provisioner Email | Succeeded
     inventory: Local Action Inventory
     project: Patching Demo
-    playbook: provisioner/100-send-email.yml
-    execution_environment: Patching Demo Provisioner EE
+    playbook: provisioner/send-email.yml
+    execution_environment: Demo Provisioner EE
     extra_vars:
       provisioning_status: Succeeded
-  - name: Send Provisioner Email | Failed | Patching Demo Provisioner
+  - name: Send Provisioner Email | Failed
     inventory: Local Action Inventory
     project: Patching Demo
-    playbook: provisioner/100-send-email.yml
-    execution_environment: Patching Demo Provisioner EE
+    playbook: provisioner/send-email.yml
+    execution_environment: Demo Provisioner EE
     extra_vars:
       provisioning_status: Failed
-  - name: Remove Controller Configuration | Patching Demo Provisioner
+  - name: Remove Controller Configuration
     inventory: Local Action Inventory
     project: Patching Demo
-    playbook: provisioner/996-remove-controller-configuration.yml
-    execution_environment: Patching Demo Provisioner EE
+    playbook: provisioner/remove-controller-configuration.yml
+    execution_environment: Demo Provisioner EE
     credentials:
        - Patching Demo Provisioner Peripheral Credentials
     extra_vars:
       controller_state: absent
-  - name: Unregister from Insights | Patching Demo Provisioner
-    inventory: Patching Demo Infrastructure
+  - name: Unregister from Insights | Patching Demo
+    inventory: Patching Demo Inventory
     project: Patching Demo
-    playbook: provisioner/997-attempt-insights-unregister.yml
-    execution_environment: Patching Demo Provisioner EE
+    playbook: provisioner/attempt-insights-unregister.yml
+    execution_environment: Demo Provisioner EE
     credentials:
       - Patching Demo Provisioner Root Account
-  - name: Unregister Demo Hosts from Insights | Patching Demo Provisioner
-    inventory: Patching Demo Infrastructure
+  - name: Unregister Demo Hosts from Insights | Patching Demo
+    inventory: Patching Demo Inventory
     limit: demo_hosts
     forks: 7
     project: Patching Demo
-    playbook: provisioner/997-attempt-insights-unregister.yml
-    execution_environment: Patching Demo Provisioner EE
+    playbook: provisioner/attempt-insights-unregister.yml
+    execution_environment: Demo Provisioner EE
     credentials:
       - Patching Demo Provisioner Root Account
-  - name: Teardown Demo Hosts | Patching Demo Provisioner
-    inventory: Patching Demo Infrastructure
+  - name: Teardown Demo Hosts | Patching Demo
+    inventory: Patching Demo Inventory
     limit: demo_hosts
     project: Patching Demo
-    playbook: provisioner/998-teardown-systems.yml
-    execution_environment: Patching Demo Provisioner EE
+    playbook: provisioner/teardown-systems.yml
+    execution_environment: Demo Provisioner EE
     credentials:
       - Patching Demo Provisioner Peripheral Credentials
-  - name: Teardown Red Hat Satellite | Patching Demo Provisioner
-    inventory: Patching Demo Infrastructure
+  - name: Teardown Red Hat Satellite | Patching Demo
+    inventory: Patching Demo Inventory
     limit: satellite
     project: Patching Demo
-    playbook: provisioner/998-teardown-systems.yml
-    execution_environment: Patching Demo Provisioner EE
+    playbook: provisioner/teardown-systems.yml
+    execution_environment: Demo Provisioner EE
     credentials:
       - Patching Demo Provisioner Peripheral Credentials 
-  - name: Cleanup DNS Records | Patching Demo Provisioner
-    inventory: Patching Demo Infrastructure
+  - name: Cleanup DNS Records | Patching Demo
+    inventory: Patching Demo Inventory
     project: Patching Demo
-    playbook: provisioner/999-delete-dns-records.yml
-    execution_environment: Patching Demo Provisioner EE
+    playbook: provisioner/delete-dns-records.yml
+    execution_environment: Demo Provisioner EE
     credentials:
       - Patching Demo Provisioner Peripheral Credentials
-  - name: Cleanup Demo Hosts DNS Records | Patching Demo Provisioner
-    inventory: Patching Demo Infrastructure
+  - name: Cleanup Demo Hosts DNS Records | Patching Demo
+    inventory: Patching Demo Inventory
     limit: demo_hosts
     project: Patching Demo
-    playbook: provisioner/999-delete-dns-records.yml
-    execution_environment: Patching Demo Provisioner EE
+    playbook: provisioner/delete-dns-records.yml
+    execution_environment: Demo Provisioner EE
     credentials:
       - Patching Demo Provisioner Peripheral Credentials
-  - name: Roll Back Content | Patching Demo Provisioner
-    inventory: Patching Demo Infrastructure
+  - name: Roll Back Content | Patching Demo
+    inventory: Patching Demo Inventory
     limit: satellite
     project: Patching Demo
-    playbook: provisioner/995-rollback-content.yml
-    execution_environment: Patching Demo Provisioner EE
+    playbook: provisioner/rollback-content.yml
+    execution_environment: Demo Provisioner EE
     credentials:
       - Patching Demo Provisioner Peripheral Credentials
 
@@ -615,6 +615,8 @@ controller_workflows:
   - name: Provision Patching Demo
     organization: "{{ deploy_from_controller_org }}"
     state: "{{ controller_state | default('present') }}"
+    extra_vars:
+      demo: patching
     survey_enabled: yes
     survey:
       name: ''
@@ -666,13 +668,13 @@ controller_workflows:
           required: yes          
     simplified_workflow_nodes:
     # Work nodes
-      - unified_job_template: Setup Red Hat Satellite | Patching Demo Provisioner
+      - unified_job_template: Setup Red Hat Satellite | Patching Demo
         identifier: node101
         success_nodes:
           - node102
         failure_nodes:
           - node201
-      - unified_job_template: Provision Demo Hosts | Patching Demo Provisioner
+      - unified_job_template: Provision Demo Hosts | Patching Demo
         identifier: node102
         all_parents_must_converge: yes
         success_nodes:
@@ -680,20 +682,20 @@ controller_workflows:
           - node104
         failure_nodes:
           - node202
-      - unified_job_template: Configure Ansible Controller | Patching Demo Provisioner
+      - unified_job_template: Configure Ansible Controller | Patching Demo
         identifier: node103
         success_nodes:
           - node112
         failure_nodes:
           - node203
-      - unified_job_template: Preconfigure for SAP | Patching Demo Provisioner
+      - unified_job_template: Preconfigure for SAP | Patching Demo
         identifier: node104
         success_nodes:
           - node105
           - node106
         failure_nodes:
           - node204
-      - unified_job_template: Preconfigure for HANA Install | Patching Demo Provisioner
+      - unified_job_template: Preconfigure for HANA Install | Patching Demo
         identifier: node105
         success_nodes:
           - node107
@@ -701,7 +703,7 @@ controller_workflows:
           - node112
         failure_nodes:
           - node205
-      - unified_job_template: Preconfigure for Netweaver/S4 Install | Patching Demo Provisioner
+      - unified_job_template: Preconfigure for Netweaver/S4 Install | Patching Demo
         identifier: node106
         success_nodes:
           - node109
@@ -709,40 +711,40 @@ controller_workflows:
           - node112
         failure_nodes:
           - node206
-      - unified_job_template: Deploy SAP HANA | Non_Production | Patching Demo Provisioner
+      - unified_job_template: Deploy SAP HANA | Non_Production | Patching Demo
         identifier: node107
         success_nodes:
           - node109
         failure_nodes:
           - node207
-      - unified_job_template: Deploy SAP HANA | Production | Patching Demo Provisioner
+      - unified_job_template: Deploy SAP HANA | Production | Patching Demo
         identifier: node108
         success_nodes:
           - node110
         failure_nodes:
           - node208
-      - unified_job_template: Install Netweaver/S4 | Non_Production | Patching Demo Provisioner
+      - unified_job_template: Install Netweaver/S4 | Non_Production | Patching Demo
         identifier: node109
         all_parents_must_converge: yes
         success_nodes:
           - node111
         failure_nodes:
           - node209
-      - unified_job_template: Install Netweaver/S4 | Production | Patching Demo Provisioner
+      - unified_job_template: Install Netweaver/S4 | Production | Patching Demo
         identifier: node110
         all_parents_must_converge: yes
         success_nodes:
           - node111
         failure_nodes:
           - node210
-      - unified_job_template: Reinstate HSR | Patching Demo Provisioner
+      - unified_job_template: Reinstate HSR | Patching Demo
         identifier: node111
         all_parents_must_converge: yes
         success_nodes:
           - node999
         failure_nodes:
           - node211
-      - unified_job_template: Prepare New Content | Patching Demo Provisioner
+      - unified_job_template: Prepare New Content | Patching Demo
         identifier: node112
         all_parents_must_converge: yes
         success_nodes:
@@ -750,36 +752,38 @@ controller_workflows:
         failure_nodes:
           - node212
     # Notification Nodes
-      - unified_job_template: Send Provisioner Email | Succeeded | Patching Demo Provisioner
+      - unified_job_template: Send Provisioner Email | Succeeded
         identifier: node999
         all_parents_must_converge: yes
-      - unified_job_template: Send Provisioner Email | Failed | Patching Demo Provisioner
+      - unified_job_template: Send Provisioner Email | Failed
         identifier: node201
-      - unified_job_template: Send Provisioner Email | Failed | Patching Demo Provisioner
+      - unified_job_template: Send Provisioner Email | Failed
         identifier: node202
-      - unified_job_template: Send Provisioner Email | Failed | Patching Demo Provisioner
+      - unified_job_template: Send Provisioner Email | Failed
         identifier: node203
-      - unified_job_template: Send Provisioner Email | Failed | Patching Demo Provisioner
+      - unified_job_template: Send Provisioner Email | Failed
         identifier: node204
-      - unified_job_template: Send Provisioner Email | Failed | Patching Demo Provisioner
+      - unified_job_template: Send Provisioner Email | Failed
         identifier: node205
-      - unified_job_template: Send Provisioner Email | Failed | Patching Demo Provisioner
+      - unified_job_template: Send Provisioner Email | Failed
         identifier: node206
-      - unified_job_template: Send Provisioner Email | Failed | Patching Demo Provisioner
+      - unified_job_template: Send Provisioner Email | Failed
         identifier: node207
-      - unified_job_template: Send Provisioner Email | Failed | Patching Demo Provisioner
+      - unified_job_template: Send Provisioner Email | Failed
         identifier: node208
-      - unified_job_template: Send Provisioner Email | Failed | Patching Demo Provisioner
+      - unified_job_template: Send Provisioner Email | Failed
         identifier: node209
-      - unified_job_template: Send Provisioner Email | Failed | Patching Demo Provisioner
+      - unified_job_template: Send Provisioner Email | Failed
         identifier: node210
-      - unified_job_template: Send Provisioner Email | Failed | Patching Demo Provisioner
+      - unified_job_template: Send Provisioner Email | Failed
         identifier: node211
-      - unified_job_template: Send Provisioner Email | Failed | Patching Demo Provisioner
+      - unified_job_template: Send Provisioner Email | Failed
         identifier: node212
   - name: Teardown Patching Demo
     organization: "{{ deploy_from_controller_org }}"
     state: "{{ controller_state | default('present') }}"
+    extra_vars:
+      demo: patching
     survey_enabled: yes
     survey:
       name: ''
@@ -791,27 +795,29 @@ controller_workflows:
           variable: audience
           required: yes
     simplified_workflow_nodes:
-      - unified_job_template: Remove Controller Configuration | Patching Demo Provisioner
+      - unified_job_template: Remove Controller Configuration
         identifier: node995
         always_nodes:
           - node997
-      - unified_job_template: Unregister from Insights | Patching Demo Provisioner
+      - unified_job_template: Unregister from Insights | Patching Demo
         identifier: node996
         always_nodes:
           - node997
-      - unified_job_template: Teardown Demo Hosts | Patching Demo Provisioner
+      - unified_job_template: Teardown Demo Hosts | Patching Demo
         identifier: node997
         always_nodes:
           - node998
-      - unified_job_template: Teardown Red Hat Satellite | Patching Demo Provisioner
+      - unified_job_template: Teardown Red Hat Satellite | Patching Demo
         identifier: node998
         always_nodes:
           - node999
-      - unified_job_template: Cleanup DNS Records | Patching Demo Provisioner
+      - unified_job_template: Cleanup DNS Records | Patching Demo
         identifier: node999
   - name: Reset Patching Demo
     organization: "{{ deploy_from_controller_org }}"
     state: "{{ controller_state | default('present') }}"
+    extra_vars:
+      demo: patching
     survey_enabled: yes
     survey:
       name: ''
@@ -823,15 +829,15 @@ controller_workflows:
           variable: audience
           required: yes
     simplified_workflow_nodes:
-      - unified_job_template: Unregister Demo Hosts from Insights | Patching Demo Provisioner
+      - unified_job_template: Unregister Demo Hosts from Insights
         identifier: node101
         always_nodes:
           - node102
           - node103
           - node104
-      - unified_job_template: Teardown Demo Hosts | Patching Demo Provisioner
+      - unified_job_template: Teardown Demo Hosts | Patching Demo
         identifier: node102
-      - unified_job_template: Roll Back Content | Patching Demo Provisioner
+      - unified_job_template: Roll Back Content | Patching Demo
         identifier: node103
-      - unified_job_template: Cleanup Demo Hosts DNS Records | Patching Demo Provisioner
+      - unified_job_template: Cleanup Demo Hosts DNS Records | Patching Demo
         identifier: node104
