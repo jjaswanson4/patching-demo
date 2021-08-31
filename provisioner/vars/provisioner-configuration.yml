@@ -665,20 +665,20 @@ controller_workflows:
         identifier: node101
         success_nodes:
           - node102
-          - node103
         failure_nodes:
           - node201
-      - unified_job_template: Configure Ansible Controller | Patching Demo Provisioner
-        identifier: node102
-        success_nodes:
-          - node112
-        failure_nodes:
-          - node202
       - unified_job_template: Provision Demo Hosts | Patching Demo Provisioner
-        identifier: node103
+        identifier: node102
         all_parents_must_converge: yes
         success_nodes:
+          - node103
           - node104
+        failure_nodes:
+          - node202
+      - unified_job_template: Configure Ansible Controller | Patching Demo Provisioner
+        identifier: node103
+        success_nodes:
+          - node112
         failure_nodes:
           - node203
       - unified_job_template: Preconfigure for SAP | Patching Demo Provisioner
