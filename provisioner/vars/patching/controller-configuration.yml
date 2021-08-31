@@ -168,7 +168,7 @@ controller_templates:
     limit: non_production
     project: "{{ audience }} Patching Code"
     organization: "{{ audience }}"
-    playbook: playbooks/run-insights-report.yml
+    playbook: demos/patching/playbooks/run-insights-report.yml
     execution_environment: Patching Demo EE
     credentials:
       - Patching Credentials
@@ -177,7 +177,7 @@ controller_templates:
     limit: non_production
     project: "{{ audience }} Patching Code"
     organization: "{{ audience }}"
-    playbook: playbooks/check-for-updates.yml
+    playbook: demos/patching/playbooks/check-for-updates.yml
     execution_environment: Patching Demo EE
     credentials:
       - Patching Credentials
@@ -186,7 +186,7 @@ controller_templates:
     limit: 'non_production:&normal_patch'
     project: "{{ audience }} Patching Code"
     organization: "{{ audience }}"
-    playbook: playbooks/install-tracer.yml
+    playbook: demos/patching/playbooks/install-tracer.yml
     execution_environment: Patching Demo EE
     credentials:
       - Patching Credentials
@@ -195,7 +195,7 @@ controller_templates:
     limit: 'non_production:&secondary'
     project: "{{ audience }} Patching Code"
     organization: "{{ audience }}"
-    playbook: playbooks/pacemaker-node-control.yml
+    playbook: demos/patching/playbooks/pacemaker-node-control.yml
     execution_environment: Patching Demo EE
     credentials:
       - Patching Credentials
@@ -206,7 +206,7 @@ controller_templates:
     limit: 'non_production:&normal_patch'
     project: "{{ audience }} Patching Code"
     organization: "{{ audience }}"
-    playbook: playbooks/update-all-packages.yml
+    playbook: demos/patching/playbooks/update-all-packages.yml
     execution_environment: Patching Demo EE
     credentials:
       - Patching Credentials
@@ -215,7 +215,7 @@ controller_templates:
     limit: 'non_production:&normal_patch'
     project: "{{ audience }} Patching Code"
     organization: "{{ audience }}"
-    playbook: playbooks/run-tracer-report.yml
+    playbook: demos/patching/playbooks/run-tracer-report.yml
     execution_environment: Patching Demo EE
     credentials:
       - Patching Credentials
@@ -224,7 +224,7 @@ controller_templates:
     limit: 'non_production:&normal_patch'
     project: "{{ audience }} Patching Code"
     organization: "{{ audience }}"
-    playbook: playbooks/reboot-server.yml
+    playbook: demos/patching/playbooks/reboot-server.yml
     execution_environment: Patching Demo EE
     credentials:
       - Patching Credentials  
@@ -233,7 +233,7 @@ controller_templates:
     limit: 'non_production:&kpatch_patch'
     project: "{{ audience }} Patching Code"
     organization: "{{ audience }}"
-    playbook: playbooks/kpatch-server.yml
+    playbook: demos/patching/playbooks/kpatch-server.yml
     execution_environment: Patching Demo EE
     credentials:
       - Patching Credentials
@@ -242,7 +242,7 @@ controller_templates:
     limit: 'non_production:&secondary'
     project: "{{ audience }} Patching Code"
     organization: "{{ audience }}"
-    playbook: playbooks/pacemaker-node-control.yml
+    playbook: demos/patching/playbooks/pacemaker-node-control.yml
     execution_environment: Patching Demo EE
     credentials:
       - Patching Credentials
@@ -253,7 +253,7 @@ controller_templates:
     limit: satellite
     project: "{{ audience }} Patching Code"
     organization: "{{ audience }}"
-    playbook: playbooks/promote-content.yml
+    playbook: demos/patching/playbooks/promote-content.yml
     extra_vars:
       current_lifecycle_environment: Non_Production
       new_lifecycle_environment:
