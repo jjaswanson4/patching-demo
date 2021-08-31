@@ -4,8 +4,10 @@
   hosts:
     - all
   gather_facts: no
-  vars_files:
-    - vars/controller-configuration.yml 
+  pre_tasks:
+    - name: include {{ demo }} controller configuration
+      ansible.builtin.include_vars:
+        file: "vars/{{ demo }}/controller-configuration.yml"
   tasks:
     - name: ansible controller configuration block
       block:
