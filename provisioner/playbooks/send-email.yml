@@ -9,11 +9,11 @@
       community.general.mail: 
         host: smtp.redhat.com
         to: "{{ provisioner }} <{{ provisioner_email }}>"
-        from: Patching Demo Provisioner <dont@email.me>
-        subject: Patching Demo Provisioning {{ provisioning_status }}
+        from: Demo Provisioner <dont@email.me>
+        subject: Demo Provisioning {{ provisioning_status }}
         body: >
           Hello {{ provisioner }},
 
-          Patching demo for {{ audience }} has completed with state: {{ provisioning_status }}
+          {{ demo }} demo for {{ audience }} has completed with state: {{ provisioning_status }}
 
-          - The Patching Demo Provisioner
+          - The Demo Provisioner
