@@ -651,7 +651,7 @@ controller_workflows:
           - node102
           - node103
           - node104
-      - unified_job_template: Teardown Demo Hosts
+      - unified_job_template: Teardown Systems
         identifier: node102
         inventory: Patching Demo Infrastructure
         limit: demo_hosts        
