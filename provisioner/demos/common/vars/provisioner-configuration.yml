@@ -128,7 +128,7 @@ controller_templates:
     execution_environment: Demo Provisioner EE
     credentials:
       - Demo Provisioner Root Account
-  - name: Reinstate HSR | Patching Demo
+  - name: Reinstate HSR
     ask_inventory_on_launch: yes
     ask_limit_on_launch: yes
     project: Demo Provisioner Codebase
