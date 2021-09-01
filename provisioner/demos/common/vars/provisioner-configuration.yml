@@ -1,0 +1,215 @@
+---
+
+controller_organizations:
+  - name: Demo Provisioner
+    galaxy_credentials:
+    - MSP Lab Automation Hub - RH Certified
+    - MSP Lab Automation Hub - Community
+    - Ansible Galaxy
+
+controller_credential_types:
+  - name: Demo Provisioner Peripheral Credentials
+    kind: cloud
+    injectors:
+      extra_vars:
+        dns_pass: "{{ dns_pass }}"
+        ansible_password: "{{ ansible_password }}"
+        satellite_password: "{{ satellite_password }}"
+        vcenter_password: "{{ vcenter_password }}"
+        controller_password: "{{ controller_password }}"
+
+controller_credentials:
+  - name: Demo Provisioner Peripheral Credentials
+    credential_type: Demo Provisioner Peripheral Credentials
+    organization: Demo Provisioner
+  - name: Demo Provisioner Root Account
+    credential_type: Machine
+    organization: Demo Provisioner
+    inputs:
+      username: root
+      password: "{{ ansible_password }}"
+
+controller_execution_environments:
+  - name: Demo Provisioner EE
+    image: aap20-hub.josh.lab.msp.redhat.com/patching-demo-provisioner-ee
+    credential: MSP Lab AAP20 Automation Hub
+    pull: always
+
+controller_inventories:
+  - name: Local Action Inventory
+    organization: Demo Provisioner
+    variables:
+      ansible_connection: local
+      ansible_python_interpreter: '{  { ansible_playbook_python }}'
+
+controller_hosts:
+  - name: localhost
+    inventory: Local Action Inventory
+
+controller_projects:
+  - name: Demo Provisioner Codebase
+    organization: Demo Provisioner
+    scm_branch: main
+    scm_type: git
+    scm_url: https://github.com/jjaswanson4/patching-demo.git
+    wait: yes
+
+controller_templates:
+  - name: Configure Ansible Controller
+    organization: Demo Provisioner
+    inventory: Local Action Inventory
+    ask_limit_on_launch: yes
+    project: Demo Provisioner Codebase
+    playbook: provisioner/playbooks/configure-ansible-controller.yml
+    execution_environment: Demo Provisioner EE
+    credentials:
+      - Demo Provisioner Peripheral Credentials
+    extra_vars:
+      controller_state: present
+  - name: Setup Red Hat Satellite
+    ask_inventory_on_launch: yes
+    ask_limit_on_launch: yes
+    project: Demo Provisioner Codebase
+    playbook: provisioner/playbooks/deploy-satellite.yml
+    execution_environment: Demo Provisioner EE
+    credentials:
+      - Demo Provisioner Peripheral Credentials
+      - Demo Provisioner Root Account
+  - name: Provision Demo Hosts
+    ask_inventory_on_launch: yes
+    ask_limit_on_launch: yes
+    forks: 10
+    project: Demo Provisioner Codebase
+    playbook: provisioner/playbooks/provision-demo-hosts.yml
+    execution_environment: Demo Provisioner EE
+    credentials:
+      - Demo Provisioner Peripheral Credentials
+      - Demo Provisioner Root Account
+    extra_vars:
+      ansible_become: no
+  - name: Preconfigure for SAP
+    ask_inventory_on_launch: yes
+    ask_limit_on_launch: yes
+    forks: 10
+    project: Demo Provisioner Codebase
+    playbook: provisioner/playbooks/sap-preconfigure.yml
+    execution_environment: Demo Provisioner EE
+    credentials:
+      - Demo Provisioner Root Account
+  - name: Preconfigure for HANA
+    ask_inventory_on_launch: yes
+    ask_limit_on_launch: yes
+    project: Demo Provisioner Codebase
+    playbook: provisioner/playbooks/hana-preconfigure.yml
+    execution_environment: Demo Provisioner EE
+    credentials:
+      - Demo Provisioner Root Account
+  - name: Preconfigure for Netweaver
+    ask_inventory_on_launch: yes
+    ask_limit_on_launch: yes
+    project: Demo Provisioner Codebase
+    playbook: provisioner/playbooks/netweaver-preconfigure.yml
+    execution_environment: Demo Provisioner EE
+    credentials:
+      - Demo Provisioner Root Account
+  - name: Deploy SAP HANA
+    ask_inventory_on_launch: yes
+    ask_limit_on_launch: yes
+    project: Demo Provisioner Codebase
+    playbook: provisioner/playbooks/deploy-hana.yml
+    execution_environment: Demo Provisioner EE
+    credentials:
+      - Demo Provisioner Root Account
+  - name: Install Netweaver
+    ask_inventory_on_launch: yes
+    ask_limit_on_launch: yes
+    project: Demo Provisioner Codebase
+    playbook: provisioner/playbooks/install-s4.yml
+    execution_environment: Demo Provisioner EE
+    credentials:
+      - Demo Provisioner Root Account
+  - name: Reinstate HSR | Patching Demo
+    ask_inventory_on_launch: yes
+    ask_limit_on_launch: yes
+    project: Demo Provisioner Codebase
+    playbook: provisioner/playbooks/reinstate-hsr.yml
+    execution_environment: Demo Provisioner EE
+    credentials:
+      - Demo Provisioner Root Account
+  - name: Remove Controller Configuration
+    inventory: Local Action Inventory
+    ask_limit_on_launch: yes
+    project: Demo Provisioner Codebase
+    playbook: provisioner/playbooks/remove-controller-configuration.yml
+    execution_environment: Demo Provisioner EE
+    credentials:
+       - Demo Provisioner Peripheral Credentials
+    extra_vars:
+      controller_state: absent
+  - name: Unregister from Insights
+    ask_inventory_on_launch: yes
+    ask_limit_on_launch: yes
+    forks: 10
+    project: Demo Provisioner Codebase
+    playbook: provisioner/playbooks/attempt-insights-unregister.yml
+    execution_environment: Demo Provisioner EE
+    credentials:
+      - Demo Provisioner Root Account
+  - name: Teardown Systems
+    ask_inventory_on_launch: yes
+    ask_limit_on_launch: yes
+    project: Demo Provisioner Codebase
+    playbook: provisioner/playbooks/teardown-systems.yml
+    execution_environment: Demo Provisioner EE
+    credentials:
+      - Demo Provisioner Peripheral Credentials
+  - name: Cleanup DNS Records
+    ask_inventory_on_launch: yes
+    ask_limit_on_launch: yes
+    project: Demo Provisioner Codebase
+    playbook: provisioner/playbooks/delete-dns-records.yml
+    execution_environment: Demo Provisioner EE
+    credentials:
+      - Demo Provisioner Peripheral Credentials
+  - name: Send Provisioner Email | Succeeded
+    organization: Demo Provisioner
+    inventory: Local Action Inventory
+    limit: localhost
+    project: Demo Provisioner Codebase
+    playbook: provisioner/playbooks/send-email.yml
+    execution_environment: Demo Provisioner EE
+    extra_vars:
+      provisioning_status: Succeeded
+  - name: Send Provisioner Email | Failed
+    organization: Demo Provisioner
+    inventory: Local Action Inventory
+    limit: localhost
+    project: Demo Provisioner Codebase
+    playbook: provisioner/playbooks/send-email.yml
+    execution_environment: Demo Provisioner EE
+    extra_vars:
+      provisioning_status: Failed
+
+controller_user_accounts:
+  - username: demo-admin
+    password: "{{ ansible_password }}"
+    email: dont@email.me
+    update_secrets: no
+  - username: demo-provisioner
+    password: "{{ ansible_password }}"
+    email: dont@email.me
+    update_secrets: no  
+
+controller_teams:
+  - name: Demo Provisioner Team
+    description: Team that can provision demos
+    organization: Demo Provisioner
+
+controller_roles:
+  - user: demo-admin
+    organization: Demo Provisioner
+    role: admin
+  - user: demo-provisioner
+    target_team: Demo Provisioner Team
+    organization: Demo Provisioner
+    role: member

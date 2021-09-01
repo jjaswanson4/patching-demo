@@ -4,51 +4,26 @@ controller_hostname: aap20-controller.josh.lab.msp.redhat.com
 controller_validate_certs: no
 controller_username: admin
 
-# Change this if you'd like to use an org other than the Default one in Ansible Controller
-deploy_from_controller_org: Default
-
-controller_credential_types:
-  - name: S4HANA Deployment Demo Provisioner Peripheral Credentials
-    organization: "{{ deploy_from_controller_org }}"
-    kind: cloud
-    injectors:
-      extra_vars:
-        dns_pass: "{{ dns_pass }}"
-        ansible_password: "{{ ansible_password }}"
-        satellite_password: "{{ satellite_password }}"
-        vcenter_password: "{{ vcenter_password }}"
-        controller_password: "{{ controller_password }}"
-
 controller_credentials:
-  - name: S4HANA Deployment Demo Provisioner Peripheral Credentials
-    credential_type: Patching Demo Provisioner Peripheral Credentials
-    organization: "{{ deploy_from_controller_org }}"
   - name: S4HANA Deployment Demo Root Account
     credential_type: Machine
-    organization: "{{ deploy_from_controller_org }}"
+    organization: Demo Provisioner
     inputs:
       username: root
       password: "{{ ansible_password }}"
 
-controller_execution_environments:
-  - name: Demo Provisioner EE
-    image: aap20-hub.josh.lab.msp.redhat.com/patching-demo-provisioner-ee
-    organization: "{{ deploy_from_controller_org }}"
-    credential: MSP Lab AAP20 Automation Hub
-    pull: always
-
 controller_inventories:
-  - name: Local Action Inventory
-    organization: "{{ deploy_from_controller_org }}"
   - name: S4HANA Deployment Demo Infrastructure
-    organization: "{{ deploy_from_controller_org }}"
-    variables: "{{ provisioner_inventory_vars }}"
+    organization: Demo Provisioner
 
 controller_hosts:
   - name: sap-deployment-satellite.josh.lab.msp.redhat.com
     inventory: S4HANA Deployment Demo Infrastructure
-    variables: "{{ lookup('file', 'vars/s4hana-deployment/satellite-configuration.yml') | from_yaml }}"
-
+    variables: "{{ lookup('file', 'demos/s4hana-deployment/vars/satellite-configuration.yml') | from_yaml }}"
+  - name: s4hana-deployment-demo
+    inventory: Local Action Inventory
+    variables: "{{ lookup('file', 'demos/s4hana-deployment/vars/controller-configuration.yml') | from_yaml }}"
+    
 controller_groups:
   - name: satellite
     inventory: S4HANA Deployment Demo Infrastructure
@@ -74,55 +49,41 @@ controller_groups:
     children:
       - satellite
 
-controller_projects:
-  - name: S4HANA Deployment Demo
-    organization: "{{ deploy_from_controller_org }}"
-    scm_branch: main
-    scm_type: git
-    scm_url: https://github.com/jjaswanson4/patching-demo.git
-    wait: yes
-
 controller_templates:
-  - name: Setup Red Hat Satellite | S4HANA Deployment Demo
+  - name: Setup Red Hat Satellite
+    organization: Demo Provisioner
     inventory: S4HANA Deployment Demo Infrastructure
     limit: satellite
-    project: Patching Demo
+    project: Demo Provisioner Codebase
     playbook: provisioner/playbooks/deploy-satellite.yml
     execution_environment: Demo Provisioner EE
     extra_vars:
       run_additional_roles: no
     credentials:
-      - S4HANA Deployment Demo Provisioner Peripheral Credentials
+      - Demo Provisioner Peripheral Credentials
       - S4HANA Deployment Demo Root Account
-  - name: Configure Ansible Controller | S4HANA Deployment Demo
-    inventory: Local Action Inventory
-    project: S4HANA Deployment Demo
-    playbook: provisioner/playbooks/configure-ansible-controller.yml
-    execution_environment: Demo Provisioner EE
-    credentials:
-      - S4HANA Deployment Demo Provisioner Peripheral Credentials
-    extra_vars:
-      controller_state: present
-  - name: Teardown Red Hat Satellite | S4HANA Deployment Demo
+  - name: Teardown Red Hat Satellite
+    organization: Demo Provisioner
     inventory: S4HANA Deployment Demo Infrastructure
     limit: satellite
-    project: S4HANA Deployment Demo
+    project: Demo Provisioner Codebase
     playbook: provisioner/playbooks/teardown-systems.yml
     execution_environment: Demo Provisioner EE
     credentials:
-      - S4HANA Deployment Demo Provisioner Peripheral Credentials
-  - name: Cleanup Satellite DNS Records | S4HANA Deployment Demo
+      - Demo Provisioner Peripheral Credentials
+  - name: Cleanup Satellite DNS Records
+    organization: Demo Provisioner
     inventory: S4HANA Deployment Demo Infrastructure
     limit: satellite
-    project: S4HANA Deployment Demo
+    project: Demo Provisioner Codebase
     playbook: provisioner/playbooks/delete-dns-records.yml
     execution_environment: Demo Provisioner EE
     credentials:
-      - S4HANA Deployment Demo Provisioner Peripheral Credentials
+      - Demo Provisioner Peripheral Credentials
 
 controller_workflows:
   - name: Provision S4HANA Deployment Demo
-    organization: "{{ deploy_from_controller_org }}"
+    organization: Demo Provisioner
     state: "{{ controller_state | default('present') }}"
     extra_vars:
       demo: s4hana-deployment
@@ -168,13 +129,14 @@ controller_workflows:
           required: yes          
     simplified_workflow_nodes:
     # Work nodes
-      - unified_job_template: Configure Ansible Controller | Patching Demo
+      - unified_job_template: Configure Ansible Controller
         identifier: node101
+        limit: s4hana-deployment-demo
         success_nodes:
           - node999
         failure_nodes:
           - node201
-      - unified_job_template: Setup Red Hat Satellite | S4HANA Deployment Demo
+      - unified_job_template: Setup Red Hat Satellite
         identifier: node102
         success_nodes:
           - node999
@@ -188,25 +150,25 @@ controller_workflows:
         identifier: node201
       - unified_job_template: Send Provisioner Email | Failed
         identifier: node202
-  - name: Teardown Patching Demo
-    organization: "{{ deploy_from_controller_org }}"
-    state: "{{ controller_state | default('present') }}"
-    extra_vars:
-      demo: patching
-    survey_enabled: yes
-    survey:
-      name: ''
-      description: ''
-      spec:
-        - type: text
-          question_name: "Demo Audience?"
-          question_description: "Who is the audience for this demo"
-          variable: audience
-          required: yes
-    simplified_workflow_nodes:
-      - unified_job_template: Remove Controller Configuration
-        identifier: node101
-      - unified_job_template: Teardown Red Hat Satellite | S4HANA Deployment Demo
-        identifier: node102
-      - unified_job_template: Cleanup Satellite DNS Records | S4HANA Deployment Demo
-        identifier: node103
+  # - name: Teardown Patching Demo
+  #   organization: Demo Provisioner
+  #   state: "{{ controller_state | default('present') }}"
+  #   extra_vars:
+  #     demo: patching
+  #   survey_enabled: yes
+  #   survey:
+  #     name: ''
+  #     description: ''
+  #     spec:
+  #       - type: text
+  #         question_name: "Demo Audience?"
+  #         question_description: "Who is the audience for this demo"
+  #         variable: audience
+  #         required: yes
+  #   simplified_workflow_nodes:
+  #     - unified_job_template: Remove Controller Configuration
+  #       identifier: node101
+  #     - unified_job_template: Teardown Red Hat Satellite
+  #       identifier: node102
+  #     - unified_job_template: Cleanup Satellite DNS Records
+  #       identifier: node103
