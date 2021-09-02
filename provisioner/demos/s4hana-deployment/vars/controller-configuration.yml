@@ -218,7 +218,7 @@ controller_workflows:
       - unified_job_template: Install Netweaver
         identifier: node107
         inventory: "{{ audience }} SAP Infrastructure"
-        limit: 'netweaver:&non_production'
+        limit: 'netweaver'
         all_parents_must_converge: yes
         success_nodes:
           - node108
