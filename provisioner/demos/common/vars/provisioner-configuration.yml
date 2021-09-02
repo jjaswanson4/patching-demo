@@ -1,7 +1,12 @@
 ---
 
+# By default, the org 'Demo Provisioner' is created and resources are configured there,
+# Use this variable to override this behavior.
+# For example, overriding to 'Default' will put the resources into the default controller organization.
+controller_organization: Demo Provisioner
+
 controller_organizations:
-  - name: Demo Provisioner
+  - name: "{{ controller_organization }}"
     galaxy_credentials:
     - MSP Lab Automation Hub - RH Certified
     - MSP Lab Automation Hub - Community
@@ -16,15 +21,18 @@ controller_credential_types:
         ansible_password: "{{ ansible_password }}"
         satellite_password: "{{ satellite_password }}"
         vcenter_password: "{{ vcenter_password }}"
+        controller_hostname: "{{ controller_hostname }}"
+        controller_username: "{{ controller_username }}"
         controller_password: "{{ controller_password }}"
+        controller_validate_certs: "{{ controller_validate_certs }}"
 
 controller_credentials:
   - name: Demo Provisioner Peripheral Credentials
     credential_type: Demo Provisioner Peripheral Credentials
-    organization: Demo Provisioner
+    organization: "{{ controller_organization }}"
   - name: Demo Provisioner Root Account
     credential_type: Machine
-    organization: Demo Provisioner
+    organization: "{{ controller_organization }}"
     inputs:
       username: root
       password: "{{ ansible_password }}"
@@ -37,7 +45,7 @@ controller_execution_environments:
 
 controller_inventories:
   - name: Local Action Inventory
-    organization: Demo Provisioner
+    organization: "{{ controller_organization }}"
     variables:
       ansible_connection: local
       ansible_python_interpreter: '{  { ansible_playbook_python }}'
@@ -48,7 +56,7 @@ controller_hosts:
 
 controller_projects:
   - name: Demo Provisioner Codebase
-    organization: Demo Provisioner
+    organization: "{{ controller_organization }}"
     scm_branch: main
     scm_type: git
     scm_url: https://github.com/jjaswanson4/patching-demo.git
@@ -56,7 +64,7 @@ controller_projects:
 
 controller_templates:
   - name: Configure Ansible Controller
-    organization: Demo Provisioner
+    organization: "{{ controller_organization }}"
     inventory: Local Action Inventory
     ask_limit_on_launch: yes
     project: Demo Provisioner Codebase
@@ -67,6 +75,7 @@ controller_templates:
     extra_vars:
       controller_state: present
   - name: Setup Red Hat Satellite
+    organization: "{{ controller_organization }}"
     ask_inventory_on_launch: yes
     ask_limit_on_launch: yes
     project: Demo Provisioner Codebase
@@ -76,6 +85,7 @@ controller_templates:
       - Demo Provisioner Peripheral Credentials
       - Demo Provisioner Root Account
   - name: Provision Demo Hosts
+    organization: "{{ controller_organization }}"
     ask_inventory_on_launch: yes
     ask_limit_on_launch: yes
     forks: 10
@@ -88,6 +98,7 @@ controller_templates:
     extra_vars:
       ansible_become: no
   - name: Preconfigure for SAP
+    organization: "{{ controller_organization }}"
     ask_inventory_on_launch: yes
     ask_limit_on_launch: yes
     forks: 10
@@ -95,8 +106,10 @@ controller_templates:
     playbook: provisioner/playbooks/sap-preconfigure.yml
     execution_environment: Demo Provisioner EE
     credentials:
+      - Demo Provisioner Peripheral Credentials
       - Demo Provisioner Root Account
   - name: Preconfigure for HANA
+    organization: "{{ controller_organization }}"
     ask_inventory_on_launch: yes
     ask_limit_on_launch: yes
     project: Demo Provisioner Codebase
@@ -105,6 +118,7 @@ controller_templates:
     credentials:
       - Demo Provisioner Root Account
   - name: Preconfigure for Netweaver
+    organization: "{{ controller_organization }}"
     ask_inventory_on_launch: yes
     ask_limit_on_launch: yes
     project: Demo Provisioner Codebase
@@ -113,6 +127,7 @@ controller_templates:
     credentials:
       - Demo Provisioner Root Account
   - name: Deploy SAP HANA
+    organization: "{{ controller_organization }}"
     ask_inventory_on_launch: yes
     ask_limit_on_launch: yes
     project: Demo Provisioner Codebase
@@ -121,6 +136,7 @@ controller_templates:
     credentials:
       - Demo Provisioner Root Account
   - name: Install Netweaver
+    organization: "{{ controller_organization }}"
     ask_inventory_on_launch: yes
     ask_limit_on_launch: yes
     project: Demo Provisioner Codebase
@@ -129,6 +145,7 @@ controller_templates:
     credentials:
       - Demo Provisioner Root Account
   - name: Reinstate HSR
+    organization: "{{ controller_organization }}"
     ask_inventory_on_launch: yes
     ask_limit_on_launch: yes
     project: Demo Provisioner Codebase
@@ -137,6 +154,7 @@ controller_templates:
     credentials:
       - Demo Provisioner Root Account
   - name: Remove Controller Configuration
+    organization: "{{ controller_organization }}"
     inventory: Local Action Inventory
     ask_limit_on_launch: yes
     project: Demo Provisioner Codebase
@@ -147,6 +165,7 @@ controller_templates:
     extra_vars:
       controller_state: absent
   - name: Unregister from Insights
+    organization: "{{ controller_organization }}"
     ask_inventory_on_launch: yes
     ask_limit_on_launch: yes
     forks: 10
@@ -156,6 +175,7 @@ controller_templates:
     credentials:
       - Demo Provisioner Root Account
   - name: Teardown Systems
+    organization: "{{ controller_organization }}"
     ask_inventory_on_launch: yes
     ask_limit_on_launch: yes
     project: Demo Provisioner Codebase
@@ -164,6 +184,7 @@ controller_templates:
     credentials:
       - Demo Provisioner Peripheral Credentials
   - name: Cleanup DNS Records
+    organization: "{{ controller_organization }}"
     ask_inventory_on_launch: yes
     ask_limit_on_launch: yes
     project: Demo Provisioner Codebase
@@ -172,7 +193,7 @@ controller_templates:
     credentials:
       - Demo Provisioner Peripheral Credentials
   - name: Send Provisioner Email | Succeeded
-    organization: Demo Provisioner
+    organization: "{{ controller_organization }}"
     inventory: Local Action Inventory
     limit: localhost
     project: Demo Provisioner Codebase
@@ -181,7 +202,7 @@ controller_templates:
     extra_vars:
       provisioning_status: Succeeded
   - name: Send Provisioner Email | Failed
-    organization: Demo Provisioner
+    organization: "{{ controller_organization }}"
     inventory: Local Action Inventory
     limit: localhost
     project: Demo Provisioner Codebase
@@ -203,13 +224,13 @@ controller_user_accounts:
 controller_teams:
   - name: Demo Provisioner Team
     description: Team that can provision demos
-    organization: Demo Provisioner
+    organization: "{{ controller_organization }}"
 
 controller_roles:
   - user: demo-admin
-    organization: Demo Provisioner
+    organization: "{{ controller_organization }}"
     role: admin
   - user: demo-provisioner
     target_team: Demo Provisioner Team
-    organization: Demo Provisioner
+    organization: "{{ controller_organization }}"
     role: member
