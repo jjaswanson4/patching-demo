@@ -37,38 +37,6 @@ controller_groups:
     children:
       - satellite
 
-controller_templates:
-  - name: Setup Red Hat Satellite
-    organization: Demo Provisioner
-    inventory: S4HANA Deployment Demo Infrastructure
-    limit: satellite
-    project: Demo Provisioner Codebase
-    playbook: provisioner/playbooks/deploy-satellite.yml
-    execution_environment: Demo Provisioner EE
-    extra_vars:
-      run_additional_roles: no
-    credentials:
-      - Demo Provisioner Peripheral Credentials
-      - S4HANA Deployment Demo Root Account
-  - name: Teardown Red Hat Satellite
-    organization: Demo Provisioner
-    inventory: S4HANA Deployment Demo Infrastructure
-    limit: satellite
-    project: Demo Provisioner Codebase
-    playbook: provisioner/playbooks/teardown-systems.yml
-    execution_environment: Demo Provisioner EE
-    credentials:
-      - Demo Provisioner Peripheral Credentials
-  - name: Cleanup Satellite DNS Records
-    organization: Demo Provisioner
-    inventory: S4HANA Deployment Demo Infrastructure
-    limit: satellite
-    project: Demo Provisioner Codebase
-    playbook: provisioner/playbooks/delete-dns-records.yml
-    execution_environment: Demo Provisioner EE
-    credentials:
-      - Demo Provisioner Peripheral Credentials
-
 controller_workflows:
   - name: Provision S4HANA Deployment Demo
     organization: Demo Provisioner
@@ -125,6 +93,8 @@ controller_workflows:
         failure_nodes:
           - node201
       - unified_job_template: Setup Red Hat Satellite
+        inventory: S4HANA Deployment Demo Infrastructure
+        limit: satellite
         identifier: node102
         success_nodes:
           - node999
