@@ -7,14 +7,14 @@ controller_organization: Demo Provisioner
 
 controller_organizations:
   - name: "{{ controller_organization }}"
-    galaxy_credentials: yes
-    - MSP Lab Automation Hub - RH Certified
-    - MSP Lab Automation Hub - Community
-    - Ansible Galaxy
+    galaxy_credentials:
+      - MSP Lab Automation Hub - RH Certified
+      - MSP Lab Automation Hub - Community
+      - Ansible Galaxy
 
 controller_credential_types:
   - name: Demo Provisioner Peripheral Credentials
-     kind: cloud
+    kind: cloud
     injectors:
       extra_vars:
         dns_pass: "{{ dns_pass }}"
@@ -72,7 +72,7 @@ controller_templates:
     playbook: provisioner/playbooks/configure-ansible-controller.yml
     execution_environment: Demo Provisioner EE
     ask_credential_on_launch: yes
-     extra_vars:
+    extra_vars:
       controller_state: present
   - name: Setup Red Hat Satellite
     organization: "{{ controller_organization }}"
@@ -159,8 +159,7 @@ controller_templates:
     playbook: provisioner/playbooks/remove-controller-configuration.yml
     execution_environment: Demo Provisioner EE
     ask_credential_on_launch: yes
-
-     extra_vars:
+    extra_vars:
       controller_state: absent
   - name: Unregister from Insights
     organization: "{{ controller_organization }}"
@@ -181,7 +180,7 @@ controller_templates:
     playbook: provisioner/playbooks/teardown-systems.yml
     execution_environment: Demo Provisioner EE
     ask_credential_on_launch: yes
-   - name: Cleanup DNS Records
+  - name: Cleanup DNS Records
     organization: "{{ controller_organization }}"
     ask_inventory_on_launch: yes
     ask_limit_on_launch: yes
@@ -190,7 +189,7 @@ controller_templates:
     playbook: provisioner/playbooks/delete-dns-records.yml
     execution_environment: Demo Provisioner EE
     ask_credential_on_launch: yes
-   - name: Send Provisioner Email | Succeeded
+  - name: Send Provisioner Email | Succeeded
     organization: "{{ controller_organization }}"
     inventory: Local Action Inventory
     limit: localhost
