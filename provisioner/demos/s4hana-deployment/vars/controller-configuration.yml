@@ -117,83 +117,15 @@ controller_templates:
     credentials:
       - S4HANA Deployment Peripheral Credentials
 
-
-  # - name: Provision Demo Hosts | Patching Demo
-  #   inventory: Patching Demo Inventory
-  #   limit: demo_hosts
-  #   project: Patching Demo
-  #   playbook: provisioner/playbooks/provision-demo-hosts.yml
-  #   execution_environment: Demo Provisioner EE
-  #   credentials:
-  #     - Patching Demo Provisioner Peripheral Credentials
-  #     - Patching Demo Provisioner Root Account
-  #   extra_vars:
-  #     ansible_become: no
-  # - name: Preconfigure for SAP | Patching Demo
-  #   inventory: Patching Demo Inventory
-  #   limit: s4hana
-  #   project: Patching Demo
-  #   playbook: provisioner/playbooks/sap-preconfigure.yml
-  #   execution_environment: Demo Provisioner EE
-  #   credentials:
-  #     - Patching Demo Provisioner Peripheral Credentials
-  #     - Patching Demo Provisioner Root Account
-  # - name: Preconfigure for HANA Install | Patching Demo
-  #   inventory: Patching Demo Inventory
-  #   limit: hana
-  #   project: Patching Demo
-  #   playbook: provisioner/playbooks/hana-preconfigure.yml
-  #   execution_environment: Demo Provisioner EE
-  #   credentials:
-  #     - Patching Demo Provisioner Root Account
-  # - name: Preconfigure for Netweaver/S4 Install | Patching Demo
-  #   inventory: Patching Demo Inventory
-  #   limit: netweaver
-  #   project: Patching Demo
-  #   playbook: provisioner/playbooks/netweaver-preconfigure.yml
-  #   execution_environment: Demo Provisioner EE
-  #   credentials:
-  #     - Patching Demo Provisioner Root Account
-  # - name: Deploy SAP HANA | Non_Production | Patching Demo
-  #   inventory: Patching Demo Inventory
-  #   limit: 'hana:&non_production'
-  #   project: Patching Demo
-  #   playbook: provisioner/playbooks/deploy-hana.yml
-  #   execution_environment: Demo Provisioner EE
-  #   credentials:
-  #     - Patching Demo Provisioner Root Account
-  # - name: Deploy SAP HANA | Production | Patching Demo
-  #   inventory: Patching Demo Inventory
-  #   limit: 'hana:&production'
-  #   project: Patching Demo
-  #   playbook: provisioner/playbooks/deploy-hana.yml
-  #   execution_environment: Demo Provisioner EE
-  #   credentials:
-  #     - Patching Demo Provisioner Root Account
-  # - name: Install Netweaver/S4 | Non_Production | Patching Demo
-  #   inventory: Patching Demo Inventory
-  #   limit: 'netweaver:&non_production'
-  #   project: Patching Demo
-  #   playbook: provisioner/playbooks/install-s4.yml
-  #   execution_environment: Demo Provisioner EE
-  #   credentials:
-  #     - Patching Demo Provisioner Root Account
-  # - name: Install Netweaver/S4 | Production | Patching Demo
-  #   inventory: Patching Demo Inventory
-  #   limit: 'netweaver:&production'
-  #   project: Patching Demo
-  #   playbook: provisioner/playbooks/install-s4.yml
-  #   execution_environment: Demo Provisioner EE
-  #   credentials:
-  #     - Patching Demo Provisioner Root Account
-  # - name: Reinstate HSR | Patching Demo
-  #   inventory: Patching Demo Inventory
-  #   limit: 'hana:&primary'
-  #   project: Patching Demo
-  #   playbook: provisioner/playbooks/reinstate-hsr.yml
-  #   execution_environment: Demo Provisioner EE
-  #   credentials:
-  #     - Patching Demo Provisioner Root Account
+controller_templates: >
+  {{ controller_templates }} +
+  {{ lookup('file', '../demos/common/vars/provisioner-configuration.yml') | from_yaml | json_query('controller_templates[?name == `Provision Demo Hosts`]') }} +
+  {{ lookup('file', '../demos/common/vars/provisioner-configuration.yml') | from_yaml | json_query('controller_templates[?name == `Preconfigure for SAP`]') }} +
+  {{ lookup('file', '../demos/common/vars/provisioner-configuration.yml') | from_yaml | json_query('controller_templates[?name == `Preconfigure for HANA`]') }} +
+  {{ lookup('file', '../demos/common/vars/provisioner-configuration.yml') | from_yaml | json_query('controller_templates[?name == `Preconfigure for Netweaver`]') }} +
+  {{ lookup('file', '../demos/common/vars/provisioner-configuration.yml') | from_yaml | json_query('controller_templates[?name == `Deploy SAP HANA`]') }} +
+  {{ lookup('file', '../demos/common/vars/provisioner-configuration.yml') | from_yaml | json_query('controller_templates[?name == `Install Netweaver`]') }} +
+  {{ lookup('file', '../demos/common/vars/provisioner-configuration.yml') | from_yaml | json_query('controller_templates[?name == `Reinstate HSR`]') }}
 
 controller_workflows:
   - name: Provision S4HANA SID
