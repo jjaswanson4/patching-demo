@@ -1,9 +1,5 @@
 ---
 
-controller_hostname: aap20-controller.josh.lab.msp.redhat.com
-controller_validate_certs: no
-controller_username: admin
-
 controller_organizations:
   - name: "{{ audience }}"
     galaxy_credentials:
@@ -21,7 +17,11 @@ controller_credential_types:
         ansible_password: "{{ ansible_password }}"
         satellite_password: "{{ satellite_password }}"
         vcenter_password: "{{ vcenter_password }}"
+        controller_hostname: "{{ controller_hostname }}"
+        controller_username: "{{ controller_username }}"
         controller_password: "{{ controller_password }}"
+        controller_validate_certs: "{{ controller_validate_certs }}"
+
 
 controller_credentials:
   - name: S4HANA Deployment Peripheral Credentials
