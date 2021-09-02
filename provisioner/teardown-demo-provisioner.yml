@@ -1,21 +1,16 @@
 ---
 
+- name: import validation playbook
+  ansible.builtin.import_playbook: validate-selected-demo.yml
+
 - name: remove appropriate configurations from Ansible Controller
   hosts:
     - localhost
   gather_facts: no
+  vars:
+    controller_state: absent
   vars_files:
-    - vars/demos.yml
-  pre_tasks:
-    - name: validate selected demo is available
-      ansible.builtin.assert:
-        that:
-          - demo in available_demos
-        success_msg: "{{ demo }} demo(s) selected"
-        fail_msg: "selected demo {{ demo }} is not available, please select one of: {{ available_demos | join(', ') }}"
-    - name: include provisioner configuration for {{ demo }} demo
-      ansible.builtin.include_vars:
-        file: "vars/{{ demo }}/provisioner-configuration.yml"
+    - "demos/{{ demo }}/vars/provisioner-configuration.yml"
   roles:
     - redhat_cop.controller_configuration.workflow_job_templates
     - redhat_cop.controller_configuration.job_templates
@@ -24,3 +19,35 @@
     - redhat_cop.controller_configuration.execution_environments
     - redhat_cop.controller_configuration.credentials
     - redhat_cop.controller_configuration.credential_types
+    - redhat_cop.controller_configuration.users
+    - redhat_cop.controller_configuration.teams
+    - redhat_cop.controller_configuration.organizations
+
+- name: remove common configurations from Ansible Controller when requested
+  hosts:
+    - localhost
+  gather_facts: no
+  vars:
+    controller_state: absent
+  vars_files:
+    - demos/common/vars/provisioner-configuration.yml
+  tasks:
+    - name: include roles to remove common provisioner configurations
+      ansible.builtin.include_role:
+        name: "{{ role }}"
+      loop_control:
+        loop_var: role
+      loop:
+        - redhat_cop.controller_configuration.workflow_job_templates
+        - redhat_cop.controller_configuration.job_templates
+        - redhat_cop.controller_configuration.projects
+        - redhat_cop.controller_configuration.inventories
+        - redhat_cop.controller_configuration.execution_environments
+        - redhat_cop.controller_configuration.credentials
+        - redhat_cop.controller_configuration.credential_types
+        - redhat_cop.controller_configuration.users
+        - redhat_cop.controller_configuration.teams
+        - redhat_cop.controller_configuration.organizations
+      when:
+        - remove_common_configuration is defined
+        - remove_common_configuration
