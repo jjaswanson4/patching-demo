@@ -11,7 +11,7 @@ controller_credentials:
   - name: S4HANA Deployment Peripheral Credentials
     credential_type: Demo Provisioner Peripheral Credentials
     organization: "{{ audience }}"
-  - name: S4HANA Deployment Credentials
+  - name: S4HANA Deployment Root Credentials
     credential_type: Machine
     organization: "{{ audience }}"
     inputs:
@@ -95,6 +95,7 @@ controller_projects:
 controller_templates:
   - name: Add Hosts to Controller Inventory
     inventory: Local Action Inventory
+    limit: localhost
     project: "{{ audience }} S4HANA Deployment Code"
     playbook: demos/s4hana-deployment/add-hosts-to-controller.yml
     execution_environment: S4HANA Deployment Demo EE
@@ -179,94 +180,132 @@ controller_workflows:
           default: SAPEXE_201-80003386.SAR
 
     simplified_workflow_nodes:
+      - unified_job_template: Add Hosts to Controller Inventory
+        identifier: node101
+        success_nodes:
+          - node102
       - unified_job_template: Provision Systems
         identifier: node102
-        inventory: Patching Demo Infrastructure
+        inventory: "{{ audience }} SAP Infrastructure"
         limit: sap
         success_nodes:
           - node103
-          - node104
-        failure_nodes:
-          - node202
-      - unified_job_template: Configure Ansible Controller
-        identifier: node103
-        limit: patching-demo
-        success_nodes:
-          - node112
-        failure_nodes:
-          - node203
       - unified_job_template: Preconfigure for SAP
-        identifier: node104
-        inventory: Patching Demo Infrastructure
+        identifier: node103
+        inventory: "{{ audience }} SAP Infrastructure"
         limit: sap
         success_nodes:
+          - node104
           - node105
-          - node106
-        failure_nodes:
-          - node204
       - unified_job_template: Preconfigure for HANA
+        identifier: node104
+        inventory: "{{ audience }} SAP Infrastructure"
+        limit: hana
+        success_nodes:
+          - node106
+      - unified_job_template: Preconfigure for Netweaver
         identifier: node105
-        inventory: Patching Demo Infrastructure
+        inventory: "{{ audience }} SAP Infrastructure"
+        limit: netweaver
+        success_nodes:
+          - node107
+      - unified_job_template: Deploy SAP HANA
+        identifier: node106
+        inventory: "{{ audience }} SAP Infrastructure"
         limit: hana
         success_nodes:
           - node107
-          - node108
-          - node112
-        failure_nodes:
-          - node205
-      - unified_job_template: Preconfigure for Netweaver
-        identifier: node106
-        inventory: Patching Demo Infrastructure
-        limit: netweaver
-        success_nodes:
-          - node109
-          - node110
-          - node112
-        failure_nodes:
-          - node206
-      - unified_job_template: Deploy SAP HANA
-        identifier: node107
-        inventory: Patching Demo Infrastructure
-        limit: 'hana:&non_production'
-        success_nodes:
-          - node109
-        failure_nodes:
-          - node207
-      - unified_job_template: Deploy SAP HANA
-        identifier: node108
-        inventory: Patching Demo Infrastructure
-        limit: 'hana:&production'
-        success_nodes:
-          - node110
-        failure_nodes:
-          - node208
       - unified_job_template: Install Netweaver
-        identifier: node109
-        inventory: Patching Demo Infrastructure
+        identifier: node107
+        inventory: "{{ audience }} SAP Infrastructure"
         limit: 'netweaver:&non_production'
         all_parents_must_converge: yes
         success_nodes:
-          - node111
-        failure_nodes:
-          - node209
-      - unified_job_template: Install Netweaver
-        identifier: node110
-        inventory: Patching Demo Infrastructure
-        limit: 'netweaver:&production'
-        all_parents_must_converge: yes
-        success_nodes:
-          - node111
-        failure_nodes:
-          - node210
+          - node108
       - unified_job_template: Reinstate HSR
-        identifier: node111
-        inventory: Patching Demo Infrastructure
-        limit: 'hana:&primary'
-        all_parents_must_converge: yes
-        success_nodes:
-          - node999
-        failure_nodes:
-          - node211
+        identifier: node108
+        inventory: "{{ audience }} SAP Infrastructure"
+        limit: primary
 
 controller_roles:
-
+  # admin account
+  - user: "{{ audience }}_admin"
+    organization: "{{ audience }}"
+    role: admin
+  # Team Membership
+  - user: "{{ audience }}_infrastructure"
+    target_team: "{{ audience }} SAP Infrastructure Team"
+    organization: "{{ audience }}"
+    role: member
+  - user: "{{ audience }}_basis"
+    target_team: "{{ audience }} BASIS Team"
+    organization: "{{ audience }}"
+    role: member
+  - user: "{{ audience }}_business_analyst"
+    target_team: "{{ audience }} Business Analyst Team"
+    organization: "{{ audience }}"
+    role: member
+  # Infrastructure Permissions
+  - team: "{{ audience }} SAP Infrastructure Team"
+    role: admin
+    credentials:
+      - S4HANA Deployment Peripheral Credentials
+      - S4HANA Deployment Root Credentials
+  - team: "{{ audience }} Infrastructure Team"
+    role: admin
+    inventory: "{{ audience }} SAP Infrastructure"
+  - team: "{{ audience }} SAP Infrastructure Team"
+    role: admin
+    project: "{{ audience }} S4HANA Deployment Code"
+  - team: "{{ audience }} SAP Infrastructure Team"
+    role: admin
+    job_template: Add Hosts to Controller Inventory
+  - team: "{{ audience }} SAP Infrastructure Team"
+    role: admin
+    job_template: Provision Systems
+  # BASIS Permissions
+  - team: "{{ audience }} BASIS Team"
+    role: read
+    credentials:
+      - S4HANA Deployment Peripheral Credentials
+      - S4HANA Deployment Root Credentials
+  - team: "{{ audience }} BASIS Team"
+    role: update
+    inventory: "{{ audience }} SAP Infrastructure"
+  - team: "{{ audience }} BASIS Team"
+    role: update
+    project: "{{ audience }} S4HANA Deployment Code"
+  - team: "{{ audience }} BASIS Team"
+    role: admin
+    job_template: Preconfigure for SAP
+  - team: "{{ audience }} BASIS Team"
+    role: admin
+    job_template: Preconfigure for HANA
+  - team: "{{ audience }} BASIS Team"
+    role: admin
+    job_template: Preconfigure for Netweaver
+  - team: "{{ audience }} BASIS Team"
+    role: admin
+    job_template: Deploy SAP HANA
+  - team: "{{ audience }} BASIS Team"
+    role: admin
+    job_template: Install Netweaver
+  - team: "{{ audience }} BASIS Team"
+    role: admin
+    job_template: Reinstate HSR
+  # Business Analyst Permissions
+  # Security Permissions
+  - team: "{{ audience }} Business Analyst Team"
+    role: read
+    credentials:
+      - S4HANA Deployment Peripheral Credentials
+      - S4HANA Deployment Root Credentials
+  - team: "{{ audience }} Business Analyst Team"
+    role: read
+    inventory: "{{ audience }} SAP Infrastructure"
+  - team: "{{ audience }} Business Analyst Team"
+    role: read
+    project: "{{ audience }} S4HANA Deployment Code"
+  - team: "{{ audience }} Business Analyst Team"
+    role: execute
+    workflow: Provision S4HANA SID
