@@ -7,25 +7,9 @@ controller_organizations:
       - MSP Lab Automation Hub - Community
       - Ansible Galaxy
 
-controller_credential_types:
-  - name: S4HANA Deployment Peripheral Credentials
-    organization: "{{ audience }}"
-    kind: cloud
-    injectors:
-      extra_vars:
-        dns_pass: "{{ dns_pass }}"
-        ansible_password: "{{ ansible_password }}"
-        satellite_password: "{{ satellite_password }}"
-        vcenter_password: "{{ vcenter_password }}"
-        controller_hostname: "{{ controller_hostname }}"
-        controller_username: "{{ controller_username }}"
-        controller_password: "{{ controller_password }}"
-        controller_validate_certs: "{{ controller_validate_certs }}"
-
-
 controller_credentials:
   - name: S4HANA Deployment Peripheral Credentials
-    credential_type: S4HANA Deployment Peripheral Credentials
+    credential_type: Demo Provisioner Peripheral Credentials
     organization: "{{ audience }}"
   - name: S4HANA Deployment Credentials
     credential_type: Machine
@@ -193,6 +177,96 @@ controller_workflows:
           question_name: "What is the S4HANA deployment kernel independent file name?"
           variable: sap_s4hana_deployment_kernel_independent_file_name
           default: SAPEXE_201-80003386.SAR
+
+    simplified_workflow_nodes:
+      - unified_job_template: Provision Systems
+        identifier: node102
+        inventory: Patching Demo Infrastructure
+        limit: sap
+        success_nodes:
+          - node103
+          - node104
+        failure_nodes:
+          - node202
+      - unified_job_template: Configure Ansible Controller
+        identifier: node103
+        limit: patching-demo
+        success_nodes:
+          - node112
+        failure_nodes:
+          - node203
+      - unified_job_template: Preconfigure for SAP
+        identifier: node104
+        inventory: Patching Demo Infrastructure
+        limit: sap
+        success_nodes:
+          - node105
+          - node106
+        failure_nodes:
+          - node204
+      - unified_job_template: Preconfigure for HANA
+        identifier: node105
+        inventory: Patching Demo Infrastructure
+        limit: hana
+        success_nodes:
+          - node107
+          - node108
+          - node112
+        failure_nodes:
+          - node205
+      - unified_job_template: Preconfigure for Netweaver
+        identifier: node106
+        inventory: Patching Demo Infrastructure
+        limit: netweaver
+        success_nodes:
+          - node109
+          - node110
+          - node112
+        failure_nodes:
+          - node206
+      - unified_job_template: Deploy SAP HANA
+        identifier: node107
+        inventory: Patching Demo Infrastructure
+        limit: 'hana:&non_production'
+        success_nodes:
+          - node109
+        failure_nodes:
+          - node207
+      - unified_job_template: Deploy SAP HANA
+        identifier: node108
+        inventory: Patching Demo Infrastructure
+        limit: 'hana:&production'
+        success_nodes:
+          - node110
+        failure_nodes:
+          - node208
+      - unified_job_template: Install Netweaver
+        identifier: node109
+        inventory: Patching Demo Infrastructure
+        limit: 'netweaver:&non_production'
+        all_parents_must_converge: yes
+        success_nodes:
+          - node111
+        failure_nodes:
+          - node209
+      - unified_job_template: Install Netweaver
+        identifier: node110
+        inventory: Patching Demo Infrastructure
+        limit: 'netweaver:&production'
+        all_parents_must_converge: yes
+        success_nodes:
+          - node111
+        failure_nodes:
+          - node210
+      - unified_job_template: Reinstate HSR
+        identifier: node111
+        inventory: Patching Demo Infrastructure
+        limit: 'hana:&primary'
+        all_parents_must_converge: yes
+        success_nodes:
+          - node999
+        failure_nodes:
+          - node211
 
 controller_roles:
 
