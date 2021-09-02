@@ -1,0 +1,15 @@
+---
+
+- name: validate selected demo
+  hosts:
+    - localhost
+  gather_facts: no
+  vars_files:
+    - demos/common/vars/demos.yml
+  tasks:
+    - name: validate selected demo is available
+      ansible.builtin.assert:
+        that:
+          - demo in available_demos
+        success_msg: "{{ demo }} demo selected"
+        fail_msg: "selected demo {{ demo }} is not available, please select one of: {{ available_demos | join(', ') }}"
