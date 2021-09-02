@@ -456,6 +456,9 @@ controller_workflows:
       - unified_job_template: Setup Red Hat Satellite
         identifier: node101
         inventory: Patching Demo Infrastructure
+        credentials:
+          - Demo Provisioner Peripheral Credentials
+          - Demo Provisioner Root Account
         limit: satellite
         success_nodes:
           - node102
@@ -465,6 +468,9 @@ controller_workflows:
         identifier: node102
         inventory: Patching Demo Infrastructure
         limit: sap
+        credentials:
+          - Demo Provisioner Peripheral Credentials
+          - Demo Provisioner Root Account
         success_nodes:
           - node103
           - node104
@@ -473,6 +479,8 @@ controller_workflows:
       - unified_job_template: Configure Ansible Controller
         identifier: node103
         limit: patching-demo
+        credentials:
+          - Demo Provisioner Peripheral Credentials
         success_nodes:
           - node112
         failure_nodes:
@@ -481,6 +489,9 @@ controller_workflows:
         identifier: node104
         inventory: Patching Demo Infrastructure
         limit: sap
+        credentials:
+          - Demo Provisioner Peripheral Credentials
+          - Demo Provisioner Root Account
         success_nodes:
           - node105
           - node106
@@ -490,6 +501,8 @@ controller_workflows:
         identifier: node105
         inventory: Patching Demo Infrastructure
         limit: hana
+        credentials:
+          - Demo Provisioner Root Account
         success_nodes:
           - node107
           - node108
@@ -500,6 +513,8 @@ controller_workflows:
         identifier: node106
         inventory: Patching Demo Infrastructure
         limit: netweaver
+        credentials:
+          - Demo Provisioner Root Account
         success_nodes:
           - node109
           - node110
@@ -510,6 +525,8 @@ controller_workflows:
         identifier: node107
         inventory: Patching Demo Infrastructure
         limit: 'hana:&non_production'
+        credentials:
+          - Demo Provisioner Root Account
         success_nodes:
           - node109
         failure_nodes:
@@ -518,6 +535,8 @@ controller_workflows:
         identifier: node108
         inventory: Patching Demo Infrastructure
         limit: 'hana:&production'
+        credentials:
+          - Demo Provisioner Root Account
         success_nodes:
           - node110
         failure_nodes:
@@ -526,6 +545,8 @@ controller_workflows:
         identifier: node109
         inventory: Patching Demo Infrastructure
         limit: 'netweaver:&non_production'
+        credentials:
+          - Demo Provisioner Root Account
         all_parents_must_converge: yes
         success_nodes:
           - node111
@@ -535,6 +556,8 @@ controller_workflows:
         identifier: node110
         inventory: Patching Demo Infrastructure
         limit: 'netweaver:&production'
+        credentials:
+          - Demo Provisioner Root Account
         all_parents_must_converge: yes
         success_nodes:
           - node111
@@ -544,6 +567,8 @@ controller_workflows:
         identifier: node111
         inventory: Patching Demo Infrastructure
         limit: 'hana:&primary'
+        credentials:
+          - Demo Provisioner Root Account
         all_parents_must_converge: yes
         success_nodes:
           - node999
@@ -551,6 +576,8 @@ controller_workflows:
           - node211
       - unified_job_template: Prepare New Content | Patching Demo
         identifier: node112
+        credentials:
+          - Demo Provisioner Peripheral Credentials
         all_parents_must_converge: yes
         success_nodes:
           - node999
@@ -603,30 +630,40 @@ controller_workflows:
       - unified_job_template: Remove Controller Configuration
         identifier: node995
         limit: patching-demo
+        credentials:
+          - Demo Provisioner Peripheral Credentials
         always_nodes:
           - node997
       - unified_job_template: Unregister from Insights
         identifier: node996
         inventory: Patching Demo Infrastructure
         limit: 'demo_hosts:satellite'
+        credentials:
+          - Demo Provisioner Root Account
         always_nodes:
           - node997
       - unified_job_template: Teardown Systems
         identifier: node997
         inventory: Patching Demo Infrastructure
         limit: demo_hosts
+        credentials:
+          - Demo Provisioner Peripheral Credentials
         always_nodes:
           - node998
       - unified_job_template: Teardown Systems
         identifier: node998
         inventory: Patching Demo Infrastructure
         limit: satellite
+        credentials:
+          - Demo Provisioner Peripheral Credentials
         always_nodes:
           - node999
       - unified_job_template: Cleanup DNS Records
         identifier: node999
         inventory: Patching Demo Infrastructure
         limit: 'demo_hosts:satellite'
+        credentials:
+          - Demo Provisioner Peripheral Credentials
   - name: Reset Patching Demo
     organization: Demo Provisioner
     state: "{{ controller_state | default('present') }}"
@@ -654,10 +691,16 @@ controller_workflows:
       - unified_job_template: Teardown Systems
         identifier: node102
         inventory: Patching Demo Infrastructure
-        limit: demo_hosts        
+        limit: demo_hosts
+        credentials:
+          - Demo Provisioner Root Account
       - unified_job_template: Roll Back Content | Patching Demo
-        identifier: node103     
+        identifier: node103
+        credentials:
+          - Demo Provisioner Peripheral Credentials
       - unified_job_template: Cleanup DNS Records
         identifier: node104
         inventory: Patching Demo Infrastructure
         limit: demo_hosts
+        credentials:
+          - Demo Provisioner Peripheral Credentials
