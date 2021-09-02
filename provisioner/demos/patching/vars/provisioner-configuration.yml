@@ -608,7 +608,7 @@ controller_workflows:
       - unified_job_template: Unregister from Insights
         identifier: node996
         inventory: Patching Demo Infrastructure
-        limit: 'demo_hosts:&satellite'
+        limit: 'demo_hosts:satellite'
         always_nodes:
           - node997
       - unified_job_template: Teardown Systems
@@ -626,7 +626,7 @@ controller_workflows:
       - unified_job_template: Cleanup DNS Records
         identifier: node999
         inventory: Patching Demo Infrastructure
-        limit: 'demo_hosts:&satellite'
+        limit: 'demo_hosts:satellite'
   - name: Reset Patching Demo
     organization: Demo Provisioner
     state: "{{ controller_state | default('present') }}"
