@@ -461,7 +461,7 @@ controller_workflows:
           - node102
         failure_nodes:
           - node201
-      - unified_job_template: Provision Demo Hosts
+      - unified_job_template: Provision Systems
         identifier: node102
         inventory: Patching Demo Infrastructure
         limit: sap
