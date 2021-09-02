@@ -4,10 +4,6 @@
   hosts:
     - all
   gather_facts: no
-  pre_tasks:
-    - name: include {{ demo }} controller configuration
-      ansible.builtin.include_vars:
-        file: "vars/{{ demo }}/controller-configuration.yml"
   roles:
     - redhat_cop.controller_configuration.workflow_job_templates
     - redhat_cop.controller_configuration.job_templates
