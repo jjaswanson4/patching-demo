@@ -4,3 +4,5 @@ extra-vars.yml
 *manifest.zip
 scratch
 **/context
+test.yml
+test*
