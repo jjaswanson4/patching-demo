@@ -1,17 +1,5 @@
 ---
 
-controller_hostname: aap20-controller.josh.lab.msp.redhat.com
-controller_validate_certs: no
-controller_username: admin
-
-controller_credentials:
-  - name: S4HANA Deployment Demo Root Account
-    credential_type: Machine
-    organization: Demo Provisioner
-    inputs:
-      username: root
-      password: "{{ ansible_password }}"
-
 controller_inventories:
   - name: S4HANA Deployment Demo Infrastructure
     organization: Demo Provisioner
