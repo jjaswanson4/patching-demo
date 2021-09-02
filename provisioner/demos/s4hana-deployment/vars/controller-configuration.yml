@@ -294,7 +294,6 @@ controller_roles:
     role: admin
     job_template: Reinstate HSR
   # Business Analyst Permissions
-  # Security Permissions
   - team: "{{ audience }} Business Analyst Team"
     role: read
     credentials:
