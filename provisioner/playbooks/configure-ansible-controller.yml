@@ -4,6 +4,10 @@
   hosts:
     - all
   gather_facts: no
+  pre_tasks:
+    - name: force evaluation of variables containing controller configurations
+      ansible.builtin.set_fact:
+        controller_templates: "{{ controller_templates }}"
   tasks:
     - name: ansible controller configuration block
       block:
