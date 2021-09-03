@@ -88,14 +88,19 @@ controller_workflows:
       - unified_job_template: Configure Ansible Controller
         identifier: node101
         limit: s4hana-deployment-demo
+        credentials:
+          - Demo Provisioner Peripheral Credentials
         success_nodes:
           - node999
         failure_nodes:
           - node201
       - unified_job_template: Setup Red Hat Satellite
+        identifier: node102
         inventory: S4HANA Deployment Demo Infrastructure
         limit: satellite
-        identifier: node102
+        credentials:
+          - Demo Provisioner Peripheral Credentials
+          - Demo Provisioner Root Account
         success_nodes:
           - node999
         failure_nodes:
