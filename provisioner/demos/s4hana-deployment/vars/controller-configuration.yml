@@ -1,5 +1,8 @@
 ---
 
+controller_organization: "{{ audience }}"
+project: "{{ audience }} S4HANA Deployment Code"
+
 controller_organizations:
   - name: "{{ audience }}"
     galaxy_credentials:
@@ -92,7 +95,7 @@ controller_projects:
     scm_url: https://github.com/jjaswanson4/patching-demo.git
     wait: yes
 
-controller_templates:
+controller_templates_local:
   - name: Add Hosts to Controller Inventory
     inventory: Local Action Inventory
     limit: localhost
@@ -102,12 +105,11 @@ controller_templates:
     credentials:
       - S4HANA Deployment Peripheral Credentials
 
-controller_templates: >
-  {{ controller_templates }} +
-  {{ lookup('file', '../demos/common/vars/provisioner-configuration.yml') | from_yaml | json_query('controller_templates[?name == `Provision Demo Hosts`]') }} +
+controller_templates_imported: >-
+  {{ lookup('file', '../demos/common/vars/provisioner-configuration.yml') | from_yaml | json_query('controller_templates[?name == `Provision Systems`]') }} + 
   {{ lookup('file', '../demos/common/vars/provisioner-configuration.yml') | from_yaml | json_query('controller_templates[?name == `Preconfigure for SAP`]') }} +
   {{ lookup('file', '../demos/common/vars/provisioner-configuration.yml') | from_yaml | json_query('controller_templates[?name == `Preconfigure for HANA`]') }} +
-  {{ lookup('file', '../demos/common/vars/provisioner-configuration.yml') | from_yaml | json_query('controller_templates[?name == `Preconfigure for Netweaver`]') }} +
+  {{ lookup('file', '../demos/common/vars/provisioner-configuration.yml') | from_yaml | json_query('controller_templates[?name == `Preconfigure for Netweaver`]') }} + 
   {{ lookup('file', '../demos/common/vars/provisioner-configuration.yml') | from_yaml | json_query('controller_templates[?name == `Deploy SAP HANA`]') }} +
   {{ lookup('file', '../demos/common/vars/provisioner-configuration.yml') | from_yaml | json_query('controller_templates[?name == `Install Netweaver`]') }} +
   {{ lookup('file', '../demos/common/vars/provisioner-configuration.yml') | from_yaml | json_query('controller_templates[?name == `Reinstate HSR`]') }}
