@@ -385,16 +385,14 @@ controller_templates:
     project: Demo Provisioner Codebase
     playbook: provisioner/demos/patching/playbooks/prepare-new-content.yml
     execution_environment: Demo Provisioner EE
-    credentials:
-      - Demo Provisioner Peripheral Credentials
+    ask_credential_on_launch: yes
   - name: Roll Back Content | Patching Demo
     inventory: Patching Demo Infrastructure
     limit: satellite
     project: Demo Provisioner Codebase
     playbook: provisioner/demos/patching/playbooks/rollback-content.yml
     execution_environment: Demo Provisioner EE
-    credentials:
-      - Demo Provisioner Peripheral Credentials
+    ask_credential_on_launch: yes
 
 controller_workflows:
   - name: Provision Patching Demo
