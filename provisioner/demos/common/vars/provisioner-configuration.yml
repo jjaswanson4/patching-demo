@@ -5,6 +5,10 @@
 # For example, overriding to 'Default' will put the resources into the default controller organization.
 controller_organization: Demo Provisioner
 
+# This is the default project name. It is a var so demos can import specific job templates and override the project locally.
+# Change this to change the name of the project for the provisioner job templates.
+project: Demo Provisioner Codebase
+
 controller_organizations:
   - name: "{{ controller_organization }}"
     galaxy_credentials:
@@ -55,7 +59,7 @@ controller_hosts:
     inventory: Local Action Inventory
 
 controller_projects:
-  - name: Demo Provisioner Codebase
+  - name: "{{ project }}"
     organization: "{{ controller_organization }}"
     scm_branch: main
     scm_type: git
@@ -67,7 +71,7 @@ controller_templates:
     organization: "{{ controller_organization }}"
     inventory: Local Action Inventory
     ask_limit_on_launch: yes
-    project: Demo Provisioner Codebase
+    project: "{{ project }}"
     allow_simultaneous: yes
     playbook: provisioner/playbooks/configure-ansible-controller.yml
     execution_environment: Demo Provisioner EE
@@ -78,7 +82,7 @@ controller_templates:
     organization: "{{ controller_organization }}"
     ask_inventory_on_launch: yes
     ask_limit_on_launch: yes
-    project: Demo Provisioner Codebase
+    project: "{{ project }}"
     allow_simultaneous: yes
     playbook: provisioner/playbooks/deploy-satellite.yml
     execution_environment: Demo Provisioner EE
@@ -88,7 +92,7 @@ controller_templates:
     ask_inventory_on_launch: yes
     ask_limit_on_launch: yes
     forks: 10
-    project: Demo Provisioner Codebase
+    project: "{{ project }}"
     allow_simultaneous: yes
     playbook: provisioner/playbooks/provision-demo-hosts.yml
     execution_environment: Demo Provisioner EE
@@ -100,7 +104,7 @@ controller_templates:
     ask_inventory_on_launch: yes
     ask_limit_on_launch: yes
     forks: 10
-    project: Demo Provisioner Codebase
+    project: "{{ project }}"
     allow_simultaneous: yes
     playbook: provisioner/playbooks/sap-preconfigure.yml
     execution_environment: Demo Provisioner EE
@@ -109,7 +113,7 @@ controller_templates:
     organization: "{{ controller_organization }}"
     ask_inventory_on_launch: yes
     ask_limit_on_launch: yes
-    project: Demo Provisioner Codebase
+    project: "{{ project }}"
     allow_simultaneous: yes
     playbook: provisioner/playbooks/hana-preconfigure.yml
     execution_environment: Demo Provisioner EE
@@ -118,7 +122,7 @@ controller_templates:
     organization: "{{ controller_organization }}"
     ask_inventory_on_launch: yes
     ask_limit_on_launch: yes
-    project: Demo Provisioner Codebase
+    project: "{{ project }}"
     allow_simultaneous: yes
     playbook: provisioner/playbooks/netweaver-preconfigure.yml
     execution_environment: Demo Provisioner EE
@@ -127,7 +131,7 @@ controller_templates:
     organization: "{{ controller_organization }}"
     ask_inventory_on_launch: yes
     ask_limit_on_launch: yes
-    project: Demo Provisioner Codebase
+    project: "{{ project }}"
     allow_simultaneous: yes
     playbook: provisioner/playbooks/deploy-hana.yml
     execution_environment: Demo Provisioner EE
@@ -136,7 +140,7 @@ controller_templates:
     organization: "{{ controller_organization }}"
     ask_inventory_on_launch: yes
     ask_limit_on_launch: yes
-    project: Demo Provisioner Codebase
+    project: "{{ project }}"
     allow_simultaneous: yes
     playbook: provisioner/playbooks/install-s4.yml
     execution_environment: Demo Provisioner EE
@@ -145,7 +149,7 @@ controller_templates:
     organization: "{{ controller_organization }}"
     ask_inventory_on_launch: yes
     ask_limit_on_launch: yes
-    project: Demo Provisioner Codebase
+    project: "{{ project }}"
     allow_simultaneous: yes
     playbook: provisioner/playbooks/reinstate-hsr.yml
     execution_environment: Demo Provisioner EE
@@ -154,7 +158,7 @@ controller_templates:
     organization: "{{ controller_organization }}"
     inventory: Local Action Inventory
     ask_limit_on_launch: yes
-    project: Demo Provisioner Codebase
+    project: "{{ project }}"
     allow_simultaneous: yes
     playbook: provisioner/playbooks/remove-controller-configuration.yml
     execution_environment: Demo Provisioner EE
@@ -166,7 +170,7 @@ controller_templates:
     ask_inventory_on_launch: yes
     ask_limit_on_launch: yes
     forks: 10
-    project: Demo Provisioner Codebase
+    project: "{{ project }}"
     allow_simultaneous: yes
     playbook: provisioner/playbooks/attempt-insights-unregister.yml
     execution_environment: Demo Provisioner EE
@@ -175,7 +179,7 @@ controller_templates:
     organization: "{{ controller_organization }}"
     ask_inventory_on_launch: yes
     ask_limit_on_launch: yes
-    project: Demo Provisioner Codebase
+    project: "{{ project }}"
     allow_simultaneous: yes
     playbook: provisioner/playbooks/teardown-systems.yml
     execution_environment: Demo Provisioner EE
@@ -184,7 +188,7 @@ controller_templates:
     organization: "{{ controller_organization }}"
     ask_inventory_on_launch: yes
     ask_limit_on_launch: yes
-    project: Demo Provisioner Codebase
+    project: "{{ project }}"
     allow_simultaneous: yes
     playbook: provisioner/playbooks/delete-dns-records.yml
     execution_environment: Demo Provisioner EE
@@ -193,7 +197,7 @@ controller_templates:
     organization: "{{ controller_organization }}"
     inventory: Local Action Inventory
     limit: localhost
-    project: Demo Provisioner Codebase
+    project: "{{ project }}"
     allow_simultaneous: yes
     playbook: provisioner/playbooks/send-email.yml
     execution_environment: Demo Provisioner EE
@@ -203,7 +207,7 @@ controller_templates:
     organization: "{{ controller_organization }}"
     inventory: Local Action Inventory
     limit: localhost
-    project: Demo Provisioner Codebase
+    project: "{{ project }}"
     allow_simultaneous: yes
     playbook: provisioner/playbooks/send-email.yml
     execution_environment: Demo Provisioner EE
