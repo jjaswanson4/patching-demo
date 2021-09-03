@@ -5,9 +5,15 @@
     - all
   gather_facts: no
   pre_tasks:
-    - name: force evaluation of variables containing controller configurations
+    - name: force evaluation of controller_templates if _local and _imported are set
       ansible.builtin.set_fact:
-        controller_templates: "{{ controller_templates }}"
+        controller_templates: "{{ lookup('vars', 'controller_templates_imported') + lookup('vars', 'controller_templates_local') }}"
+      when:
+        - controller_templates_local is defined
+        - controller_templates_imported is defined
+        - controller_templates is not defined
+    - debug:
+        var: controller_templates
   tasks:
     - name: ansible controller configuration block
       block:
