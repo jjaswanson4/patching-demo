@@ -100,7 +100,7 @@ controller_templates_local:
     inventory: Local Action Inventory
     limit: localhost
     project: "{{ audience }} S4HANA Deployment Code"
-    playbook: demos/s4hana-deployment/add-hosts-to-controller.yml
+    playbook: demos/s4hana-deployment/playbooks/add-hosts-to-controller.yml
     execution_environment: S4HANA Deployment Demo EE
     credentials:
       - S4HANA Deployment Peripheral Credentials
