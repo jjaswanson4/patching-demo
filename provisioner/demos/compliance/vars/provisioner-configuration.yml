@@ -1,0 +1,196 @@
+---
+
+controller_inventories:
+  - name: Compliance Demo Infrastructure
+    organization: Demo Provisioner
+
+controller_hosts:
+  - name: compliance-satellite.josh.lab.msp.redhat.com
+    inventory: Compliance Demo Infrastructure
+    variables: "{{ lookup('file', 'demos/compliance/vars/satellite-configuration.yml') | from_yaml }}"
+  - name: compliance-deployment-demo
+    inventory: Local Action Inventory
+    variables: "{{ lookup('file', 'demos/compliance/vars/controller-configuration.yml') | from_yaml }}"
+  - name: rhel7-hipaa.josh.lab.msp.redhat.com
+    inventory: Compliance Demo Infrastructure
+    variables:
+      ansible_host: 10.15.121.50
+      ip: "{  { ansible_host }}"
+  - name: rhel8-hipaa.josh.lab.msp.redhat.com
+    inventory: Compliance Demo Infrastructure
+    variables:
+      ansible_host: 10.15.121.51
+      ip: "{  { ansible_host }}" 
+    
+controller_groups:
+  - name: satellite
+    inventory: Compliance Demo Infrastructure
+    hosts:
+      - compliance-satellite.josh.lab.msp.redhat.com
+  - name: management_plane
+    inventory: Compliance Demo Infrastructure
+    variables:
+      lifecycle_environment: production
+      provisioning:
+        satellite:
+          server: satellite06.lab.msp.redhat.com
+          username: admin
+          password: "{  { satellite_password }}"
+        host_group: "{  { os }}"
+        organization: MSP Lab
+        location: MSP Lab
+        method: bootdisk
+        dns_domain: josh.lab.msp.redhat.com
+        cpus: "{  { cpus }}"
+        memory_mb: "{  { memory_mb }}"
+        activation_keys: "ak-{  { application }}-{  { os }}-{  { lifecycle_environment }}"
+    children:
+      - satellite
+  - name: rhel7-hipaa
+    inventory: Compliance Demo Infrastructure
+  - name: rhel8-hipaa
+    inventory: Compliance Demo Infrastructure
+  - name: demo_hosts
+    inventory: Compliance Demo Infrastructure
+  - name: rhel7
+    inventory: Compliance Demo Infrastructure
+    variables:
+      os: rhel7
+      htop_url: https://dl.fedoraproject.org/pub/epel/7/x86_64/Packages/h/htop-2.2.0-3.el7.x86_64.rpm
+  - name: rhel8
+    inventory: Compliance Demo Infrastructure
+    variables:
+      os: rhel8
+      htop_url: https://dl.fedoraproject.org/pub/epel/8/Everything/x86_64/Packages/h/htop-3.0.5-1.el8.x86_64.rpm
+  - name: demo_hosts
+    inventory: Compliance Demo Infrastructure
+    children:
+      - rhel7
+      - rhel8
+    variables:
+      cpus: 2
+      memory_mb: 4096
+      application: general
+      lifecycle_environment: production
+      run_additional_roles: no
+      firewall:
+        name: firewalld
+        state: stopped
+        enabled: no
+      provisioning:
+        satellite:
+          server: patching-satellite.josh.lab.msp.redhat.com
+          username: admin
+          password: "{  { ansible_password }}"
+        host_group: "{  { os }}"
+        organization: "{  { audience }}"
+        location: "{  { audience }}"
+        method: bootdisk
+        dns_domain: josh.lab.msp.redhat.com
+        cpus: "{  { cpus }}"
+        memory_mb: "{  { memory_mb }}"
+        activation_keys: "ak-{  { application }}-{  { os }}-{  { lifecycle_environment }}"
+
+controller_workflows:
+  - name: Provision S4HANA Deployment Demo
+    organization: Demo Provisioner
+    state: "{{ controller_state | default('present') }}"
+    extra_vars:
+      demo: s4hana-deployment
+    survey_enabled: yes
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - type: text
+          question_name: "Demo Audience?"
+          question_description: "Who is the audience for this demo?"
+          variable: audience
+          required: yes
+        - type: text
+          question_name: "Provisioner?"
+          question_description: "Who is provisioning this demo?"
+          variable: provisioner
+          required: yes
+          default: 'Josh Swanson'
+        - type: text
+          question_name: "Provisioner's Email?"
+          question_description: "What is the provisioner's email address?"
+          variable: provisioner_email
+          required: yes
+          default: 'joshswanson@redhat.com'
+        - type: multiplechoice
+          question_name: Deploy Satellite?
+          question_description: Should satellite be deployed?
+          variable: deploy_satellite
+          choices:
+            - "yes"
+            - "no"
+          default: "yes"
+          required: yes
+        - type: multiplechoice
+          question_name: Configure controller?
+          question_description: Should controller be configured?
+          variable: configure_controller
+          choices:
+            - "yes"
+            - "no"
+          default: "yes"
+          required: yes          
+    simplified_workflow_nodes:
+    # Work nodes
+      - unified_job_template: Configure Ansible Controller
+        identifier: node101
+        limit: compliance-deployment-demo
+        credentials:
+          - Demo Provisioner Peripheral Credentials
+        success_nodes:
+          - node999
+        failure_nodes:
+          - node201
+      - unified_job_template: Setup Red Hat Satellite
+        identifier: node102
+        inventory: Compliance Demo Infrastructure
+        limit: satellite
+        credentials:
+          - Demo Provisioner Peripheral Credentials
+          - Demo Provisioner Root Account
+        success_nodes:
+          - node999
+        failure_nodes:
+          - node202
+      - unified_job_template: Provision Systems
+        identifier: node103
+        inventory: Compliance Demo Infrastructure
+        limit: demo_hosts
+      
+    # Notification Nodes
+      - unified_job_template: Send Provisioner Email | Succeeded
+        identifier: node999
+        all_parents_must_converge: yes
+      - unified_job_template: Send Provisioner Email | Failed
+        identifier: node201
+      - unified_job_template: Send Provisioner Email | Failed
+        identifier: node202
+  # - name: Teardown Patching Demo
+  #   organization: Demo Provisioner
+  #   state: "{{ controller_state | default('present') }}"
+  #   extra_vars:
+  #     demo: patching
+  #   survey_enabled: yes
+  #   survey:
+  #     name: ''
+  #     description: ''
+  #     spec:
+  #       - type: text
+  #         question_name: "Demo Audience?"
+  #         question_description: "Who is the audience for this demo"
+  #         variable: audience
+  #         required: yes
+  #   simplified_workflow_nodes:
+  #     - unified_job_template: Remove Controller Configuration
+  #       identifier: node101
+  #     - unified_job_template: Teardown Red Hat Satellite
+  #       identifier: node102
+  #     - unified_job_template: Cleanup Satellite DNS Records
+  #       identifier: node103
