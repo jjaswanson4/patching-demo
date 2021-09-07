@@ -1,0 +1,30 @@
+---
+
+controller_organizations:
+  - name: "{{ audience }}"
+    galaxy_credentials:
+      - MSP Lab Automation Hub - RH Certified
+      - MSP Lab Automation Hub - Community
+      - Ansible Galaxy
+
+controller_credential_types:
+  - name: Console.redhat.com Credentials
+    kind: cloud
+    injectors:
+      extra_vars:
+        crhc_username: "{{ crhc_username }}"
+        crhc_password: "{{ crhc_password }}"
+
+controller_credentials:
+  - name: Console.redhat.com Credentials
+    credential_type: Console.redhat.com Credentials
+    organization: "{{ audience }}"
+
+# controller_workflows:
+#   - name: Setup Compliance
+#     organization: "{{ audience }}"
+#     state: "{{ controller_state | default('present') }}"
+#     extra_vars:
+#       demo: compliance
+#     workflow_nodes:
+#       - unified_job_template: Upload SCAP Content to Satellite
