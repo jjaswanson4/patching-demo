@@ -26,6 +26,7 @@ collections:
   - name: jjaswanson4.install_satellite
     version: '>=1.2.4'
   - name: jjaswanson4.configure_satellite
+    version: '>=2.1.4'
   - name: ansible.posix
   - name: redhat_cop.controller_configuration
   - name: awx.awx
