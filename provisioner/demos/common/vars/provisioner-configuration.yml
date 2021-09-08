@@ -29,6 +29,8 @@ controller_credential_types:
         controller_username: "{{ controller_username }}"
         controller_password: "{{ controller_password }}"
         controller_validate_certs: "{{ controller_validate_certs }}"
+        crhc_username: "{{ crhc_username }}"
+        crhc_password: "{{ crhc_password }}"
 
 controller_credentials:
   - name: Demo Provisioner Peripheral Credentials
