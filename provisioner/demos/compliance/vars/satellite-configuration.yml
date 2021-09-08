@@ -202,14 +202,14 @@ satellite:
         update_args: --partition-tables "RHEL8 Kickstart Partition Table,Kickstart default"
     partition_tables:
       - name: RHEL7 Kickstart Partition Table
-        file: ../files/rhel7-ptable.erb
+        file: ../demos/common/files/rhel8-ptable.erb
         os_family: Redhat
         organizations:
           - name: "{{ audience }}"
         locations:
           - name: "{{ audience }}"
       - name: RHEL8 Kickstart Partition Table
-        file: ../files/rhel8-ptable.erb
+        file: ../demos/common/files/rhel8-ptable.erb
         os_family: Redhat
         organizations:
           - name: "{{ audience }}"
@@ -288,11 +288,13 @@ satellite:
           content_view: composite-rhel7
           release_version: 7Server
           content_overrides:
-            - label: 
+            - label: rhel-7-server-rpms
+            - label: rhel-7-server-satellite-tools-6.9-rpms
         - name: ak-general-rhel8-production
           lifecycle_environment: Production
           content_view: composite-rhel8
           release_version: 8
           content_overrides:
-            - label: rhel-7-server-rpms
-            - label: rhel-7-server-satellite-tools-6.9-rpms
+            - label: satellite-tools-6.9-for-rhel-8-x86_64-rpms
+            - label: rhel-8-for-x86_64-baseos-rpms
+            - label: rhel-8-for-x86_64-appstream-rpms          
