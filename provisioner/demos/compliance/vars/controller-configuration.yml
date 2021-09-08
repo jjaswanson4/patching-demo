@@ -14,11 +14,34 @@ controller_credential_types:
       extra_vars:
         crhc_username: "{{ crhc_username }}"
         crhc_password: "{{ crhc_password }}"
+  - name: Compliance
+
 
 controller_credentials:
+  - name: Demo Provisioner Peripheral Credentials
+    credential_type: Demo Provisioner Peripheral Credentials
+    organization: "{{ audience }}"
   - name: Console.redhat.com Credentials
     credential_type: Console.redhat.com Credentials
     organization: "{{ audience }}"
+  - name: Demo Provisioner Root Account
+    credential_type: Machine
+    organization: "{{ audience }}"
+    inputs:
+      username: root
+      password: "{{ ansible_password }}"
+
+controller_templates:
+  - name: Upload SCAP Content
+    inventory: PCompliance Demo Infrastructure
+    limit: satellite
+    project: Demo Provisioner Codebase
+    playbook: provisioner/demos/compliance/playbooks/upload-scap-content.yml
+    execution_environment: Compliance Demo EE
+    ask_credential_on_launch: yes
+
+
+
 
 # controller_workflows:
 #   - name: Setup Compliance
