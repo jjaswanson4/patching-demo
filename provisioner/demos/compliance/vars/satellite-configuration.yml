@@ -138,7 +138,7 @@ satellite:
         network: 10.15.120.0
         mask: 255.255.252.0
         gateway: 10.15.123.254
-        dns_primary: 10.15.121.1
+        dns_primary: 10.15.121.3
         dns_secondary: 10.15.108.148
         ipam: None
         boot_mode: Static
