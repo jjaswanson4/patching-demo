@@ -24,6 +24,7 @@
             loop_var: role
           loop:
             - redhat_cop.controller_configuration.organizations
+            - redhat_cop.controller_configuration.credential_types
             - redhat_cop.controller_configuration.credentials
             - redhat_cop.controller_configuration.execution_environments
             - redhat_cop.controller_configuration.teams
