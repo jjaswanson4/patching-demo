@@ -4,8 +4,6 @@
   hosts:
     - all
   gather_facts: no
-  vars:
-    run_additional_roles: yes
   pre_tasks:
     - name: add host and custom DNS entries
       ansible.builtin.set_fact:
