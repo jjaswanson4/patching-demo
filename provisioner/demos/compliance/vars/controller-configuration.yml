@@ -14,17 +14,21 @@ controller_credential_types:
       extra_vars:
         crhc_username: "{{ crhc_username }}"
         crhc_password: "{{ crhc_password }}"
-  - name: Compliance
-
 
 controller_credentials:
-  - name: Demo Provisioner Peripheral Credentials
+  - name: Compliance Demo Peripheral Credentials
     credential_type: Demo Provisioner Peripheral Credentials
     organization: "{{ audience }}"
   - name: Console.redhat.com Credentials
     credential_type: Console.redhat.com Credentials
     organization: "{{ audience }}"
-  - name: Demo Provisioner Root Account
+  - name: Compliance Root Credentials
+    credential_type: Machine
+    organization: "{{ audience }}"
+    inputs:
+      username: root
+      password: "{{ ansible_password }}"
+  - name: Compliance Non-Root Credentials
     credential_type: Machine
     organization: "{{ audience }}"
     inputs:
@@ -40,14 +44,14 @@ controller_templates:
     execution_environment: Compliance Demo EE
     ask_credential_on_launch: yes
 
-
-
-
-# controller_workflows:
-#   - name: Setup Compliance
-#     organization: "{{ audience }}"
-#     state: "{{ controller_state | default('present') }}"
-#     extra_vars:
-#       demo: compliance
-#     workflow_nodes:
-#       - unified_job_template: Upload SCAP Content to Satellite
+controller_workflows:
+  - name: Setup Compliance
+    organization: "{{ audience }}"
+    state: "{{ controller_state | default('present') }}"
+    extra_vars:
+      demo: compliance
+    workflow_nodes:
+      - unified_job_template: Upload SCAP Content
+        identifier: node101
+        credentials:
+          - Compliance Demo Peripheral Credentials
