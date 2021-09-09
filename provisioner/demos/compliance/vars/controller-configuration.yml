@@ -7,6 +7,12 @@ controller_organizations:
       - MSP Lab Automation Hub - Community
       - Ansible Galaxy
 
+controller_execution_environments:
+  - name: Compliance Demo EE
+    image: 'aap20-hub.josh.lab.msp.redhat.com/compliance-demo-ee:latest'
+    organization: "{{ audience }}"
+    credential: MSP Lab AAP20 Automation Hub
+
 controller_credential_types:
   - name: Console.redhat.com Credentials
     kind: cloud
@@ -99,7 +105,7 @@ controller_workflows:
     state: "{{ controller_state | default('present') }}"
     extra_vars:
       demo: compliance
-    workflow_nodes:
+    simplified_workflow_nodes:
       - unified_job_template: Upload SCAP Content
         identifier: node101
         credentials:
