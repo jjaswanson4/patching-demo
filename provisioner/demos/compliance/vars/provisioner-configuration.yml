@@ -67,12 +67,12 @@ controller_hosts:
     inventory: Compliance Demo Infrastructure
     variables:
       ansible_host: 10.15.121.50
-      ip: "{  { ansible_host }}"
+      ip_address: "{  { ansible_host }}"
   - name: rhel8-hipaa.josh.lab.msp.redhat.com
     inventory: Compliance Demo Infrastructure
     variables:
       ansible_host: 10.15.121.51
-      ip: "{  { ansible_host }}" 
+      ip_address: "{  { ansible_host }}" 
     
 controller_groups:
   - name: satellite
@@ -100,8 +100,12 @@ controller_groups:
       - satellite
   - name: rhel7_hipaa
     inventory: Compliance Demo Infrastructure
+    hosts:
+      - rhel7-hipaa.josh.lab.msp.redhat.com
   - name: rhel8_hipaa
     inventory: Compliance Demo Infrastructure
+    hosts:
+      - rhel8-hipaa.josh.lab.msp.redhat.com
   - name: rhel7
     inventory: Compliance Demo Infrastructure
     children:
@@ -133,7 +137,7 @@ controller_groups:
         enabled: no
       provisioning:
         satellite:
-          server: patching-satellite.josh.lab.msp.redhat.com
+          server: compliance-satellite.josh.lab.msp.redhat.com
           username: admin
           password: "{  { ansible_password }}"
         host_group: "{  { os }}"
@@ -190,7 +194,16 @@ controller_workflows:
             - "yes"
             - "no"
           default: "yes"
-          required: yes          
+          required: yes
+        - type: multiplechoice
+          question_name: Provision demo hosts?
+          question_description: Should the demo hosts be provisioned?
+          variable: provision_demo_hosts
+          choices:
+            - "yes"
+            - "no"
+          default: "yes"
+          required: yes           
     simplified_workflow_nodes:
     # Work nodes
       - unified_job_template: Configure Ansible Controller
@@ -219,7 +232,11 @@ controller_workflows:
         limit: demo_hosts
         credentials:
           - Demo Provisioner Peripheral Credentials
-          - Demo Provisioner Root Account      
+          - Demo Provisioner Root Account
+        success_nodes:
+          - node999
+        failure_nodes:
+          - node203
     # Notification Nodes
       - unified_job_template: Send Provisioner Email | Succeeded
         identifier: node999
@@ -228,25 +245,42 @@ controller_workflows:
         identifier: node201
       - unified_job_template: Send Provisioner Email | Failed
         identifier: node202
-  # - name: Teardown Patching Demo
-  #   organization: Demo Provisioner
-  #   state: "{{ controller_state | default('present') }}"
-  #   extra_vars:
-  #     demo: patching
-  #   survey_enabled: yes
-  #   survey:
-  #     name: ''
-  #     description: ''
-  #     spec:
-  #       - type: text
-  #         question_name: "Demo Audience?"
-  #         question_description: "Who is the audience for this demo"
-  #         variable: audience
-  #         required: yes
-  #   simplified_workflow_nodes:
-  #     - unified_job_template: Remove Controller Configuration
-  #       identifier: node101
-  #     - unified_job_template: Teardown Red Hat Satellite
-  #       identifier: node102
-  #     - unified_job_template: Cleanup Satellite DNS Records
-  #       identifier: node103
+      - unified_job_template: Send Provisioner Email | Failed
+        identifier: node203
+  - name: Reset Compliance Demo
+    organization: Demo Provisioner
+    state: "{{ controller_state | default('present') }}"
+    extra_vars:
+      demo: compliance
+    survey_enabled: yes
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - type: text
+          question_name: "Demo Audience?"
+          question_description: "Who is the audience for this demo"
+          variable: audience
+          required: yes
+    simplified_workflow_nodes:
+      - unified_job_template: Unregister from Insights
+        identifier: node101
+        inventory: Compliance Demo Infrastructure
+        limit: demo_hosts
+        credentials:
+          - Demo Provisioner Root Account
+        always_nodes:
+          - node102
+          - node103
+      - unified_job_template: Teardown Systems
+        identifier: node102
+        inventory: Compliance Demo Infrastructure
+        limit: demo_hosts
+        credentials:
+          - Demo Provisioner Peripheral Credentials
+      - unified_job_template: Cleanup DNS Records
+        identifier: node103
+        inventory: Compliance Demo Infrastructure
+        limit: demo_hosts
+        credentials:
+          - Demo Provisioner Peripheral Credentials
