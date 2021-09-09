@@ -17,9 +17,9 @@
             url: https://{{ inventory_hostname }}/ansible/api/ansible_roles/import
             method: PUT
             body:
-              location_id: 1
-              organization_id: 1
-              proxy_id: 1
+              location_id: '1'
+              organization_id: '1'
+              proxy_id: '1'
               role_names:
                 - theforeman.foreman_scap_client
         - name: import ansible vars from theforeman.foreman_scap_client ansible role
@@ -27,9 +27,9 @@
             url: https://{{ inventory_hostname }}/ansible/api/ansible_variables/import
             validate_certs: no
             body:
-              location_id: 1
-              organization_id: 1
-              proxy_id: 1
+              location_id: '1'
+              organization_id: '1'
+              proxy_id: '1'
       delegate_to: localhost
     - name: upload scap content to satellite
       ansible.builtin.shell:
