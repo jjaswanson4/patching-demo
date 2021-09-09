@@ -40,6 +40,15 @@
             - redhat_cop.controller_configuration.inventory_source_update
           when:
             controller_inventory_sources is defined
+        - name: include roles to create hosts if statically defined
+          ansible.builtin.include_role:
+            name: "{{ role }}"
+          loop_control:
+            loop_var: role
+          loop:        
+            - redhat_cop.controller_configuration.hosts
+          when:
+            controller_inventory_sources is not defined
         - name: pause for inventory sync
           ansible.builtin.pause:
             seconds: 30
