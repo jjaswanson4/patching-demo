@@ -12,8 +12,6 @@
         - controller_templates_local is defined
         - controller_templates_imported is defined
         - controller_templates is not defined
-    - debug:
-        var: controller_templates
   roles:
     - redhat_cop.controller_configuration.workflow_job_templates
     - redhat_cop.controller_configuration.job_templates
