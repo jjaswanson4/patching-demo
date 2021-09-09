@@ -71,6 +71,10 @@ controller_hosts:
       ansible_host: 10.15.121.51
 
 controller_groups:
+  - name: satellite
+    inventory: "{{ audience }} Infrastructure"
+    hosts:
+      - compliance-satellite.josh.lab.msp.redhat.com
   - name: rhel7_hipaa
     inventory: "{{ audience }} Infrastructure"
     hosts:
@@ -106,11 +110,27 @@ controller_projects:
 
 controller_templates:
   - name: Upload SCAP Content
-    inventory: Compliance Demo Infrastructure
     organization: "{{ audience }}"
-    limit: satellite
+    ask_inventory_on_launch: yes
+    ask_limit_on_launch: yes
     project: "{{ audience }} Compliance Code"
     playbook: demos/compliance/playbooks/upload-scap-content.yml
+    execution_environment: Compliance Demo EE
+    ask_credential_on_launch: yes
+  - name: Create Compliance Hostgroups
+    organization: "{{ audience }}"
+    ask_inventory_on_launch: yes
+    ask_limit_on_launch: yes
+    project: "{{ audience }} Compliance Code"
+    playbook: demos/compliance/playbooks/create-compliance-hostgroups.yml
+    execution_environment: Compliance Demo EE
+    ask_credential_on_launch: yes
+  - name: Move Hosts to Hostgroups
+    organization: "{{ audience }}"
+    ask_inventory_on_launch: yes
+    ask_limit_on_launch: yes
+    project: "{{ audience }} Compliance Code"
+    playbook: demos/compliance/playbooks/move-hosts-to-hostgroups.yml
     execution_environment: Compliance Demo EE
     ask_credential_on_launch: yes
 
@@ -123,5 +143,23 @@ controller_workflows:
     simplified_workflow_nodes:
       - unified_job_template: Upload SCAP Content
         identifier: node101
+        inventory: "{{ audience }} Infrastructure"
+        limit: satellite
+        credentials:
+          - Compliance Demo Peripheral Credentials
+        success_nodes:
+          - node102
+      - unified_job_template: Create Compliance Hostgroups
+        identifier: node102
+        inventory: "{{ audience }} Infrastructure"
+        limit: satellite
+        credentials:
+          - Compliance Demo Peripheral Credentials
+        success_nodes:
+          - node103
+      - unified_job_template: Move Hosts to Hostgroups
+        identifier: node103
+        inventory: "{{ audience }} Infrastructure"
+        limit: rhel7:rhel8
         credentials:
           - Compliance Demo Peripheral Credentials
