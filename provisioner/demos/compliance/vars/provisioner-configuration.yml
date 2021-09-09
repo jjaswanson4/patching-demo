@@ -98,25 +98,17 @@ controller_groups:
         activation_keys: "ak-{  { application }}-{  { os }}-{  { lifecycle_environment }}"
     children:
       - satellite
-  - name: rhel7_hipaa
+  - name: rhel7
     inventory: Compliance Demo Infrastructure
     hosts:
       - rhel7-hipaa.josh.lab.msp.redhat.com
-  - name: rhel8_hipaa
-    inventory: Compliance Demo Infrastructure
-    hosts:
-      - rhel8-hipaa.josh.lab.msp.redhat.com
-  - name: rhel7
-    inventory: Compliance Demo Infrastructure
-    children:
-      - rhel7_hipaa
     variables:
       os: rhel7
       htop_url: https://dl.fedoraproject.org/pub/epel/7/x86_64/Packages/h/htop-2.2.0-3.el7.x86_64.rpm
   - name: rhel8
     inventory: Compliance Demo Infrastructure
-    children:
-      - rhel8_hipaa
+    hosts:
+      - rhel8-hipaa.josh.lab.msp.redhat.com
     variables:
       os: rhel8
       htop_url: https://dl.fedoraproject.org/pub/epel/8/Everything/x86_64/Packages/h/htop-3.0.5-1.el8.x86_64.rpm
