@@ -44,6 +44,17 @@ controller_credentials:
 controller_inventories:
   - name: "{{ audience }} Infrastructure"
     organization: "{{ audience }}"
+    variables:
+      satellite_url: https://compliance-satellite.josh.lab.msp.redhat.com
+      ansible_roles:
+        - theforeman.foreman_scap_client
+      hostgroups:
+        - name: rhel7-hipaa
+          parent: rhel7
+          ansible_roles: "{  { ansible_roles }}"
+        - name: rhel8-hipaa
+          parent: rhel8
+          ansible_roles: "{  { ansible_roles }}"
 
 controller_hosts:
   - name: compliance-satellite.josh.lab.msp.redhat.com
@@ -64,10 +75,14 @@ controller_groups:
     inventory: "{{ audience }} Infrastructure"
     hosts:
       - rhel7-hipaa.josh.lab.msp.redhat.com
+    variables:
+      hostgroup: rhel7/rhel7-hipaa
   - name: rhel8_hipaa
     inventory: "{{ audience }} Infrastructure"
     hosts:
       - rhel8-hipaa.josh.lab.msp.redhat.com
+    variables:
+      hostgroup: rhel8/rhel8-hipaa
   - name: rhel7
     inventory: "{{ audience }} Infrastructure"
     children:
