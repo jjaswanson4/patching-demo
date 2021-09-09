@@ -14,3 +14,4 @@
         name: "{{ inventory_hostname }}"
         hostgroup: "{{ hostgroup }}"
       delegate_to: localhost
+      throttle: 1
