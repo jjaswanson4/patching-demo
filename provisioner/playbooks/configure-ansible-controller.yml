@@ -12,8 +12,6 @@
         - controller_templates_local is defined
         - controller_templates_imported is defined
         - controller_templates is not defined
-    - debug:
-        var: controller_templates
   tasks:
     - name: ansible controller configuration block
       block:
