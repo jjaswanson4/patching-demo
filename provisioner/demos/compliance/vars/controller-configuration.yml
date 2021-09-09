@@ -35,12 +35,64 @@ controller_credentials:
       username: root
       password: "{{ ansible_password }}"
 
+controller_inventories:
+  - name: "{{ audience }} Infrastructure"
+    organization: "{{ audience }}"
+
+controller_hosts:
+  - name: compliance-satellite.josh.lab.msp.redhat.com
+    inventory: "{{ audience }} Infrastructure"
+    variables:
+      ansible_host: 10.15.121.3
+      ip_address: "{  { ansible_host }}"
+  - name: rhel7-hipaa.josh.lab.msp.redhat.com
+    inventory: "{{ audience }} Infrastructure"
+    variables:
+      ansible_host: 10.15.121.50
+      ip_address: "{  { ansible_host }}"
+  - name: rhel8-hipaa.josh.lab.msp.redhat.com
+    inventory: "{{ audience }} Infrastructure"
+    variables:
+      ansible_host: 10.15.121.51
+      ip_address: "{  { ansible_host }}" 
+
+controller_groups:
+  - name: rhel7_hipaa
+    inventory: "{{ audience }} Infrastructure"
+    hosts:
+      - rhel7-hipaa.josh.lab.msp.redhat.com
+  - name: rhel8_hipaa
+    inventory: "{{ audience }} Infrastructure"
+    hosts:
+      - rhel8-hipaa.josh.lab.msp.redhat.com
+  - name: rhel7
+    inventory: "{{ audience }} Infrastructure"
+    children:
+      - rhel7_hipaa
+    variables:
+      os: rhel7
+  - name: rhel8
+    inventory: "{{ audience }} Infrastructure"
+    children:
+      - rhel8_hipaa
+    variables:
+      os: rhel8
+
+controller_projects:
+  - name: "{{ audience }} Compliance Code"
+    organization: "{{ audience }}"
+    scm_branch: main
+    scm_type: git
+    scm_url: https://github.com/jjaswanson4/patching-demo.git
+    wait: yes
+
 controller_templates:
   - name: Upload SCAP Content
-    inventory: PCompliance Demo Infrastructure
+    inventory: Compliance Demo Infrastructure
+    organization: "{{ audience }}"
     limit: satellite
-    project: Demo Provisioner Codebase
-    playbook: provisioner/demos/compliance/playbooks/upload-scap-content.yml
+    project: "{{ audience }} Compliance Code"
+    playbook: demos/compliance/playbooks/upload-scap-content.yml
     execution_environment: Compliance Demo EE
     ask_credential_on_launch: yes
 
