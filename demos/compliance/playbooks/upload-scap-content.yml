@@ -3,12 +3,14 @@
 - name: import and upload scap content and related to satellite
   hosts:
     - all
+  gather_facts: no
   module_defaults:
     ansible.builtin.uri:
       user: admin
       password: "{{ satellite_password }}"
       force_basic_auth: yes
       validate_certs: no
+      body_format: json
   tasks:
     - name: make API calls to import role and variables
       block:
@@ -17,7 +19,7 @@
             url: https://{{ inventory_hostname }}/ansible/api/ansible_roles/import
             method: PUT
             body:
-              location_id: '1'
+              location_id: '2' # should query for these values
               organization_id: '1'
               proxy_id: '1'
               role_names:
@@ -25,9 +27,9 @@
         - name: import ansible vars from theforeman.foreman_scap_client ansible role
           ansible.builtin.uri:
             url: https://{{ inventory_hostname }}/ansible/api/ansible_variables/import
-            validate_certs: no
+            method: PUT
             body:
-              location_id: '1'
+              location_id: '2'
               organization_id: '1'
               proxy_id: '1'
       delegate_to: localhost
