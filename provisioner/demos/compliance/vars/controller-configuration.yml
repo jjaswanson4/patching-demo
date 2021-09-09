@@ -44,17 +44,14 @@ controller_hosts:
     inventory: "{{ audience }} Infrastructure"
     variables:
       ansible_host: 10.15.121.3
-      ip_address: "{  { ansible_host }}"
   - name: rhel7-hipaa.josh.lab.msp.redhat.com
     inventory: "{{ audience }} Infrastructure"
     variables:
       ansible_host: 10.15.121.50
-      ip_address: "{  { ansible_host }}"
   - name: rhel8-hipaa.josh.lab.msp.redhat.com
     inventory: "{{ audience }} Infrastructure"
     variables:
       ansible_host: 10.15.121.51
-      ip_address: "{  { ansible_host }}" 
 
 controller_groups:
   - name: rhel7_hipaa
