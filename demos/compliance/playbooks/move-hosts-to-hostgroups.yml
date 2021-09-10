@@ -5,13 +5,13 @@
     - all
   gather_facts: no
   tasks:
-    - name: move host to appropriate compliance hostgroup
+    - name: move host to appropriate compliance hostgroup and set scap proxy
       redhat.satellite.host:
         username: "{{ satellite.admin_username }}"
         password: "{{ satellite.admin_password }}"
         validate_certs: false
         server_url: "{{ satellite_url }}"
         name: "{{ inventory_hostname }}"
-        hostgroup: "{{ hostgroup }}"
+        hostgroup: "{{ parent_hostgroup }}/{{ child_hostgroup }}"
       delegate_to: localhost
       throttle: 1
