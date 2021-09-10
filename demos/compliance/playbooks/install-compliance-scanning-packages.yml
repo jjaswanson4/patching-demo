@@ -1,0 +1,12 @@
+---
+
+- name: install compliance scanning packages
+  hosts:
+    - all
+  tasks:
+    - name: install packages
+      ansible.builtin.yum:
+        name:
+          - openscap
+          - scap-security-guide
+          - openscap-scanner
