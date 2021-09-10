@@ -264,7 +264,7 @@ satellite:
               basearch: x86_64
         - name: cv-satellitetools6.9-rhel7
           repos:
-            - repo: Red Hat Satellite Tools 6.8 (for RHEL 7 Server) (RPMs)
+            - repo: Red Hat Satellite Tools 6.9 (for RHEL 7 Server) (RPMs)
               product: Red Hat Enterprise Linux Server
               basearch: x86_64     
       composite_content_views:
