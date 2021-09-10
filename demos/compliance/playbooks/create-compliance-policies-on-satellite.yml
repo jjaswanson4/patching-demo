@@ -1,0 +1,54 @@
+---
+
+- name: create compliance policies in satellite
+  hosts:
+    - all
+  gather_facts: no
+  module_defaults:
+    ansible.builtin.uri:
+      user: admin
+      password: "{{ satellite_password }}"
+      force_basic_auth: yes
+      validate_certs: no
+      body_format: json
+  pre_tasks:
+    - name: get scap content and profiles
+      block:
+        - name: search for scap content profile information
+          ansible.builtin.uri:
+            url: "{{ satellite_url }}/api/compliance/scap_content_profiles?search=title~{{ profile_name | regex_replace(' ', '%20') }}"
+          register: scap_content_profiles
+        - name: get hostgroup id
+          ansible.builtin.uri:
+            url: "{{ satellite_url }}/api/hostgroups?search=title={{ parent_hostgroup }}/{{ child_hostgroup }}"
+          register: hostgroup_id
+        - name: grab os specific profile
+          ansible.builtin.set_fact:
+            hostgroup_id: "{{ hostgroup_id | json_query('json.results[0].id') }}"
+            scap_content_profile: "{{ scap_content_profiles | json_query(json_query) }}"
+          vars:
+            json_query: json.results[?contains(scap_content.title, '{{ os }}')] | [0]
+      delegate_to: localhost
+  tasks:
+    - name: create compliance policy in satellite
+      ansible.builtin.uri:
+        url: "{{ satellite_url }}/api/compliance/policies"
+        method: POST
+        body:
+          policy:
+            name: "{{ os }}-{{ child_hostgroup }}"
+            scap_content_id: "{{ scap_content_profile.scap_content.id }}"
+            scap_content_profile_id: "{{ scap_content_profile.id }}"
+            period: weekly
+            weekday: sunday
+            hostgroup_ids:
+              - "{{ hostgroup_id }}"
+            deploy_by: ansible
+      register: create_compliance_policy
+      changed_when:
+        - create_compliance_policy.status == '201'
+      failed_when:
+        - create_compliance_policy.status != '201'
+        - create_compliance_policy.json.error.full_messages is defined
+        - "'Name has already been taken' not in create_compliance_policy.json.error.full_messages"
+      delegate_to: localhost
