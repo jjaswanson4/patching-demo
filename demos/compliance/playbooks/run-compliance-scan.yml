@@ -1,0 +1,17 @@
+---
+
+- name: run compliance scan and report results
+  hosts:
+    - all
+  roles:
+    - redhatinsights.insights.compliance
+  tasks:
+    - name: grab compliance command to run
+      ansible.builtin.shell:
+        cmd: grep foreman_scap_client /etc/cron.d/foreman_scap_client_cron | cut -d ';' -f 2 | sed 's/^ //' | grep -v '#'
+      register: compliance_scan_command
+      changed_when: no
+      check_mode: no
+    - name: run compliance scan
+      ansible.builtin.shell:
+        cmd: "{{ compliance_scan_command.stdout }}"
