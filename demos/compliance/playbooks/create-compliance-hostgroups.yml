@@ -10,10 +10,10 @@
         username: "{{ satellite.admin_username }}"
         password: "{{ satellite.admin_password }}"
         validate_certs: false
-        server_url: "https://{{ inventory_hostname }}"
-        name: "{{ hostgroup.name }}"
-        parent: "{{ hostgroup.parent }}"
-        ansible_roles: "{{ hostgroup.ansible_roles }}"
-      loop_control:
-        loop_var: hostgroup
-      loop: "{{ hostgroups }}"
+        server_url: "{{ satellite_url }}"
+        name: "{{ child_hostgroup }}"
+        parent: "{{ parent_hostgroup }}"
+        ansible_roles: "{{ ansible_roles }}"
+        openscap_proxy: "{{ satellite_url | regex_replace('https://', '') }}"
+      delegate_to: localhost
+      throttle: 1
