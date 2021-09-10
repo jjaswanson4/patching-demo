@@ -1,0 +1,52 @@
+---
+
+- name: assign hosts to compliance policy on console.redhat.com
+  hosts:
+    - all
+  module_defaults:
+    ansible.builtin.uri:
+        user: "{{ crhc_username }}"
+        password: "{{ crhc_password }}"
+        force_basic_auth: yes
+  pre_tasks:
+    - name: get insights_id from system
+      ansible.builtin.slurp:
+        src: /etc/insights-client/machine-id
+      register: insights_id
+    - name: make API calls from localhost
+      block:
+        - name: grab host info from console.redhat.com
+          ansible.builtin.uri:
+            url: https://console.redhat.com/api/inventory/v1/hosts?insights_id={{ insights_id.content | b64decode }}
+          register: insights_host_info
+          throttle: 1
+        - name: grab compliance profiles from console.redhat.com
+          ansible.builtin.uri:
+            url: https://console.redhat.com/api/compliance/v1/profiles?limit=100
+          register: compliance_profiles
+          throttle: 1
+      delegate_to: localhost
+    - name: set host_id and compliance_policy_id facts
+      ansible.builtin.set_fact:
+        insights_host_id: "{{ insights_host_info.json | json_query('results[0].id') }}"
+        compliance_policy_id: "{{ compliance_profiles.json | json_query(json_query) }}"
+      vars:
+        json_query: "data[?attributes.name == '{{ policy_name }}' && attributes.os_version == '{{ ansible_distribution_major_version }}'].id | [0]"
+  tasks:
+    - name: add hosts to complaince policies on console.redhat.com
+      ansible.builtin.uri:
+        url: https://console.redhat.com/api/compliance/v1/profiles/{{ compliance_policy_id }}
+        method: PATCH
+        body_format: json
+        status_code:
+          - 200
+          - 404
+        body:
+          data:
+            relationships:
+              hosts:
+                data:
+                  - id: "{{ insights_host_id }}"
+                    type: host
+      delegate_to: localhost
+      throttle: 1
