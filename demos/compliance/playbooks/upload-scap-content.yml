@@ -11,27 +11,48 @@
       force_basic_auth: yes
       validate_certs: no
       body_format: json
+  pre_tasks:
+    - name: get necessary ids for satellite API calls
+      block:
+        - name: find satellite organization id
+          ansible.builtin.uri:
+            url: "{{ satellite_url }}/katello/api/organizations?search=name={{ audience }}"
+          register: satellite_organizations
+        - name: find satellite location id
+          ansible.builtin.uri:
+            url: "{{ satellite_url }}/api/locations?search=name={{ audience }}"
+          register: satellite_locations
+        - name: find satellite proxy id
+          ansible.builtin.uri:
+            url: "{{ satellite_url }}/api/smart_proxies?search=name={{ satellite_url | regex_replace('https://', '') }}"
+          register: satellite_proxies
+      delegate_to: localhost
+    - name: set IDs as facts
+      ansible.builtin.set_fact:
+        organization_id: "{{ satellite_organizations.json.results[0].id }}"
+        location_id: "{{ satellite_locations.json.results[0].id }}"
+        proxy_id: "{{ satellite_proxies.json.results[0].id }}"
+      
   tasks:
     - name: make API calls to import role and variables
       block:
         - name: import theforeman.foreman_scap_client ansible role
           ansible.builtin.uri:
-            url: https://{{ inventory_hostname }}/ansible/api/ansible_roles/import
+            url: "{{ satellite_url }}/ansible/api/ansible_roles/import"
             method: PUT
             body:
-              location_id: '2' # should query for these values
-              organization_id: '1'
-              proxy_id: '1'
-              role_names:
-                - theforeman.foreman_scap_client
+              organization_id: "{{ organization_id }}"
+              location_id: "{{ location_id }}"
+              proxy_id: "{{ proxy_id }}"
+              role_names: "{{ ansible_roles }}"
         - name: import ansible vars from theforeman.foreman_scap_client ansible role
           ansible.builtin.uri:
-            url: https://{{ inventory_hostname }}/ansible/api/ansible_variables/import
+            url: "{{ satellite_url }}/ansible/api/ansible_variables/import"
             method: PUT
             body:
-              location_id: '2'
-              organization_id: '1'
-              proxy_id: '1'
+              organization_id: "{{ organization_id }}"
+              location_id: "{{ location_id }}"
+              proxy_id: "{{ proxy_id }}"
       delegate_to: localhost
     - name: upload scap content to satellite
       ansible.builtin.shell:
