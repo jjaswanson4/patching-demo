@@ -239,6 +239,59 @@ controller_workflows:
         identifier: node202
       - unified_job_template: Send Provisioner Email | Failed
         identifier: node203
+  - name: Teardown Compliance Demo
+    organization: Demo Provisioner
+    state: "{{ controller_state | default('present') }}"
+    extra_vars:
+      demo: compliance
+    survey_enabled: yes
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - type: text
+          question_name: "Demo Audience?"
+          question_description: "Who is the audience for this demo"
+          variable: audience
+          required: yes
+    simplified_workflow_nodes:
+      - unified_job_template: Remove Controller Configuration
+        identifier: node995
+        limit: compliance-demo
+        credentials:
+          - Demo Provisioner Peripheral Credentials
+        always_nodes:
+          - node997
+      - unified_job_template: Unregister from Insights
+        identifier: node996
+        inventory: Compliance Demo Infrastructure
+        limit: 'demo_hosts:satellite'
+        credentials:
+          - Demo Provisioner Root Account
+        always_nodes:
+          - node997
+      - unified_job_template: Teardown Systems
+        identifier: node997
+        inventory: Compliance Demo Infrastructure
+        limit: demo_hosts
+        credentials:
+          - Demo Provisioner Peripheral Credentials
+        always_nodes:
+          - node998
+      - unified_job_template: Teardown Systems
+        identifier: node998
+        inventory: Compliance Demo Infrastructure
+        limit: satellite
+        credentials:
+          - Demo Provisioner Peripheral Credentials
+        always_nodes:
+          - node999
+      - unified_job_template: Cleanup DNS Records
+        identifier: node999
+        inventory: Compliance Demo Infrastructure
+        limit: 'demo_hosts:satellite'
+        credentials:
+          - Demo Provisioner Peripheral Credentials
   - name: Reset Compliance Demo
     organization: Demo Provisioner
     state: "{{ controller_state | default('present') }}"
