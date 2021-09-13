@@ -283,7 +283,7 @@ controller_workflows:
         success_nodes:
           - node104
 
-- Name: Apply Compliance Automation
+  - name: Apply Compliance Automation
     organization: "{{ audience }}"
     state: "{{ controller_state | default('present') }}"
     extra_vars:
