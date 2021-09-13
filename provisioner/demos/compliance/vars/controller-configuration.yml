@@ -13,6 +13,11 @@ controller_execution_environments:
     organization: "{{ audience }}"
     credential: MSP Lab AAP20 Automation Hub
     pull: always
+  - name: Compliance Demo Compliance EE
+    image: 'aap20-hub.josh.lab.msp.redhat.com/compliance-demo-compliance-ee:1.0.0'
+    organization: "{{ audience }}"
+    credential: MSP Lab AAP20 Automation Hub
+    pull: always
 
 controller_credential_types:
   - name: Console.redhat.com Credentials
@@ -49,7 +54,7 @@ controller_inventories:
       satellite_url: https://compliance-satellite.josh.lab.msp.redhat.com
       ansible_roles:
         - theforeman.foreman_scap_client
-      ansible_local.insights: installed
+      
 
 controller_hosts:
   - name: compliance-satellite.josh.lab.msp.redhat.com
@@ -169,13 +174,15 @@ controller_templates:
     execution_environment: Compliance Demo EE
     ask_credential_on_launch: yes
     ask_variables_on_launch: yes
+    extra_vars:
+      ansible_local.insights: installed
   - name: Run Compliance Roles
     organization: "{{ audience }}"
     ask_inventory_on_launch: yes
     ask_limit_on_launch: yes
     project: "{{ audience }} Compliance Code"
-    playbook: demos/compliance/playbooks/run-compliance-scan.yml
-    execution_environment: Compliance Demo EE
+    playbook: demos/compliance/playbooks/run-compliance-roles.yml
+    execution_environment: Compliance Demo Compliance EE
     ask_credential_on_launch: yes
     ask_variables_on_launch: yes
   - name: Reboot Systems
@@ -267,6 +274,7 @@ controller_workflows:
         limit: rhel7:rhel8
         credentials:
           - Console.redhat.com Credentials
+          - Compliance Root Credentials
         success_nodes:
           - node102
       - approval_node:
@@ -280,8 +288,7 @@ controller_workflows:
         limit: rhel7:rhel8
         credentials:
           - Console.redhat.com Credentials
-        success_nodes:
-          - node104
+          - Compliance Root Credentials
 
   - name: Apply Compliance Automation
     organization: "{{ audience }}"
@@ -299,7 +306,7 @@ controller_workflows:
         success_nodes:
           - node102
       - approval_node:
-          name: Approve 'Run Compliance Scan'
+          name: Approve 'Run Compliance Roles'
         identifier: node102
         success_nodes:
           - node103
