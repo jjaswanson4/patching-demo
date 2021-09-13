@@ -1,0 +1,24 @@
+---
+
+roles:
+  - name: redhatofficial.rhel7_c2s
+  - name: redhatofficial.rhel7_cjis
+  - name: redhatofficial.rhel7_cui
+  - name: redhatofficial.rhel7_hipaa
+  - name: redhatofficial.rhel7_ospp
+  - name: redhatofficial.rhel7_pci_dss
+  - name: redhatofficial.rhel7_rht_ccp
+  - name: redhatofficial.rhel7_stig
+  - name: redhatofficial.rhel8_cjis
+  - name: redhatofficial.rhel8_cui
+  - name: redhatofficial.rhel8_hipaa
+  - name: redhatofficial.rhel8_ospp
+  - name: redhatofficial.rhel8_pci_dss
+  - name: redhatofficial.rhel8_rht_ccp
+  - name: redhatofficial.rhel8_stig
+
+collections:
+  - name: redhat.satellite
+  - name: redhatinsights.insights
+  - name: community.general
+  - name: ansible.posix
