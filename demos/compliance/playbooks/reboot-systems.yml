@@ -1,0 +1,8 @@
+---
+
+- name: reboot systems
+  hosts:
+    - all
+  tasks:
+    - name: reboot systems
+      ansible.builtin.reboot:
