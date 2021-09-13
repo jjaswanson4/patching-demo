@@ -1,0 +1,20 @@
+---
+
+- name: create compliance user on systems
+  hosts:
+    - all
+  gather_facts: no
+  pre_tasks:
+    - name: double password for length
+      ansible.builtin.set_fact:
+        password_doubled: "{{ ansible_password }}{{ ansible_password }}"
+    - name: set hased password
+      ansible.builtin.set_fact:
+        password_hashed: "{{ password_doubled | password_hash('sha512', 's4p3rs3cr3ts6lt') }}"
+  tasks:
+    - name: create compliance user on systems
+      ansible.builtin.user:
+        name: compliance-user
+        password: "{{ password_hashed }}"
+        groups:
+          - wheel
