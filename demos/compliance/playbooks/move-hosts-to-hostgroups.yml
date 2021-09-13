@@ -7,8 +7,8 @@
   tasks:
     - name: move host to appropriate compliance hostgroup and set scap proxy
       redhat.satellite.host:
-        username: "{{ satellite.admin_username }}"
-        password: "{{ satellite.admin_password }}"
+        username: admin
+        password: "{{ satellite_password }}"
         validate_certs: false
         server_url: "{{ satellite_url }}"
         name: "{{ inventory_hostname }}"
