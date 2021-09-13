@@ -1,0 +1,9 @@
+---
+
+- name: run compliance role based on desired baseline
+  hosts:
+    - all
+  tasks:
+    - name: include compliance role
+      ansible.builtin.include_role:
+        name: "redhatofficial.{{ os }}_{{ child_hostgroup }}"
