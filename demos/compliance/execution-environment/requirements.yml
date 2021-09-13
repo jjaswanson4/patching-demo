@@ -19,3 +19,4 @@ roles:
 
 collections:
   - name: redhat.satellite
+  - name: redhatinsights.insights
