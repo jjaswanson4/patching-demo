@@ -135,7 +135,7 @@ controller_templates:
     playbook: demos/compliance/playbooks/create-policies-on-satellite.yml
     execution_environment: Compliance Demo EE
     ask_credential_on_launch: yes
-  - name: Deploy Scanning via Satellite
+  - name: Deploy Compliance Scanning
     organization: "{{ audience }}"
     ask_inventory_on_launch: yes
     ask_limit_on_launch: yes
@@ -175,6 +175,7 @@ controller_workflows:
     state: "{{ controller_state | default('present') }}"
     extra_vars:
       demo: compliance
+      audience: "{{ audience }}"
     simplified_workflow_nodes:
       - unified_job_template: Upload SCAP Content
         identifier: node101
@@ -234,5 +235,3 @@ controller_workflows:
         limit: rhel7:rhel8
         credentials:
           - Compliance Demo Peripheral Credentials
-        success_nodes:
-          - node108
