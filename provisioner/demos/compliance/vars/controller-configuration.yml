@@ -39,8 +39,8 @@ controller_credentials:
     credential_type: Machine
     organization: "{{ audience }}"
     inputs:
-      username: root
-      password: "{{ ansible_password }}"
+      username: compliance-user
+      password: "{{ ansible_password }}{{ ansible_password }}"
 
 controller_inventories:
   - name: "{{ audience }} Infrastructure"
@@ -168,10 +168,27 @@ controller_templates:
     playbook: demos/compliance/playbooks/run-compliance-scan.yml
     execution_environment: Compliance Demo EE
     ask_credential_on_launch: yes
-
+    ask_variables_on_launch: yes
+  - name: Run Compliance Roles
+    organization: "{{ audience }}"
+    ask_inventory_on_launch: yes
+    ask_limit_on_launch: yes
+    project: "{{ audience }} Compliance Code"
+    playbook: demos/compliance/playbooks/run-compliance-scan.yml
+    execution_environment: Compliance Demo EE
+    ask_credential_on_launch: yes
+    ask_variables_on_launch: yes
+  - name: Reboot Systems
+    organization: "{{ audience }}"
+    ask_inventory_on_launch: yes
+    ask_limit_on_launch: yes
+    project: "{{ audience }} Compliance Code"
+    playbook: demos/compliance/playbooks/reboot-systems.yml
+    execution_environment: Compliance Demo EE
+    ask_credential_on_launch: yes
 
 controller_workflows:
-  - name: Run Compliance Demo
+  - name: Setup Satellite Compliance Scanning
     organization: "{{ audience }}"
     state: "{{ controller_state | default('present') }}"
     extra_vars:
@@ -236,3 +253,77 @@ controller_workflows:
         limit: rhel7:rhel8
         credentials:
           - Compliance Demo Peripheral Credentials
+
+  - name: Setup Insights Compliance Scanning
+    organization: "{{ audience }}"
+    state: "{{ controller_state | default('present') }}"
+    extra_vars:
+      demo: compliance
+      audience: "{{ audience }}"
+    simplified_workflow_nodes:
+      - unified_job_template: Create Policies on Console.redhat.com
+        identifier: node101
+        inventory: "{{ audience }} Infrastructure"
+        limit: rhel7:rhel8
+        credentials:
+          - Console.redhat.com Credentials
+        success_nodes:
+          - node102
+      - approval_node:
+          name: Approve 'Assign Hosts to Policy on Console.redhat.com'
+        identifier: node102
+        success_nodes:
+          - node103
+      - unified_job_template: Assign Hosts to Policy on Console.redhat.com
+        identifier: node103
+        inventory: "{{ audience }} Infrastructure"
+        limit: rhel7:rhel8
+        credentials:
+          - Console.redhat.com Credentials
+        success_nodes:
+          - node104
+
+- Name: Apply Compliance Automation
+    organization: "{{ audience }}"
+    state: "{{ controller_state | default('present') }}"
+    extra_vars:
+      demo: compliance
+      audience: "{{ audience }}"
+    simplified_workflow_nodes:
+      - unified_job_template: Run Compliance Scan
+        identifier: node101
+        inventory: "{{ audience }} Infrastructure"
+        limit: rhel7:rhel8
+        credentials:
+          - Compliance Root Credentials
+        success_nodes:
+          - node102
+      - approval_node:
+          name: Approve 'Run Compliance Scan'
+        identifier: node102
+        success_nodes:
+          - node103
+      - unified_job_template: Run Compliance Roles
+        identifier: node103
+        inventory: "{{ audience }} Infrastructure"
+        limit: rhel7:rhel8
+        credentials:
+          - Compliance Root Credentials
+        success_nodes:
+          - node104
+      - unified_job_template: Reboot Systems
+        identifier: node104
+        inventory: "{{ audience }} Infrastructure"
+        limit: rhel7:rhel8
+        credentials:
+          - Compliance Root Credentials
+        success_nodes:
+          - node105
+      - unified_job_template: Run Compliance Scan
+        identifier: node105
+        inventory: "{{ audience }} Infrastructure"
+        limit: rhel7:rhel8
+        credentials:
+          - Compliance Non-Root Credentials
+        extra_data:
+          become: yes
