@@ -60,7 +60,7 @@ controller_hosts:
   - name: compliance-satellite.josh.lab.msp.redhat.com
     inventory: Compliance Demo Infrastructure
     variables: "{{ lookup('file', 'demos/compliance/vars/satellite-configuration.yml') | from_yaml }}"
-  - name: compliance-deployment-demo
+  - name: compliance-demo
     inventory: Local Action Inventory
     variables: "{{ lookup('file', 'demos/compliance/vars/controller-configuration.yml') | from_yaml }}"
   - name: rhel7-hipaa.josh.lab.msp.redhat.com
@@ -200,7 +200,7 @@ controller_workflows:
     # Work nodes
       - unified_job_template: Configure Ansible Controller
         identifier: node101
-        limit: compliance-deployment-demo
+        limit: compliance-demo
         credentials:
           - Demo Provisioner Peripheral Credentials
         success_nodes:
