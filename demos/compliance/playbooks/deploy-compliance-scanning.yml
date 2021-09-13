@@ -7,8 +7,8 @@
   tasks:
     - name: run ansible roles against hosts via satellite
       redhat.satellite.job_invocation:
-        username: "{{ satellite.admin_username }}"
-        password: "{{ satellite.admin_password }}"
+        username: admin
+        password: "{{ satellite_password }}"
         validate_certs: false
         server_url: "{{ satellite_url }}"
         job_template: Ansible Roles - Ansible Default
