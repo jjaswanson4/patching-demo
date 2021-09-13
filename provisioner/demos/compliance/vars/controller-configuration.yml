@@ -48,13 +48,7 @@ controller_inventories:
       satellite_url: https://compliance-satellite.josh.lab.msp.redhat.com
       ansible_roles:
         - theforeman.foreman_scap_client
-      hostgroups:
-        - name: rhel7-hipaa
-          parent: rhel7
-          ansible_roles: "{  { ansible_roles }}"
-        - name: rhel8-hipaa
-          parent: rhel8
-          ansible_roles: "{  { ansible_roles }}"
+      ansible_local.insights: installed
 
 controller_hosts:
   - name: compliance-satellite.josh.lab.msp.redhat.com
@@ -75,30 +69,30 @@ controller_groups:
     inventory: "{{ audience }} Infrastructure"
     hosts:
       - compliance-satellite.josh.lab.msp.redhat.com
-  - name: rhel7_hipaa
+  - name: hipaa
+    inventory: "{{ audience }} Infrastructure"
+    hosts:
+      - rhel7-hipaa.josh.lab.msp.redhat.com
+      - rhel8-hipaa.josh.lab.msp.redhat.com
+    variables:
+      policy_name: Health Insurance Portability and Accountability Act (HIPAA)
+      child_hostgroup: hipaa
+      rhel7_parent_profile_id: 5d7af59d-2266-4e09-8024-07a48eb1557c
+      rhel8_parent_profile_id: e5264e5d-d4b3-4c82-80a0-93448de468a7
+  - name: rhel7
     inventory: "{{ audience }} Infrastructure"
     hosts:
       - rhel7-hipaa.josh.lab.msp.redhat.com
     variables:
-      hostgroup: rhel7/rhel7-hipaa
-  - name: rhel8_hipaa
+      os: rhel7
+      parent_hostgroup: rhel7
+  - name: rhel8
     inventory: "{{ audience }} Infrastructure"
     hosts:
       - rhel8-hipaa.josh.lab.msp.redhat.com
     variables:
-      hostgroup: rhel8/rhel8-hipaa
-  - name: rhel7
-    inventory: "{{ audience }} Infrastructure"
-    children:
-      - rhel7_hipaa
-    variables:
-      os: rhel7
-  - name: rhel8
-    inventory: "{{ audience }} Infrastructure"
-    children:
-      - rhel8_hipaa
-    variables:
       os: rhel8
+      parent_hostgroup: rhel8
 
 controller_projects:
   - name: "{{ audience }} Compliance Code"
@@ -117,12 +111,12 @@ controller_templates:
     playbook: demos/compliance/playbooks/upload-scap-content.yml
     execution_environment: Compliance Demo EE
     ask_credential_on_launch: yes
-  - name: Create Compliance Hostgroups
+  - name: Create Hostgroups
     organization: "{{ audience }}"
     ask_inventory_on_launch: yes
     ask_limit_on_launch: yes
     project: "{{ audience }} Compliance Code"
-    playbook: demos/compliance/playbooks/create-compliance-hostgroups.yml
+    playbook: demos/compliance/playbooks/create-hostgroups.yml
     execution_environment: Compliance Demo EE
     ask_credential_on_launch: yes
   - name: Move Hosts to Hostgroups
@@ -133,9 +127,50 @@ controller_templates:
     playbook: demos/compliance/playbooks/move-hosts-to-hostgroups.yml
     execution_environment: Compliance Demo EE
     ask_credential_on_launch: yes
+  - name: Create Policies on Satellite
+    organization: "{{ audience }}"
+    ask_inventory_on_launch: yes
+    ask_limit_on_launch: yes
+    project: "{{ audience }} Compliance Code"
+    playbook: demos/compliance/playbooks/create-policies-on-satellite.yml
+    execution_environment: Compliance Demo EE
+    ask_credential_on_launch: yes
+  - name: Deploy Scanning via Satellite
+    organization: "{{ audience }}"
+    ask_inventory_on_launch: yes
+    ask_limit_on_launch: yes
+    project: "{{ audience }} Compliance Code"
+    playbook: demos/compliance/playbooks/deploy-compliance-scanning.yml
+    execution_environment: Compliance Demo EE
+    ask_credential_on_launch: yes
+  - name: Create Policies on Console.redhat.com
+    organization: "{{ audience }}"
+    ask_inventory_on_launch: yes
+    ask_limit_on_launch: yes
+    project: "{{ audience }} Compliance Code"
+    playbook: demos/compliance/playbooks/create-policies-on-crhc.yml
+    execution_environment: Compliance Demo EE
+    ask_credential_on_launch: yes
+  - name: Assign Hosts to Policy on Console.redhat.com
+    organization: "{{ audience }}"
+    ask_inventory_on_launch: yes
+    ask_limit_on_launch: yes
+    project: "{{ audience }} Compliance Code"
+    playbook: demos/compliance/playbooks/assign-hosts-to-policy.yml
+    execution_environment: Compliance Demo EE
+    ask_credential_on_launch: yes
+  - name: Run Compliance Scan
+    organization: "{{ audience }}"
+    ask_inventory_on_launch: yes
+    ask_limit_on_launch: yes
+    project: "{{ audience }} Compliance Code"
+    playbook: demos/compliance/playbooks/run-compliance-scan.yml
+    execution_environment: Compliance Demo EE
+    ask_credential_on_launch: yes
+
 
 controller_workflows:
-  - name: Setup Compliance
+  - name: Run Compliance Demo
     organization: "{{ audience }}"
     state: "{{ controller_state | default('present') }}"
     extra_vars:
@@ -149,17 +184,55 @@ controller_workflows:
           - Compliance Demo Peripheral Credentials
         success_nodes:
           - node102
-      - unified_job_template: Create Compliance Hostgroups
+      - approval_node:
+          name: Approve 'Create Hostgroups'
         identifier: node102
-        inventory: "{{ audience }} Infrastructure"
-        limit: satellite
-        credentials:
-          - Compliance Demo Peripheral Credentials
         success_nodes:
           - node103
-      - unified_job_template: Move Hosts to Hostgroups
+      - unified_job_template: Create Hostgroups
         identifier: node103
         inventory: "{{ audience }} Infrastructure"
         limit: rhel7:rhel8
         credentials:
           - Compliance Demo Peripheral Credentials
+        success_nodes:
+          - node104
+      - approval_node:
+          name: Approve 'Move Hosts to Hostgroups'
+        identifier: node104
+        success_nodes:
+          - node105
+      - unified_job_template: Move Hosts to Hostgroups
+        identifier: node105
+        inventory: "{{ audience }} Infrastructure"
+        limit: rhel7:rhel8
+        credentials:
+          - Compliance Demo Peripheral Credentials
+        success_nodes:
+          - node106
+      - approval_node:
+          name: Approve 'Create Policies on Satellite'
+        identifier: node106
+        success_nodes:
+          - node107
+      - unified_job_template: Create Policies on Satellite
+        identifier: node107
+        inventory: "{{ audience }} Infrastructure"
+        limit: rhel7:rhel8
+        credentials:
+          - Compliance Demo Peripheral Credentials
+        success_nodes:
+          - node108
+      - approval_node:
+          name: Approve 'Deploy Compliance Scanning'
+        identifier: node108
+        success_nodes:
+          - node109
+      - unified_job_template: Deploy Compliance Scanning
+        identifier: node109
+        inventory: "{{ audience }} Infrastructure"
+        limit: rhel7:rhel8
+        credentials:
+          - Compliance Demo Peripheral Credentials
+        success_nodes:
+          - node108
