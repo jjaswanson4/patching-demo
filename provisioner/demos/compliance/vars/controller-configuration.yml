@@ -12,6 +12,7 @@ controller_execution_environments:
     image: 'aap20-hub.josh.lab.msp.redhat.com/compliance-demo-ee:latest'
     organization: "{{ audience }}"
     credential: MSP Lab AAP20 Automation Hub
+    pull: always
 
 controller_credential_types:
   - name: Console.redhat.com Credentials
