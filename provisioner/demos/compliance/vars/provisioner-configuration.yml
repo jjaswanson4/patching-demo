@@ -1,5 +1,14 @@
 ---
 
+# By default, the org 'Demo Provisioner' is created and resources are configured there,
+# Use this variable to override this behavior.
+# For example, overriding to 'Default' will put the resources into the default controller organization.
+controller_organization: Demo Provisioner
+
+# This is the default project name. It is a var so demos can import specific job templates and override the project locally.
+# Change this to change the name of the project for the provisioner job templates.
+project: Demo Provisioner Codebase
+
 controller_inventories:
   - name: Compliance Demo Infrastructure
     organization: Demo Provisioner
@@ -141,6 +150,16 @@ controller_groups:
         memory_mb: "{  { memory_mb }}"
         activation_keys: "ak-{  { application }}-{  { os }}-{  { lifecycle_environment }}"
 
+controller_templates:
+  - name: Create Compliance User
+    organization: "{{ controller_organization }}"
+    ask_inventory_on_launch: yes
+    ask_limit_on_launch: yes
+    project: "{{ project }}"
+    playbook: provisioner/demos/compliance/playbooks/create-compliance-user.yml
+    execution_environment: Demo Provisioner EE
+    ask_credential_on_launch: yes
+
 controller_workflows:
   - name: Provision Compliance Demo
     organization: Demo Provisioner
@@ -226,9 +245,19 @@ controller_workflows:
           - Demo Provisioner Peripheral Credentials
           - Demo Provisioner Root Account
         success_nodes:
-          - node999
+          - node104
         failure_nodes:
           - node203
+      - unified_job_template: Create Compliance User
+        identifier: node104
+        inventory: Compliance Demo Infrastructure
+        limit: demo_hosts
+        credentials:
+          - Demo Provisioner Root Account
+        success_nodes:
+          - node999
+        failure_nodes:
+          - node204
     # Notification Nodes
       - unified_job_template: Send Provisioner Email | Succeeded
         identifier: node999
@@ -239,6 +268,8 @@ controller_workflows:
         identifier: node202
       - unified_job_template: Send Provisioner Email | Failed
         identifier: node203
+      - unified_job_template: Send Provisioner Email | Failed
+        identifier: node204
   - name: Teardown Compliance Demo
     organization: Demo Provisioner
     state: "{{ controller_state | default('present') }}"
