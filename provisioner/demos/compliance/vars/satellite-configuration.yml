@@ -297,4 +297,4 @@ satellite:
           content_overrides:
             - label: satellite-tools-6.9-for-rhel-8-x86_64-rpms
             - label: rhel-8-for-x86_64-baseos-rpms
-            - label: rhel-8-for-x86_64-appstream-rpms          
+            - label: rhel-8-for-x86_64-appstream-rpms
