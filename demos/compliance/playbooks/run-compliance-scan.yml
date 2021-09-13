@@ -3,15 +3,22 @@
 - name: run compliance scan and report results
   hosts:
     - all
-  roles:
-    - redhatinsights.insights.compliance
-  tasks:
-    - name: grab compliance command to run
+  pre_tasks:
+    - name: ensure insights compliance components are installed
+      ansible.builtin.import_role:
+        name: redhatinsights.insights.compliance
+        tasks_from: install.yml
+    - name: grab compliance command to run for reporting to satellite
       ansible.builtin.shell:
         cmd: grep foreman_scap_client /etc/cron.d/foreman_scap_client_cron | cut -d ';' -f 2 | sed 's/^ //' | grep -v '#'
       register: compliance_scan_command
       changed_when: no
       check_mode: no
-    - name: run compliance scan
+  tasks:  
+    - name: run compliance scan and report to insights
+      ansible.builtin.import_role:
+        name: redhatinsights.insights.compliance
+        tasks_from: run.yml
+    - name: run compliance scan and report to satellite
       ansible.builtin.shell:
         cmd: "{{ compliance_scan_command.stdout }}"
