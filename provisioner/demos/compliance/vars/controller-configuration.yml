@@ -39,7 +39,8 @@ controller_credentials:
     organization: "{{ audience }}"
     inputs:
       username: root
-      password: "{{ ansible_password }}"
+      password: "{{ ansible_password }}{{ ansible_password }}"
+      become_password: "{{ ansible_password }}{{ ansible_password }}"
   - name: Compliance Non-Root Credentials
     credential_type: Machine
     organization: "{{ audience }}"
@@ -174,8 +175,7 @@ controller_templates:
     execution_environment: Compliance Demo EE
     ask_credential_on_launch: yes
     ask_variables_on_launch: yes
-    extra_vars:
-      ansible_local.insights: installed
+    become_enabled: yes
   - name: Run Compliance Roles
     organization: "{{ audience }}"
     ask_inventory_on_launch: yes
@@ -185,6 +185,7 @@ controller_templates:
     execution_environment: Compliance Demo Compliance EE
     ask_credential_on_launch: yes
     ask_variables_on_launch: yes
+    become_enabled: yes
   - name: Reboot Systems
     organization: "{{ audience }}"
     ask_inventory_on_launch: yes
@@ -193,6 +194,7 @@ controller_templates:
     playbook: demos/compliance/playbooks/reboot-systems.yml
     execution_environment: Compliance Demo EE
     ask_credential_on_launch: yes
+    become_enabled: yes
 
 controller_workflows:
   - name: Setup Satellite Compliance Scanning
@@ -302,7 +304,7 @@ controller_workflows:
         inventory: "{{ audience }} Infrastructure"
         limit: rhel7:rhel8
         credentials:
-          - Compliance Root Credentials
+          - Compliance Non-Root Credentials
         success_nodes:
           - node102
       - approval_node:
@@ -315,7 +317,7 @@ controller_workflows:
         inventory: "{{ audience }} Infrastructure"
         limit: rhel7:rhel8
         credentials:
-          - Compliance Root Credentials
+          - Compliance Non-Root Credentials
         success_nodes:
           - node104
       - unified_job_template: Reboot Systems
@@ -323,7 +325,7 @@ controller_workflows:
         inventory: "{{ audience }} Infrastructure"
         limit: rhel7:rhel8
         credentials:
-          - Compliance Root Credentials
+          - Compliance Non-Root Credentials
         success_nodes:
           - node105
       - unified_job_template: Run Compliance Scan
