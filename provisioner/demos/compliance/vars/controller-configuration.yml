@@ -39,14 +39,15 @@ controller_credentials:
     organization: "{{ audience }}"
     inputs:
       username: root
-      password: "{{ ansible_password }}{{ ansible_password }}"
-      become_password: "{{ ansible_password }}{{ ansible_password }}"
+      password: "{{ ansible_password }}"
   - name: Compliance Non-Root Credentials
     credential_type: Machine
     organization: "{{ audience }}"
     inputs:
       username: compliance-user
       password: "{{ ansible_password }}{{ ansible_password }}"
+      become_password: "{{ ansible_password }}{{ ansible_password }}"
+
 
 controller_inventories:
   - name: "{{ audience }} Infrastructure"
