@@ -1,5 +1,14 @@
 ---
 
+- name: Install Ansible Controller
+  organization: "{{ controller_organization }}"
+  ask_inventory_on_launch: yes
+  ask_limit_on_launch: yes
+  project: "{{ project }}"
+  allow_simultaneous: yes
+  playbook: resources/playbooks/install-aap.yml
+  execution_environment: Demo Provisioner EE
+  ask_credential_on_launch: yes
 - name: Configure Ansible Controller
   organization: "{{ controller_organization }}"
   ask_inventory_on_launch: yes
