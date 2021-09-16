@@ -5,6 +5,7 @@
   state: "{{ controller_state | default('present') }}"
   ask_inventory_on_launch: yes
   limit: satellite
+  ask_variables_on_launch: yes
   simplified_workflow_nodes:
     - unified_job_template: Provision Systems
       identifier: node101
@@ -25,6 +26,7 @@
   state: "{{ controller_state | default('present') }}"
   ask_inventory_on_launch: yes
   limit: controller
+  ask_variables_on_launch: yes
   simplified_workflow_nodes:
     - unified_job_template: Provision Systems
       identifier: node101
