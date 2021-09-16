@@ -3,7 +3,6 @@
 - name: build out satellite
   hosts:
     - all
-  gather_facts: no
   vars:
     deploy_satellite: yes
   pre_tasks:
