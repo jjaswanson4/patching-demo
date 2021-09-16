@@ -1,7 +1,7 @@
 ---
 
 ansible_host: "{{ satellite.ip_address }}"
-ip_address: "{{ ansible_host }}"
+ip_address: "{  { ansible_host }}"
 cpus: 8
 memory_mb: 24576
 os: rhel7
@@ -64,13 +64,13 @@ satellite:
     - "--foreman-proxy-dns true"
   foreman:
     organizations:
-      - name: "{{ audience }}"
+      - name: "{  { audience }}"
         initial_organization: yes
     locations:
-      - name: "{{ audience }}"
+      - name: "{  { audience }}"
         initial_location: yes
         organizations:
-          - name: "{{ audience }}"
+          - name: "{  { audience }}"
     settings:
       - name: default_download_policy
         value: on_demand
@@ -93,9 +93,9 @@ satellite:
           password: "{{ vcenter_password }}"
           datacenter: MSP Lab
         organizations:
-          - name: "{{ audience }}"
+          - name: "{  { audience }}"
         locations:
-          - name: "{{ audience }}"
+          - name: "{  { audience }}"
     compute_profiles:
       - name: general-vlan146
         compute_resource: vcenter02.lab.msp.redhat.com
@@ -130,9 +130,9 @@ satellite:
     domains:
       - name: josh.lab.msp.redhat.com
         organizations:
-          - name: "{{ audience }}"
+          - name: "{  { audience }}"
         locations:
-          - name: "{{ audience }}"
+          - name: "{  { audience }}"
     subnets:
       - name: VLAN146
         network: 10.15.120.0
@@ -143,9 +143,9 @@ satellite:
         ipam: None
         boot_mode: Static
         organizations:
-          - name: "{{ audience }}"
+          - name: "{  { audience }}"
         locations:
-          - name: "{{ audience }}"
+          - name: "{  { audience }}"
         domains:
           - name: josh.lab.msp.redhat.com
     hostgroups:
@@ -159,11 +159,11 @@ satellite:
         lifecycle_environment: Production
         operatingsystem: RedHat-8.4
         ptable: RHEL8 Kickstart Partition Table
-        organization_of_content_source: "{{ audience }}"
+        organization_of_content_source: "{  { audience }}"
         organizations:
-          - "{{ audience }}"
+          - "{  { audience }}"
         locations:
-          - "{{ audience }}"
+          - "{  { audience }}"
         subnet: VLAN146
         pxe_loader: None
         root_pass: "{{ ansible_password }}"
@@ -180,11 +180,11 @@ satellite:
         file: ../files/rhel8-ptable.erb
         os_family: Redhat
         organizations:
-          - name: "{{ audience }}"
+          - name: "{  { audience }}"
         locations:
-          - name: "{{ audience }}"
+          - name: "{  { audience }}"
   katello:
-    - organization_name: "{{ audience }}"
+    - organization_name: "{  { audience }}"
       state: present
       manifest: "/tmp/satellite-manifest.zip"
       repo_sync_attempts: 1
