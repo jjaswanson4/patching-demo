@@ -15,6 +15,10 @@ demo_prefix: "S4HANA Deployment Demo"
 
 #
 #
+vars_files_path: demos/s4hana-deployment/vars
+
+#
+#
 inventory: "{{ demo_prefix }} Infrastructure"
 
 #
@@ -25,18 +29,16 @@ execution_environment:
 
 #
 #
-test: patching-controller.josh.lab.msp.redhat.com
 controller:
-  hostname: patching-controller.josh.lab.msp.redhat.com
-  configuration_file: demos/patching/vars/controller-configuration.yml
+  hostname: s4hana-deployment-controller.josh.lab.msp.redhat.com
+  configuration_file: "{{ vars_files_path }}/controller-configuration.yml"
   ip_address: 10.15.121.13
 
 #
 #
-test2: patching-satellite.josh.lab.msp.redhat.com
 satellite:
-  hostname: patching-satellite.josh.lab.msp.redhat.com
-  configuration_file: demos/patching/vars/satellite-configuration.yml
+  hostname: s4hana-deployment-satellite.josh.lab.msp.redhat.com
+  configuration_file: "{{ vars_files_path }}/satellite-configuration.yml"
   ip_address: 10.15.121.3
 
 # Provisioner components
@@ -64,8 +66,6 @@ controller_workflows:
       - unified_job_template: Setup Red Hat Satellite
         identifier: node101
         inventory: "{{ inventory }}"
-        success_nodes:
-          - node102
       - unified_job_template: Setup Ansible Controller
         identifier: node102
         inventory: "{{ inventory }}"
