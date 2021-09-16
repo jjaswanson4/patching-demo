@@ -36,7 +36,7 @@
         - "{{ demo_prefix }} Root Account"
       success_nodes:
         - node102
-     - unified_job_template: Configure Ansible Controller
+    - unified_job_template: Configure Ansible Controller
       identifier: node102
       inventory: "{{ inventory }}"
       credentials:
