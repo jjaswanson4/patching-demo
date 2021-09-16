@@ -1,0 +1,7 @@
+---
+
+- name: install Ansible Automation Platform
+  hosts:
+    - all
+  roles:
+    - jjaswanson4.ansible_utilities.install_aap
