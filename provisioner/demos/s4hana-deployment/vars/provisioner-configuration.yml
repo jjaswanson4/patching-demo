@@ -33,6 +33,8 @@ controller:
   hostname: s4hana-deployment-controller.josh.lab.msp.redhat.com
   configuration_file: "{{ vars_files_path }}/controller-configuration.yml"
   ip_address: 10.15.121.13
+  username: "{{ controller_username }}"
+  password: "{{ controller_password }}"
 
 #
 #
