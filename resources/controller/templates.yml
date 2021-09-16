@@ -11,6 +11,8 @@
   ask_credential_on_launch: yes
   extra_vars:
     controller_state: present
+    ansible_connection: local
+    ansible_python_interpreter: '{  { ansible_playbook_python }}'
 - name: Configure Red Hat Satellite
   organization: "{{ controller_organization }}"
   ask_inventory_on_launch: yes
