@@ -8,94 +8,48 @@ controller_organization: Demo Provisioner
 # This is the default project name. It is a var so demos can import specific job templates and override the project locally.
 # Change this to change the name of the project for the provisioner job templates.
 project: Demo Provisioner Codebase
-controller_inventories:
-  - name: S4HANA Deployment Demo Infrastructure
-    organization: Demo Provisioner
-    variables:
-      dns_zone: josh.lab.msp.redhat.com
-      dns:
-        server: idm05.lab.msp.redhat.com
-        password: "{  { dns_pass }}"
-        records:
-          - name: "{  { inventory_hostname.split('.')[0] }}"
-            zone: josh.lab.msp.redhat.com
-            type: A
-            value: "{  { ip_address }}"
-          - name: "{  { ip_address.split('.')[-1] }}"
-            zone: "{  { ip_address.split('.')[2] }}.15.10.in-addr.arpa."
-            type: PTR
-            value: "{  { inventory_hostname }}."
-      config_files:
-        - hosts
-        - resolv.conf
-      timesync_ntp_servers:
-        - hostname: 0.rhel.pool.ntp.org
-          iburst: yes
-        - hostname: 1.rhel.pool.ntp.org
-          iburst: yes
-        - hostname: 2.rhel.pool.ntp.org
-          iburst: yes
-        - hostname: 3.rhel.pool.ntp.org
-          iburst: yes
-      vcenter:
-        server: vcenter02.lab.msp.redhat.com
-        username: 'Administrator@vsphere.local'
-        password: "{  { vcenter_password }}"
-        datacenter: MSP Lab
-      selinux_policy: targeted
-      selinux_state: permissive
-      dns_resolv:
-        search_domains:
-          - josh.lab.msp.redhat.com
-          - lab.msp.redhat.com
-        nameservers:
-          - 10.15.120.4
-          - 10.15.108.5
-        options:
-          - 'timeout:1'
-      base_packages:
-        disable_gpg_check: yes
-        packages:
-          - lsof
-          - vim
-          - sos
-          - redhat-support-tool
-          - "{  { htop_url }}"
-      ignore_virtual_disk_errors: yes
-      remove_cdrom: no
 
-controller_hosts:
-  - name: sap-deployment-satellite.josh.lab.msp.redhat.com
-    inventory: S4HANA Deployment Demo Infrastructure
-    variables: "{{ lookup('file', 'demos/s4hana-deployment/vars/satellite-configuration.yml') | from_yaml }}"
-  - name: s4hana-deployment-demo
-    inventory: Local Action Inventory
-    variables: "{{ lookup('file', 'demos/s4hana-deployment/vars/controller-configuration.yml') | from_yaml }}"
-    
-controller_groups:
-  - name: satellite
-    inventory: S4HANA Deployment Demo Infrastructure
-    hosts:
-      - sap-deployment-satellite.josh.lab.msp.redhat.com
-  - name: management_plane
-    inventory: S4HANA Deployment Demo Infrastructure
-    variables:
-      lifecycle_environment: production
-      provisioning:
-        satellite:
-          server: satellite06.lab.msp.redhat.com
-          username: admin
-          password: "{  { satellite_password }}"
-        host_group: "{  { os }}"
-        organization: MSP Lab
-        location: MSP Lab
-        method: bootdisk
-        dns_domain: josh.lab.msp.redhat.com
-        cpus: "{  { cpus }}"
-        memory_mb: "{  { memory_mb }}"
-        activation_keys: "ak-{  { application }}-{  { os }}-{  { lifecycle_environment }}"
-    children:
-      - satellite
+# This is the default prefix for assets created for this demo.
+# Change this variable to use a different prefix.
+demo_prefix: "S4HANA Deployment Demo"
+
+#
+#
+inventory: "{{ demo_prefix }} Infrastructure"
+
+#
+#
+execution_environment:
+  name: Demo Provisioner EE
+  image: patching-demo-provisioner-ee
+
+#
+#
+test: patching-controller.josh.lab.msp.redhat.com
+controller:
+  hostname: patching-controller.josh.lab.msp.redhat.com
+  configuration_file: demos/patching/vars/controller-configuration.yml
+  ip_address: 10.15.121.13
+
+#
+#
+test2: patching-satellite.josh.lab.msp.redhat.com
+satellite:
+  hostname: patching-satellite.josh.lab.msp.redhat.com
+  configuration_file: demos/patching/vars/satellite-configuration.yml
+  ip_address: 10.15.121.3
+
+# Provisioner components
+
+controller_organizations: []
+controller_credential_types: []
+controller_credentials: []
+controller_execution_environments: []
+controller_inventories: []
+controller_projects: []
+controller_hosts: []
+controller_groups: []
+controller_templates: []
 
 controller_workflows:
   - name: Provision S4HANA Deployment Demo
@@ -104,94 +58,14 @@ controller_workflows:
     extra_vars:
       demo: s4hana-deployment
     survey_enabled: yes
-    survey:
-      name: ''
-      description: ''
-      spec:
-        - type: text
-          question_name: "Demo Audience?"
-          question_description: "Who is the audience for this demo?"
-          variable: audience
-          required: yes
-        - type: text
-          question_name: "Provisioner?"
-          question_description: "Who is provisioning this demo?"
-          variable: provisioner
-          required: yes
-          default: 'Josh Swanson'
-        - type: text
-          question_name: "Provisioner's Email?"
-          question_description: "What is the provisioner's email address?"
-          variable: provisioner_email
-          required: yes
-          default: 'joshswanson@redhat.com'
-        - type: multiplechoice
-          question_name: Deploy Satellite?
-          question_description: Should satellite be deployed?
-          variable: deploy_satellite
-          choices:
-            - "yes"
-            - "no"
-          default: "yes"
-          required: yes
-        - type: multiplechoice
-          question_name: Configure controller?
-          question_description: Should controller be configured?
-          variable: configure_controller
-          choices:
-            - "yes"
-            - "no"
-          default: "yes"
-          required: yes          
+    survey: "{{ lookup('file', '../resources/controller/provisioner-workflow-survey.yml') | from_yaml }}"
     simplified_workflow_nodes:
     # Work nodes
-      - unified_job_template: Configure Ansible Controller
-        identifier: node101
-        limit: s4hana-deployment-demo
-        credentials:
-          - Demo Provisioner Peripheral Credentials
-        success_nodes:
-          - node999
-        failure_nodes:
-          - node201
       - unified_job_template: Setup Red Hat Satellite
-        identifier: node102
-        inventory: S4HANA Deployment Demo Infrastructure
-        limit: satellite
-        credentials:
-          - Demo Provisioner Peripheral Credentials
-          - Demo Provisioner Root Account
+        identifier: node101
+        inventory: "{{ inventory }}"
         success_nodes:
-          - node999
-        failure_nodes:
-          - node202
-    # Notification Nodes
-      - unified_job_template: Send Provisioner Email | Succeeded
-        identifier: node999
-        all_parents_must_converge: yes
-      - unified_job_template: Send Provisioner Email | Failed
-        identifier: node201
-      - unified_job_template: Send Provisioner Email | Failed
-        identifier: node202
-  # - name: Teardown Patching Demo
-  #   organization: Demo Provisioner
-  #   state: "{{ controller_state | default('present') }}"
-  #   extra_vars:
-  #     demo: patching
-  #   survey_enabled: yes
-  #   survey:
-  #     name: ''
-  #     description: ''
-  #     spec:
-  #       - type: text
-  #         question_name: "Demo Audience?"
-  #         question_description: "Who is the audience for this demo"
-  #         variable: audience
-  #         required: yes
-  #   simplified_workflow_nodes:
-  #     - unified_job_template: Remove Controller Configuration
-  #       identifier: node101
-  #     - unified_job_template: Teardown Red Hat Satellite
-  #       identifier: node102
-  #     - unified_job_template: Cleanup Satellite DNS Records
-  #       identifier: node103
+          - node102
+      - unified_job_template: Setup Ansible Controller
+        identifier: node102
+        inventory: "{{ inventory }}"

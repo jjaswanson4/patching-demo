@@ -1,5 +1,12 @@
 ---
 
+ansible_host: "{{ controller.ip_address }}"
+ip_address: "{{ ansible_host }}"
+cpus: 4
+memory_mb: 16384
+os: rhel8
+application: general
+
 controller_organization: "{{ audience }}"
 project: "{{ audience }} S4HANA Deployment Code"
 

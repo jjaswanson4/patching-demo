@@ -1,6 +1,6 @@
 ---
 
-- name: "{{ asset_prefix }} Infrastructure"
+- name: "{{ demo_prefix }} Infrastructure"
   organization: "{{ controller_organization }}"
   variables:
     dns_zone: josh.lab.msp.redhat.com

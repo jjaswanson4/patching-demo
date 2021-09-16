@@ -1,18 +1,20 @@
 ---
 
 - name: controller
-  inventory: "{{ asset_prefix }} Infrastructure"
+  inventory: "{{ demo_prefix }} Infrastructure"
   variables:
     ansible_connection: local
     ansible_python_interpreter: '{  { ansible_playbook_python }}'
+  hosts:
+    - "{{ controller.hostname }}"
 
 - name: satellite
-  inventory: "{{ asset_prefix }} Infrastructure"
+  inventory: "{{ demo_prefix }} Infrastructure"
   hosts:
-    - "{{ satellite_hostname }}"
+    - "{{ satellite.hostname }}"
 
 - name: management_plane
-  inventory: "{{ asset_prefix }} Infrastructure"
+  inventory: "{{ demo_prefix }} Infrastructure"
   variables:
     lifecycle_environment: production
     provisioning:
@@ -28,6 +30,7 @@
       cpus: "{  { cpus }}"
       memory_mb: "{  { memory_mb }}"
       activation_keys: "ak-{  { application }}-{  { os }}-{  { lifecycle_environment }}"
+    run_additional_roles: no
   children:
     - controller
     - satellite

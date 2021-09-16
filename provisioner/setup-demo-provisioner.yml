@@ -10,9 +10,17 @@
   vars:
     resources_path: ../resources
     controller_resources: "{{ resources_path }}/controller/"
-  vars_files:
-    - demos/patching/vars/provisioner-configuration.yml
   pre_tasks:
+    - name: map provisioner controller vars
+      ansible.builtin.set_fact:
+        controller_hostname: "{{ provisioner_controller.hostname }}"
+        controller_validate_certs: "{{ provisioner_controller.validate_certs }}"
+        controller_username: "{{ provisioner_controller.username }}"
+        controller_password: "{{ provisioner_controller.password }}"
+
+    - name: load in {{ demo }} provisioner vars
+      ansible.builtin.include_vars:
+        file: "demos/{{ demo }}/vars/provisioner-configuration.yml"
     - name: load in preconfigured resources
       ansible.builtin.set_fact:
         preconfigured:
@@ -22,6 +30,10 @@
           controller_execution_environments: "{{ lookup('file', controller_resources + 'execution-environments.yml') | from_yaml }}"
           controller_inventories: "{{ lookup('file', controller_resources + 'inventories.yml') | from_yaml }}"
           controller_hosts: "{{ lookup('file', controller_resources + 'hosts.yml') | from_yaml }}"
+          controller_groups: "{{ lookup('file', controller_resources + 'groups.yml') | from_yaml }}"
+          controller_projects: "{{ lookup('file', controller_resources + 'projects.yml') | from_yaml }}"
+          controller_templates: "{{ lookup('file', controller_resources + 'templates.yml') | from_yaml }}"
+          controller_workflows: "{{ lookup('file', controller_resources + 'workflows.yml') | from_yaml }}"
 
     - name: add demo specific resources
       ansible.builtin.set_fact:
@@ -31,6 +43,10 @@
         controller_execution_environments: "{{ preconfigured.controller_execution_environments + controller_execution_environments }}"
         controller_inventories: "{{ preconfigured.controller_inventories + controller_inventories }}"
         controller_hosts: "{{ preconfigured.controller_hosts + controller_hosts }}"
+        controller_groups: "{{ preconfigured.controller_groups + controller_groups }}"
+        controller_projects: "{{ preconfigured.controller_projects + controller_projects }}"
+        controller_templates: "{{ preconfigured.controller_templates + controller_templates }}"
+        controller_workflows: "{{ preconfigured.controller_workflows + controller_workflows }}"
 
     - name: set facts so ansible instanciates vars
       ansible.builtin.set_fact:
@@ -42,6 +58,8 @@
         controller_hosts: "{{ lookup('vars', 'controller_hosts') | default(omit) }}"
         controller_groups: "{{ lookup('vars', 'controller_groups') | default(omit) }}"
         controller_projects: "{{ lookup('vars', 'controller_projects') | default(omit) }}"
+        controller_templates: "{{ lookup('vars', 'controller_templates') | default(omit) }}"
+        controller_workflows: "{{ lookup('vars', 'controller_workflows') | default(omit) }}"
 
   roles:
     - redhat_cop.controller_configuration.organizations
@@ -52,8 +70,8 @@
     - redhat_cop.controller_configuration.hosts
     - redhat_cop.controller_configuration.groups
     - redhat_cop.controller_configuration.projects
-    # - redhat_cop.controller_configuration.job_templates
-    # - redhat_cop.controller_configuration.workflow_job_templates
+    - redhat_cop.controller_configuration.job_templates
+    - redhat_cop.controller_configuration.workflow_job_templates
     # - redhat_cop.controller_configuration.users
     # - redhat_cop.controller_configuration.teams
     # - redhat_cop.controller_configuration.roles
