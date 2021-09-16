@@ -1,0 +1,6 @@
+---
+
+- name: "{{ asset_prefix }} EE"
+  image: "aap20-hub.josh.lab.msp.redhat.com/{{ execution_environment_image }}"
+  credential: MSP Lab AAP20 Automation Hub
+  pull: always

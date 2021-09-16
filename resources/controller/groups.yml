@@ -1,0 +1,33 @@
+---
+
+- name: controller
+  inventory: "{{ asset_prefix }} Infrastructure"
+  variables:
+    ansible_connection: local
+    ansible_python_interpreter: '{  { ansible_playbook_python }}'
+
+- name: satellite
+  inventory: "{{ asset_prefix }} Infrastructure"
+  hosts:
+    - "{{ satellite_hostname }}"
+
+- name: management_plane
+  inventory: "{{ asset_prefix }} Infrastructure"
+  variables:
+    lifecycle_environment: production
+    provisioning:
+      satellite:
+        server: satellite06.lab.msp.redhat.com
+        username: admin
+        password: "{  { satellite_password }}"
+      host_group: "{  { os }}"
+      organization: MSP Lab
+      location: MSP Lab
+      method: bootdisk
+      dns_domain: josh.lab.msp.redhat.com
+      cpus: "{  { cpus }}"
+      memory_mb: "{  { memory_mb }}"
+      activation_keys: "ak-{  { application }}-{  { os }}-{  { lifecycle_environment }}"
+  children:
+    - controller
+    - satellite

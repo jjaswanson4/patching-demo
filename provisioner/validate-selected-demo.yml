@@ -5,7 +5,7 @@
     - localhost
   gather_facts: no
   vars_files:
-    - demos/common/vars/demos.yml
+    - vars/demos.yml
   tasks:
     - name: validate selected demo is available
       ansible.builtin.assert:

@@ -9,64 +9,31 @@ controller_organization: Demo Provisioner
 # Change this to change the name of the project for the provisioner job templates.
 project: Demo Provisioner Codebase
 
-controller_organizations:
-  - name: "{{ controller_organization }}"
-    galaxy_credentials:
-      - MSP Lab Automation Hub - RH Certified
-      - MSP Lab Automation Hub - Community
-      - Ansible Galaxy
+# This is the default prefix for assets created for this demo.
+# Change this variable to use a different prefix.
+asset_prefix: "{{ controller_organization }}"
 
-controller_credential_types:
-  - name: Demo Provisioner Peripheral Credentials
-    kind: cloud
-    injectors:
-      extra_vars:
-        dns_pass: "{{ dns_pass }}"
-        ansible_password: "{{ ansible_password }}"
-        satellite_password: "{{ satellite_password }}"
-        vcenter_password: "{{ vcenter_password }}"
-        controller_hostname: "{{ controller_hostname }}"
-        controller_username: "{{ controller_username }}"
-        controller_password: "{{ controller_password }}"
-        controller_validate_certs: "{{ controller_validate_certs }}"
-        crhc_username: "{{ crhc_username }}"
-        crhc_password: "{{ crhc_password }}"
+#
+#
+execution_environment_image: patching-demo-provisioner-ee
 
+controller_organizations: "{{ lookup('file', '../common/assets/controller/organizations.yml') | from_yaml }}"
+controller_credential_types: "{{ lookup('file', '../common/assets/controller/credential-types.yml') | from_yaml }}"
 controller_credentials:
-  - name: Demo Provisioner Peripheral Credentials
-    credential_type: Demo Provisioner Peripheral Credentials
-    organization: "{{ controller_organization }}"
-  - name: Demo Provisioner Root Account
-    credential_type: Machine
-    organization: "{{ controller_organization }}"
-    inputs:
-      username: root
-      password: "{{ ansible_password }}"
-
-controller_execution_environments:
-  - name: Demo Provisioner EE
-    image: aap20-hub.josh.lab.msp.redhat.com/patching-demo-provisioner-ee
-    credential: MSP Lab AAP20 Automation Hub
-    pull: always
+  - "{{ lookup('file', '../common/assets/controller/credentials/peripheral.yml') | from_yaml }}"
+  - "{{ lookup('file', '../common/assets/controller/credentials/root.yml') | from_yaml }}"
+controller_execution_environments: "{{ lookup('file', '../common/assets/controller/execution-environments.yml') | from_yaml }}"
 
 controller_inventories:
-  - name: Local Action Inventory
-    organization: "{{ controller_organization }}"
-    variables:
-      ansible_connection: local
-      ansible_python_interpreter: '{  { ansible_playbook_python }}'
+  - "{{ lookup('file', '../common/assets/controller/inventories/controller-configuration.yml') | from_yaml }}"
+  - "{{ lookup('file', '../common/assets/controller/inventories/demo-infrastructure.yml') | from_yaml }}"
+  - "{{ lookup('file', '../common/assets/controller/inventories/local-action.yml') | from_yaml }}"
 
 controller_hosts:
-  - name: localhost
-    inventory: Local Action Inventory
+  - "{{ lookup('file', '../common/assets/controller/hosts/localhost.yml') | from_yaml }}"
 
 controller_projects:
-  - name: "{{ project }}"
-    organization: "{{ controller_organization }}"
-    scm_branch: main
-    scm_type: git
-    scm_url: https://github.com/jjaswanson4/patching-demo.git
-    wait: yes
+
 
 controller_templates:
   - name: Configure Ansible Controller

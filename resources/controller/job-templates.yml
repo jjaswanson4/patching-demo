@@ -1,0 +1,137 @@
+---
+
+- name: Configure Ansible Controller
+  organization: "{{ controller_organization }}"
+  ask_inventory_on_launch: yes
+  ask_limit_on_launch: yes
+  project: "{{ project }}"
+  allow_simultaneous: yes
+  playbook: resources/playbooks/configure-ansible-controller.yml
+  execution_environment: Demo Provisioner EE
+  ask_credential_on_launch: yes
+  extra_vars:
+    controller_state: present
+- name: Configure Red Hat Satellite
+  organization: "{{ controller_organization }}"
+  ask_inventory_on_launch: yes
+  ask_limit_on_launch: yes
+  project: "{{ project }}"
+  allow_simultaneous: yes
+  playbook: resources/playbooks/configure-satellite.yml
+  execution_environment: Demo Provisioner EE
+  ask_credential_on_launch: yes
+- name: Provision Systems
+  organization: "{{ controller_organization }}"
+  ask_inventory_on_launch: yes
+  ask_limit_on_launch: yes
+  forks: 10
+  project: "{{ project }}"
+  allow_simultaneous: yes
+  playbook: resources/playbooks/provision-systems.yml
+  execution_environment: Demo Provisioner EE
+  ask_credential_on_launch: yes
+  extra_vars:
+    ansible_become: no
+- name: Preconfigure for SAP
+  organization: "{{ controller_organization }}"
+  ask_inventory_on_launch: yes
+  ask_limit_on_launch: yes
+  forks: 10
+  project: "{{ project }}"
+  allow_simultaneous: yes
+  playbook: resources/playbooks/sap-preconfigure.yml
+  execution_environment: Demo Provisioner EE
+  ask_credential_on_launch: yes
+- name: Preconfigure for HANA
+  organization: "{{ controller_organization }}"
+  ask_inventory_on_launch: yes
+  ask_limit_on_launch: yes
+  project: "{{ project }}"
+  allow_simultaneous: yes
+  playbook: resources/playbooks/hana-preconfigure.yml
+  execution_environment: Demo Provisioner EE
+  ask_credential_on_launch: yes
+- name: Preconfigure for Netweaver
+  organization: "{{ controller_organization }}"
+  ask_inventory_on_launch: yes
+  ask_limit_on_launch: yes
+  project: "{{ project }}"
+  allow_simultaneous: yes
+  playbook: resources/playbooks/netweaver-preconfigure.yml
+  execution_environment: Demo Provisioner EE
+  ask_credential_on_launch: yes
+- name: Deploy SAP HANA
+  organization: "{{ controller_organization }}"
+  ask_inventory_on_launch: yes
+  ask_limit_on_launch: yes
+  project: "{{ project }}"
+  allow_simultaneous: yes
+  playbook: resources/playbooks/deploy-hana.yml
+  execution_environment: Demo Provisioner EE
+  ask_credential_on_launch: yes
+- name: Install Netweaver
+  organization: "{{ controller_organization }}"
+  ask_inventory_on_launch: yes
+  ask_limit_on_launch: yes
+  project: "{{ project }}"
+  allow_simultaneous: yes
+  playbook: resources/playbooks/install-s4.yml
+  execution_environment: Demo Provisioner EE
+  ask_credential_on_launch: yes
+- name: Reinstate HSR
+  organization: "{{ controller_organization }}"
+  ask_inventory_on_launch: yes
+  ask_limit_on_launch: yes
+  project: "{{ project }}"
+  allow_simultaneous: yes
+  playbook: resources/playbooks/reinstate-hsr.yml
+  execution_environment: Demo Provisioner EE
+  ask_credential_on_launch: yes
+- name: Remove Controller Configuration
+  organization: "{{ controller_organization }}"
+  ask_inventory_on_launch: yes
+  ask_limit_on_launch: yes
+  project: "{{ project }}"
+  allow_simultaneous: yes
+  playbook: resources/playbooks/remove-controller-configuration.yml
+  execution_environment: Demo Provisioner EE
+  ask_credential_on_launch: yes
+  extra_vars:
+    controller_state: absent
+- name: Unregister from Insights
+  organization: "{{ controller_organization }}"
+  ask_inventory_on_launch: yes
+  ask_limit_on_launch: yes
+  forks: 10
+  project: "{{ project }}"
+  allow_simultaneous: yes
+  playbook: resources/playbooks/attempt-insights-unregister.yml
+  execution_environment: Demo Provisioner EE
+  ask_credential_on_launch: yes
+- name: Teardown Systems
+  organization: "{{ controller_organization }}"
+  ask_inventory_on_launch: yes
+  ask_limit_on_launch: yes
+  project: "{{ project }}"
+  allow_simultaneous: yes
+  playbook: resources/playbooks/teardown-systems.yml
+  execution_environment: Demo Provisioner EE
+  ask_credential_on_launch: yes
+- name: Cleanup DNS Records
+  organization: "{{ controller_organization }}"
+  ask_inventory_on_launch: yes
+  ask_limit_on_launch: yes
+  project: "{{ project }}"
+  allow_simultaneous: yes
+  playbook: resources/playbooks/delete-dns-records.yml
+  execution_environment: Demo Provisioner EE
+  ask_credential_on_launch: yes
+- name: Send Provisioner Email
+  organization: "{{ controller_organization }}"
+  inventory: Demo Inventory
+  limit: localhost
+  project: "{{ project }}"
+  allow_simultaneous: yes
+  playbook: resources/playbooks/send-email.yml
+  execution_environment: Demo Provisioner EE
+  ask_variables_on_launch: yes

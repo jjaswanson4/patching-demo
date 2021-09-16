@@ -1,0 +1,10 @@
+---
+
+available_demos:
+  - patching
+  - s4hana-deployment
+  - compliance
+  # - satellite-as-code
+  # - controller-as-code
+  # - insights
+  # - automation-hub

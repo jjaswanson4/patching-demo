@@ -1,0 +1,7 @@
+---
+
+- name: "{{ controller_organization }}"
+  galaxy_credentials:
+    - MSP Lab Automation Hub - RH Certified
+    - MSP Lab Automation Hub - Community
+    - Ansible Galaxy

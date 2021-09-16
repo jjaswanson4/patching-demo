@@ -1,101 +1,125 @@
 ---
 
-# By default, the org 'Demo Provisioner' is created and resources are configured there,
-# Use this variable to override this behavior.
-# For example, overriding to 'Default' will put the resources into the default controller organization.
-controller_organization: Demo Provisioner
-
-# This is the default project name. It is a var so demos can import specific job templates and override the project locally.
-# Change this to change the name of the project for the provisioner job templates.
-project: Demo Provisioner Codebase
-
-# This is the default prefix for assets created for this demo.
-# Change this variable to use a different prefix.
-demo_prefix: "Patching Demo"
-
-#
-#
-inventory: "{{ demo_prefix }} Infrastructure"
-
-#
-#
-execution_environment_image: patching-demo-provisioner-ee
-
-controller_hostname: patching-controller.josh.lab.msp.redhat.com
-controller_configuration_file: demos/patching/vars/controller-configuration.yml
-
-satellite_hostname: patching-satellite.josh.lab.msp.redhat.com
-satellite_configuration_file: demos/patching/vars/satellite-configuration.yml
-
-
-
-# Provisioner components
-
-controller_organizations: []
-controller_credential_types: []
-controller_credentials: []
-controller_execution_environments: []
-controller_inventories: []
-controller_projects: []
+controller_inventories:
+  - name: Patching Demo Infrastructure
+    organization: Demo Provisioner
+    variables:
+      dns_zone: josh.lab.msp.redhat.com
+      dns:
+        server: idm05.lab.msp.redhat.com
+        password: "{  { dns_pass }}"
+        records:
+          - name: "{  { inventory_hostname.split('.')[0] }}"
+            zone: josh.lab.msp.redhat.com
+            type: A
+            value: "{  { ip_address }}"
+          - name: "{  { ip_address.split('.')[-1] }}"
+            zone: "{  { ip_address.split('.')[2] }}.15.10.in-addr.arpa."
+            type: PTR
+            value: "{  { inventory_hostname }}."
+      config_files:
+        - hosts
+        - resolv.conf
+      timesync_ntp_servers:
+        - hostname: 0.rhel.pool.ntp.org
+          iburst: yes
+        - hostname: 1.rhel.pool.ntp.org
+          iburst: yes
+        - hostname: 2.rhel.pool.ntp.org
+          iburst: yes
+        - hostname: 3.rhel.pool.ntp.org
+          iburst: yes
+      vcenter:
+        server: vcenter02.lab.msp.redhat.com
+        username: 'Administrator@vsphere.local'
+        password: "{  { vcenter_password }}"
+        datacenter: MSP Lab
+      selinux_policy: targeted
+      selinux_state: permissive
+      dns_resolv:
+        search_domains:
+          - josh.lab.msp.redhat.com
+          - lab.msp.redhat.com
+        nameservers:
+          - 10.15.120.4
+          - 10.15.108.5
+        options:
+          - 'timeout:1'
+      base_packages:
+        disable_gpg_check: yes
+        packages:
+          - lsof
+          - vim
+          - sos
+          - redhat-support-tool
+          - "{  { htop_url }}"
+      ignore_virtual_disk_errors: yes
+      remove_cdrom: no
 
 controller_hosts:
+  - name: patching-demo
+    inventory: Local Action Inventory
+    variables: "{{ lookup('file', 'demos/patching/vars/controller-configuration.yml') | from_yaml }}"
+  - name: patching-satellite.josh.lab.msp.redhat.com
+    inventory: Patching Demo Infrastructure
+    variables: "{{ lookup('file', 'demos/patching/vars/satellite-configuration.yml') | from_yaml }}"
   - name: sapdnhdb1.josh.lab.msp.redhat.com
-    inventory: "{{ inventory }}"
+    inventory: Patching Demo Infrastructure
     variables:
       ansible_host: 10.15.121.31
       ip_address: "{  { ansible_host }}"
       sap_hana_hsr_alias: DC1
   - name: sapdnhdb2.josh.lab.msp.redhat.com
-    inventory: "{{ inventory }}"
+    inventory: Patching Demo Infrastructure
     variables:
       ansible_host: 10.15.121.32
       ip_address: "{  { ansible_host }}"
       sap_hana_hsr_alias: DC2
   - name: sapdnapp1.josh.lab.msp.redhat.com
-    inventory: "{{ inventory }}"
+    inventory: Patching Demo Infrastructure
     variables:
       ansible_host: 10.15.121.34
       ip_address: "{  { ansible_host }}"
   - name: sapdphdb1.josh.lab.msp.redhat.com
-    inventory: "{{ inventory }}"
+    inventory: Patching Demo Infrastructure
     variables:
       ansible_host: 10.15.121.35
       ip_address: "{  { ansible_host }}"
       sap_hana_hsr_alias: DC1
   - name: sapdphdb2.josh.lab.msp.redhat.com
-    inventory: "{{ inventory }}"
+    inventory: Patching Demo Infrastructure
     variables:
       ansible_host: 10.15.121.36
       ip_address: "{  { ansible_host }}"
       sap_hana_hsr_alias: DC2
   - name: sapdpapp1.josh.lab.msp.redhat.com
-    inventory: "{{ inventory }}"
+    inventory: Patching Demo Infrastructure
     variables:
       ansible_host: 10.15.121.38
       ip_address: "{  { ansible_host }}"
   - name: sap-metrics.josh.lab.msp.redhat.com
-    inventory: "{{ inventory }}"
+    inventory: Patching Demo Infrastructure
     variables:
       ansible_host: 10.15.121.39
-      ip_address: "{  { ansible_host }}"  
+      ip_address: "{  { ansible_host }}"
 
 controller_groups:
   - name: primary
-    inventory: "{{ inventory }}"
+    inventory: Patching Demo Infrastructure
     hosts:
       - sapdnhdb1.josh.lab.msp.redhat.com
       - sapdphdb1.josh.lab.msp.redhat.com
     variables:
       sap_hana_hsr_role: primary
   - name: secondary
-    inventory: "{{ inventory }}"
+    inventory: Patching Demo Infrastructure
     hosts:
       - sapdnhdb2.josh.lab.msp.redhat.com
       - sapdphdb2.josh.lab.msp.redhat.com
     variables:
       sap_hana_hsr_role: secondary
   - name: hana
-    inventory: "{{ inventory }}"
+    inventory: Patching Demo Infrastructure
     children:
       - primary
       - secondary
@@ -146,7 +170,7 @@ controller_groups:
       sap_hana_hsr_hana_db_system_password: "{  { ansible_password }}"
       sap_hana_preconfigure_fail_if_reboot_required: no
   - name: netweaver
-    inventory: "{{ inventory }}"
+    inventory: Patching Demo Infrastructure
     hosts:
       - sapdnapp1.josh.lab.msp.redhat.com
       - sapdpapp1.josh.lab.msp.redhat.com
@@ -200,7 +224,7 @@ controller_groups:
       sap_s4hana_deployment_sapadm_password: "{  { ansible_password }}"
       sap_s4hana_deployment_sap_sidadm_password: "{  { ansible_password }}"
   - name: non_production
-    inventory: "{{ inventory }}"
+    inventory: Patching Demo Infrastructure
     hosts:
       - sapdnapp1.josh.lab.msp.redhat.com
       - sapdnhdb1.josh.lab.msp.redhat.com
@@ -233,7 +257,7 @@ controller_groups:
           type: PTR
           value: "{  { sap_s4hana_deployment_db_host }}."
   - name: production
-    inventory: "{{ inventory }}"
+    inventory: Patching Demo Infrastructure
     hosts:
       - sapdpapp1.josh.lab.msp.redhat.com
       - sapdphdb1.josh.lab.msp.redhat.com
@@ -266,7 +290,7 @@ controller_groups:
           type: PTR
           value: "{  { sap_s4hana_deployment_db_host }}."
   - name: sap
-    inventory: "{{ inventory }}"
+    inventory: Patching Demo Infrastructure
     children:
       - hana
       - netweaver
@@ -285,7 +309,7 @@ controller_groups:
         - src: 10.15.108.14:/mnt/data01/sap
           path: /software
   - name: peripheral
-    inventory: "{{ inventory }}"
+    inventory: Patching Demo Infrastructure
     hosts:
       - sap-metrics.josh.lab.msp.redhat.com
     variables:
@@ -299,14 +323,13 @@ controller_groups:
       metrics_rention_days: 14
       metrics_monitored_hosts:  "{  { groups['sap'] }}"
   - name: demo_hosts
-    inventory: "{{ inventory }}"
+    inventory: Patching Demo Infrastructure
     children:
       - sap
       - non_production
       - production
       - peripheral
     variables:
-      run_additional_roles: yes
       htop_url: https://dl.fedoraproject.org/pub/epel/8/Everything/x86_64/Packages/h/htop-3.0.5-1.el8.x86_64.rpm
       firewall:
         name: firewalld
@@ -331,22 +354,45 @@ controller_groups:
         cpus: "{  { cpus }}"
         memory_mb: "{  { memory_mb }}"
         activation_keys: "ak-{  { application }}-{  { os }}-{  { lifecycle_environment }}"
+  - name: satellite
+    inventory: Patching Demo Infrastructure
+    hosts:
+      - patching-satellite.josh.lab.msp.redhat.com
+  - name: management_plane
+    inventory: Patching Demo Infrastructure
+    variables:
+      lifecycle_environment: production
+      provisioning:
+        satellite:
+          server: satellite06.lab.msp.redhat.com
+          username: admin
+          password: "{  { satellite_password }}"
+        host_group: "{  { os }}"
+        organization: MSP Lab
+        location: MSP Lab
+        method: bootdisk
+        dns_domain: josh.lab.msp.redhat.com
+        cpus: "{  { cpus }}"
+        memory_mb: "{  { memory_mb }}"
+        activation_keys: "ak-{  { application }}-{  { os }}-{  { lifecycle_environment }}"
+    children:
+      - satellite
 
 controller_templates:
-- name: Prepare New Content
-  inventory: "{{ inventory }}"
-  limit: satellite
-  project: Demo Provisioner Codebase
-  playbook: provisioner/demos/patching/playbooks/prepare-new-content.yml
-  execution_environment: Demo Provisioner EE
-  ask_credential_on_launch: yes
-- name: Roll Back Content
-  inventory: "{{ inventory }}"
-  limit: satellite
-  project: Demo Provisioner Codebase
-  playbook: provisioner/demos/patching/playbooks/rollback-content.yml
-  execution_environment: Demo Provisioner EE
-  ask_credential_on_launch: yes
+  - name: Prepare New Content | Patching Demo
+    inventory: Patching Demo Infrastructure
+    limit: satellite
+    project: Demo Provisioner Codebase
+    playbook: provisioner/demos/patching/playbooks/prepare-new-content.yml
+    execution_environment: Demo Provisioner EE
+    ask_credential_on_launch: yes
+  - name: Roll Back Content | Patching Demo
+    inventory: Patching Demo Infrastructure
+    limit: satellite
+    project: Demo Provisioner Codebase
+    playbook: provisioner/demos/patching/playbooks/rollback-content.yml
+    execution_environment: Demo Provisioner EE
+    ask_credential_on_launch: yes
 
 controller_workflows:
   - name: Provision Patching Demo
@@ -355,19 +401,70 @@ controller_workflows:
     extra_vars:
       demo: patching
     survey_enabled: yes
-    survey: "{{ lookup('file', '../resources/controller/provisioner-workflow-survey.yml') | from_yaml }}"
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - type: text
+          question_name: "Demo Audience?"
+          question_description: "Who is the audience for this demo?"
+          variable: audience
+          required: yes
+        - type: text
+          question_name: "Provisioner?"
+          question_description: "Who is provisioning this demo?"
+          variable: provisioner
+          required: yes
+          default: 'Josh Swanson'
+        - type: text
+          question_name: "Provisioner's Email?"
+          question_description: "What is the provisioner's email address?"
+          variable: provisioner_email
+          required: yes
+          default: 'joshswanson@redhat.com'
+        - type: multiplechoice
+          question_name: Deploy Satellite?
+          question_description: Should satellite be deployed?
+          variable: deploy_satellite
+          choices:
+            - "yes"
+            - "no"
+          default: "yes"
+          required: yes
+        - type: multiplechoice
+          question_name: Configure controller?
+          question_description: Should controller be configured?
+          variable: configure_controller
+          choices:
+            - "yes"
+            - "no"
+          default: "yes"
+          required: yes
+        - type: multiplechoice
+          question_name: Provision demo hosts?
+          question_description: Should the demo hosts be provisioned?
+          variable: provision_demo_hosts
+          choices:
+            - "yes"
+            - "no"
+          default: "yes"
+          required: yes          
     simplified_workflow_nodes:
     # Work nodes
       - unified_job_template: Setup Red Hat Satellite
-        identifier: node102
-        inventory: "{{ inventory }}"
+        identifier: node101
+        inventory: Patching Demo Infrastructure
+        credentials:
+          - Demo Provisioner Peripheral Credentials
+          - Demo Provisioner Root Account
+        limit: satellite
         success_nodes:
-          - node101
+          - node102
         failure_nodes:
           - node201
       - unified_job_template: Provision Systems
         identifier: node102
-        inventory: "{{ inventory }}"
+        inventory: Patching Demo Infrastructure
         limit: sap
         credentials:
           - Demo Provisioner Peripheral Credentials
@@ -379,8 +476,7 @@ controller_workflows:
           - node202
       - unified_job_template: Configure Ansible Controller
         identifier: node103
-        inventory: "{{ inventory }}"
-        limit: "{{ asset_prefix }}-controller-configuration"
+        limit: patching-demo
         credentials:
           - Demo Provisioner Peripheral Credentials
         success_nodes:
@@ -389,7 +485,7 @@ controller_workflows:
           - node203
       - unified_job_template: Preconfigure for SAP
         identifier: node104
-        inventory: "{{ inventory }}"
+        inventory: Patching Demo Infrastructure
         limit: sap
         credentials:
           - Demo Provisioner Peripheral Credentials
@@ -401,7 +497,7 @@ controller_workflows:
           - node204
       - unified_job_template: Preconfigure for HANA
         identifier: node105
-        inventory: "{{ inventory }}"
+        inventory: Patching Demo Infrastructure
         limit: hana
         credentials:
           - Demo Provisioner Root Account
@@ -413,7 +509,7 @@ controller_workflows:
           - node205
       - unified_job_template: Preconfigure for Netweaver
         identifier: node106
-        inventory: "{{ inventory }}"
+        inventory: Patching Demo Infrastructure
         limit: netweaver
         credentials:
           - Demo Provisioner Root Account
@@ -425,7 +521,7 @@ controller_workflows:
           - node206
       - unified_job_template: Deploy SAP HANA
         identifier: node107
-        inventory: "{{ inventory }}"
+        inventory: Patching Demo Infrastructure
         limit: 'hana:&non_production'
         credentials:
           - Demo Provisioner Root Account
@@ -435,7 +531,7 @@ controller_workflows:
           - node207
       - unified_job_template: Deploy SAP HANA
         identifier: node108
-        inventory: "{{ inventory }}"
+        inventory: Patching Demo Infrastructure
         limit: 'hana:&production'
         credentials:
           - Demo Provisioner Root Account
@@ -445,7 +541,7 @@ controller_workflows:
           - node208
       - unified_job_template: Install Netweaver
         identifier: node109
-        inventory: "{{ inventory }}"
+        inventory: Patching Demo Infrastructure
         limit: 'netweaver:&non_production'
         credentials:
           - Demo Provisioner Root Account
@@ -456,7 +552,7 @@ controller_workflows:
           - node209
       - unified_job_template: Install Netweaver
         identifier: node110
-        inventory: "{{ inventory }}"
+        inventory: Patching Demo Infrastructure
         limit: 'netweaver:&production'
         credentials:
           - Demo Provisioner Root Account
@@ -467,7 +563,7 @@ controller_workflows:
           - node210
       - unified_job_template: Reinstate HSR
         identifier: node111
-        inventory: "{{ inventory }}"
+        inventory: Patching Demo Infrastructure
         limit: 'hana:&primary'
         credentials:
           - Demo Provisioner Root Account
@@ -513,120 +609,96 @@ controller_workflows:
         identifier: node211
       - unified_job_template: Send Provisioner Email | Failed
         identifier: node212
-  # - name: Teardown Patching Demo
-  #   organization: Demo Provisioner
-  #   state: "{{ controller_state | default('present') }}"
-  #   extra_vars:
-  #     demo: patching
-  #   survey_enabled: yes
-  #   survey:
-  #     name: ''
-  #     description: ''
-  #     spec:
-  #       - type: text
-  #         question_name: "Demo Audience?"
-  #         question_description: "Who is the audience for this demo"
-  #         variable: audience
-  #         required: yes
-  #   simplified_workflow_nodes:
-  #     - unified_job_template: Remove Controller Configuration
-  #       identifier: node995
-  #       limit: patching-demo
-  #       credentials:
-  #         - Demo Provisioner Peripheral Credentials
-  #       always_nodes:
-  #         - node997
-  #     - unified_job_template: Unregister from Insights
-  #       identifier: node996
-  #       inventory: "{{ inventory }}"
-  #       limit: 'demo_hosts:satellite'
-  #       credentials:
-  #         - Demo Provisioner Root Account
-  #       always_nodes:
-  #         - node997
-  #     - unified_job_template: Teardown Systems
-  #       identifier: node997
-  #       inventory: "{{ inventory }}"
-  #       limit: demo_hosts
-  #       credentials:
-  #         - Demo Provisioner Peripheral Credentials
-  #       always_nodes:
-  #         - node998
-  #     - unified_job_template: Teardown Systems
-  #       identifier: node998
-  #       inventory: "{{ inventory }}"
-  #       limit: satellite
-  #       credentials:
-  #         - Demo Provisioner Peripheral Credentials
-  #       always_nodes:
-  #         - node999
-  #     - unified_job_template: Cleanup DNS Records
-  #       identifier: node999
-  #       inventory: "{{ inventory }}"
-  #       limit: 'demo_hosts:satellite'
-  #       credentials:
-  #         - Demo Provisioner Peripheral Credentials
-  # - name: Reset Patching Demo
-  #   organization: Demo Provisioner
-  #   state: "{{ controller_state | default('present') }}"
-  #   extra_vars:
-  #     demo: patching
-  #   survey_enabled: yes
-  #   survey:
-  #     name: ''
-  #     description: ''
-  #     spec:
-  #       - type: text
-  #         question_name: "Demo Audience?"
-  #         question_description: "Who is the audience for this demo"
-  #         variable: audience
-  #         required: yes
-  #   simplified_workflow_nodes:
-  #     - unified_job_template: Unregister from Insights
-  #       identifier: node101
-  #       inventory: "{{ inventory }}"
-  #       limit: demo_hosts
-  #       always_nodes:
-  #         - node102
-  #         - node103
-  #         - node104
-  #     - unified_job_template: Teardown Systems
-  #       identifier: node102
-  #       inventory: "{{ inventory }}"
-  #       limit: demo_hosts
-  #       credentials:
-  #         - Demo Provisioner Root Account
-  #     - unified_job_template: Roll Back Content | Patching Demo
-  #       identifier: node103
-  #       credentials:
-  #         - Demo Provisioner Peripheral Credentials
-  #     - unified_job_template: Cleanup DNS Records
-  #       identifier: node104
-  #       inventory: "{{ inventory }}"
-  #       limit: demo_hosts
-  #       credentials:
-  #         - Demo Provisioner Peripheral Credentials
-
-controller_user_accounts:
-  - username: demo-admin
-    password: "{{ ansible_password }}"
-    email: dont@email.me
-    update_secrets: no
-  - username: demo-provisioner
-    password: "{{ ansible_password }}"
-    email: dont@email.me
-    update_secrets: no  
-
-controller_teams:
-  - name: Demo Provisioner Team
-    description: Team that can provision demos
-    organization: "{{ controller_organization }}"
-
-controller_roles:
-  - user: demo-admin
-    organization: "{{ controller_organization }}"
-    role: admin
-  - user: demo-provisioner
-    target_team: Demo Provisioner Team
-    organization: "{{ controller_organization }}"
-    role: member
+  - name: Teardown Patching Demo
+    organization: Demo Provisioner
+    state: "{{ controller_state | default('present') }}"
+    extra_vars:
+      demo: patching
+    survey_enabled: yes
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - type: text
+          question_name: "Demo Audience?"
+          question_description: "Who is the audience for this demo"
+          variable: audience
+          required: yes
+    simplified_workflow_nodes:
+      - unified_job_template: Remove Controller Configuration
+        identifier: node995
+        limit: patching-demo
+        credentials:
+          - Demo Provisioner Peripheral Credentials
+        always_nodes:
+          - node997
+      - unified_job_template: Unregister from Insights
+        identifier: node996
+        inventory: Patching Demo Infrastructure
+        limit: 'demo_hosts:satellite'
+        credentials:
+          - Demo Provisioner Root Account
+        always_nodes:
+          - node997
+      - unified_job_template: Teardown Systems
+        identifier: node997
+        inventory: Patching Demo Infrastructure
+        limit: demo_hosts
+        credentials:
+          - Demo Provisioner Peripheral Credentials
+        always_nodes:
+          - node998
+      - unified_job_template: Teardown Systems
+        identifier: node998
+        inventory: Patching Demo Infrastructure
+        limit: satellite
+        credentials:
+          - Demo Provisioner Peripheral Credentials
+        always_nodes:
+          - node999
+      - unified_job_template: Cleanup DNS Records
+        identifier: node999
+        inventory: Patching Demo Infrastructure
+        limit: 'demo_hosts:satellite'
+        credentials:
+          - Demo Provisioner Peripheral Credentials
+  - name: Reset Patching Demo
+    organization: Demo Provisioner
+    state: "{{ controller_state | default('present') }}"
+    extra_vars:
+      demo: patching
+    survey_enabled: yes
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - type: text
+          question_name: "Demo Audience?"
+          question_description: "Who is the audience for this demo"
+          variable: audience
+          required: yes
+    simplified_workflow_nodes:
+      - unified_job_template: Unregister from Insights
+        identifier: node101
+        inventory: Patching Demo Infrastructure
+        limit: demo_hosts
+        always_nodes:
+          - node102
+          - node103
+          - node104
+      - unified_job_template: Teardown Systems
+        identifier: node102
+        inventory: Patching Demo Infrastructure
+        limit: demo_hosts
+        credentials:
+          - Demo Provisioner Root Account
+      - unified_job_template: Roll Back Content | Patching Demo
+        identifier: node103
+        credentials:
+          - Demo Provisioner Peripheral Credentials
+      - unified_job_template: Cleanup DNS Records
+        identifier: node104
+        inventory: Patching Demo Infrastructure
+        limit: demo_hosts
+        credentials:
+          - Demo Provisioner Peripheral Credentials

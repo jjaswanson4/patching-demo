@@ -1,0 +1,27 @@
+---
+
+- name: Setup Red Hat Satellite
+  organization: "{{ controller_organization }}"
+  state: "{{ controller_state | default('present') }}"
+  ask_inventory_on_launch: yes
+  simplified_workflow_nodes:
+    - unified_job_template: Provision Systems
+      identifier: node101
+      inventory: "{{ inventory }}"
+      limit: satellite
+      credentials:
+        - "{{ asset_prefix }} Peripheral Credentials"
+        - "{{ asset_prefix }} Root Account"
+      success_nodes:
+        - node102
+      failure_nodes:
+        - node201
+    - unified_job_template: Configure Red Hat Satellite
+      identifier: node102
+      inventory: "{{ inventory }}"
+      limit: satellite
+      credentials:
+        - "{{ asset_prefix }} Peripheral Credentials"
+        - "{{ asset_prefix }} Root Account"
+      failure_nodes:
+        - node202
