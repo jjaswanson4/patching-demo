@@ -84,15 +84,6 @@
           sap_hana_ha_pacemaker_node2_fqdn: sapddhdb2.josh.lab.msp.redhat.com
           sap_hana_ha_pacemaker_node1_ip: 10.15.121.41
           sap_hana_ha_pacemaker_node2_ip: 10.15.121.42
-          custom_dns_records:
-            - name: "{  { sap_s4hana_deployment_db_host.split('.')[0] }}"
-              zone: josh.lab.msp.redhat.com
-              type: A
-              value: "{  { sap_hana_ha_pacemaker_vip }}"
-            - name: "{  { sap_hana_ha_pacemaker_vip.split('.')[-1] }}"
-              zone: "{  { sap_hana_ha_pacemaker_vip.split('.')[2] }}.15.10.in-addr.arpa."
-              type: PTR
-              value: "{  { sap_s4hana_deployment_db_host }}."
       - name: netweaver
         inventory: "{{ company }} SAP Infrastructure"
         hosts:
@@ -184,6 +175,15 @@
                 zone: "{  { ip_address.split('.')[2] }}.15.10.in-addr.arpa."
                 type: PTR
                 value: "{  { inventory_hostname }}."
+          custom_dns_records:
+            - name: "{  { sap_s4hana_deployment_db_host.split('.')[0] }}"
+              zone: josh.lab.msp.redhat.com
+              type: A
+              value: "{  { sap_hana_ha_pacemaker_vip }}"
+            - name: "{  { sap_hana_ha_pacemaker_vip.split('.')[-1] }}"
+              zone: "{  { sap_hana_ha_pacemaker_vip.split('.')[2] }}.15.10.in-addr.arpa."
+              type: PTR
+              value: "{  { sap_s4hana_deployment_db_host }}."
           config_files:
             - hosts
             - resolv.conf
