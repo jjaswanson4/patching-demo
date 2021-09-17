@@ -155,6 +155,8 @@
           - hana
           - netweaver
         variables:
+          ignore_virtual_disk_errors: yes
+          remove_cdrom: no
           lifecycle_environment: production
           os: rhel8.4
           application: sap
@@ -234,8 +236,6 @@
             cpus: "{  { cpus }}"
             memory_mb: "{  { memory_mb }}"
             activation_keys: "ak-{  { application }}-{  { os }}-{  { lifecycle_environment }}"
-      ignore_virtual_disk_errors: yes
-      remove_cdrom: no
     controller_hosts:
       - name: sapddhdb1.josh.lab.msp.redhat.com
         organization: "{{ company }}"
