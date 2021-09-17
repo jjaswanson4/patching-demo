@@ -258,5 +258,6 @@
           ansible_host: 10.15.121.44
           ip_address: "{  { ansible_host }}"
   roles:
-    - redhat_cop.controller_configuration.groups
     - redhat_cop.controller_configuration.hosts
+    - redhat_cop.controller_configuration.groups
+
