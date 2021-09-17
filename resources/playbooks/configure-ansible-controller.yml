@@ -12,6 +12,17 @@
         - controller_templates_local is defined
         - controller_templates_imported is defined
         - controller_templates is not defined
+    
+    - name: bootstrap block
+      block:
+        - name: run credential config rule
+          ansible.builtin.include_role:
+            name: redhat_cop_controller_configuration.credentials
+          vars:
+            controller_credentials: "{{ lookup('var', 'controller_content_credentials') }}"
+      when:
+        - controller_content_credentials is defined
+
   tasks:
     - name: ansible controller configuration block
       block:
