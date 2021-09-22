@@ -28,92 +28,85 @@ controller_organizations:
       - MSP Lab Automation Hub - Community
       - Ansible Galaxy
 
-controller_credentials:
-  - name: S4HANA Deployment Peripheral Credentials
-    credential_type: Demo Provisioner Peripheral Credentials
-    organization: "{  { audience }}"
-  - name: S4HANA Deployment Root Credentials
-    credential_type: Machine
-    organization: "{  { audience }}"
-    inputs:
-      username: root
-      password: "{  { ansible_password }}"
+controller_content_credentials: "{{ lookup('file', '../resources/controller/content-credentials.yml') | from_yaml }}"
+controller_credentials: "{{ lookup('file', '../resources/controller/content-credentials.yml') | from_yaml }}"
 
-controller_execution_environments:
-  - name: S4HANA Deployment Demo EE
-    image: 'aap20-hub.josh.lab.msp.redhat.com/s4hana-deployment-demo-ee:latest'
-    organization: "{  { audience }}"
-    credential: MSP Lab AAP20 Automation Hub
+execution_environment:
+  name: Demo Provisioner EE
+  image: patching-demo-provisioner-ee
 
-controller_teams:
-  - name: "{  { audience }} SAP Infrastructure Team"
-    description: infrastructure team
-    organization: "{  { audience }}"
-  - name: "{  { audience }} BASIS Team"
-    description: BASIS team
-    organization: "{  { audience }}"
-  - name: "{  { audience }} Business Analyst Team"
-    description: BASIS team
-    organization: "{  { audience }}"
+controller_execution_environments: "{{ lookup('file', '../resources/controller/execution-environments.yml') | from_yaml }}"
 
-controller_user_accounts:
-  - username: "{  { audience }}_infrastructure"
-    password: "{{ ansible_password }}"
-    email: dont@email.me
-    update_secrets: no
-  - username: "{  { audience }}_basis"
-    password: "{{ ansible_password }}"
-    email: dont@email.me
-    update_secrets: no
-  - username: "{  { audience }}_business_analyst"
-    password: "{{ ansible_password }}"
-    email: dont@email.me
-    update_secrets: no
 
-controller_inventories:
-  - name: "{  { audience }} SAP Infrastructure"
-    organization: "{  { audience }}"
-    variables:
-      company: "{  { audience }}"
+# controller_teams:
+#   - name: "{  { audience }} SAP Infrastructure Team"
+#     description: infrastructure team
+#     organization: "{  { audience }}"
+#   - name: "{  { audience }} BASIS Team"
+#     description: BASIS team
+#     organization: "{  { audience }}"
+#   - name: "{  { audience }} Business Analyst Team"
+#     description: BASIS team
+#     organization: "{  { audience }}"
 
-controller_groups:
-  - name: primary
-    inventory: "{  { audience }} SAP Infrastructure"
-    variables:
-      sap_hana_hsr_role: primary
-  - name: secondary
-    inventory: "{  { audience }} SAP Infrastructure"
-    variables:
-      sap_hana_hsr_role: secondary
-  - name: hana
-    inventory: "{  { audience }} SAP Infrastructure"
-    children:
-      - primary
-      - secondary
-  - name: netweaver
-    inventory: "{  { audience }} SAP Infrastructure"
-  - name: s4hana
-    inventory: "{  { audience }} SAP Infrastructure"
-    children:
-      - hana
-      - netweaver
-    variables:
-      os: rhel8.4
-      application: sap
-  - name: production
-    inventory: "{  { audience }} SAP Infrastructure"
-    variables:
-      lifecycle_environment: production
+# controller_user_accounts:
+#   - username: "{  { audience }}_infrastructure"
+#     password: "{{ ansible_password }}"
+#     email: dont@email.me
+#     update_secrets: no
+#   - username: "{  { audience }}_basis"
+#     password: "{{ ansible_password }}"
+#     email: dont@email.me
+#     update_secrets: no
+#   - username: "{  { audience }}_business_analyst"
+#     password: "{{ ansible_password }}"
+#     email: dont@email.me
+#     update_secrets: no
 
-controller_projects:
-  - name: "{  { audience }} S4HANA Deployment Code"
-    organization: "{  { audience }}"
-    scm_branch: main
-    scm_type: git
-    scm_url: https://github.com/jjaswanson4/patching-demo.git
-    wait: yes
+# controller_inventories:
+#   - name: "{  { audience }} SAP Infrastructure"
+#     organization: "{  { audience }}"
+#     variables:
+#       company: "{  { audience }}"
 
-controller_templates_local:
+# controller_groups:
+#   - name: primary
+#     inventory: "{  { audience }} SAP Infrastructure"
+#     variables:
+#       sap_hana_hsr_role: primary
+#   - name: secondary
+#     inventory: "{  { audience }} SAP Infrastructure"
+#     variables:
+#       sap_hana_hsr_role: secondary
+#   - name: hana
+#     inventory: "{  { audience }} SAP Infrastructure"
+#     children:
+#       - primary
+#       - secondary
+#   - name: netweaver
+#     inventory: "{  { audience }} SAP Infrastructure"
+#   - name: s4hana
+#     inventory: "{  { audience }} SAP Infrastructure"
+#     children:
+#       - hana
+#       - netweaver
+#     variables:
+#       os: rhel8.4
+#       application: sap
+#   - name: production
+#     inventory: "{  { audience }} SAP Infrastructure"
+#     variables:
+#       lifecycle_environment: production
+
+# controller_projects:
+#   - name: "{  { audience }} S4HANA Deployment Code"
+#     organization: "{  { audience }}"
+#     scm_branch: main
+#     scm_type: git
+#     scm_url: https://github.com/jjaswanson4/patching-demo.git
+#     wait: yes
+
+controller_templates:
   - name: Add Hosts to Controller Inventory
     inventory: Local Action Inventory
     limit: localhost
@@ -123,14 +116,17 @@ controller_templates_local:
     credentials:
       - S4HANA Deployment Peripheral Credentials
 
-# controller_templates_imported: >-
-#   {{ lookup('file', '../demos/common/vars/provisioner-configuration.yml') | from_yaml | json_query('controller_templates[?name == `Provision Systems`]') }} + 
-#   {{ lookup('file', '../demos/common/vars/provisioner-configuration.yml') | from_yaml | json_query('controller_templates[?name == `Preconfigure for SAP`]') }} +
-#   {{ lookup('file', '../demos/common/vars/provisioner-configuration.yml') | from_yaml | json_query('controller_templates[?name == `Preconfigure for HANA`]') }} +
-#   {{ lookup('file', '../demos/common/vars/provisioner-configuration.yml') | from_yaml | json_query('controller_templates[?name == `Preconfigure for Netweaver`]') }} + 
-#   {{ lookup('file', '../demos/common/vars/provisioner-configuration.yml') | from_yaml | json_query('controller_templates[?name == `Deploy SAP HANA`]') }} +
-#   {{ lookup('file', '../demos/common/vars/provisioner-configuration.yml') | from_yaml | json_query('controller_templates[?name == `Install Netweaver`]') }} +
-#   {{ lookup('file', '../demos/common/vars/provisioner-configuration.yml') | from_yaml | json_query('controller_templates[?name == `Reinstate HSR`]') }}
+controller_templates: >-
+  {{ controller_templates }} +
+  {{ lookup('file', '../resources/controller/templates.yml') | from_yaml | json_query('[?name == `Provision Systems`]') }}
+
+
+# {{ lookup('file', '../resources/controller/templates.yml') | from_yaml | json_query('controller_templates[?name == `Preconfigure for SAP`]') }} +
+# {{ lookup('file', '../resources/controller/templates.yml') | from_yaml | json_query('controller_templates[?name == `Preconfigure for HANA`]') }} +
+# {{ lookup('file', '../resources/controller/templates.yml') | from_yaml | json_query('controller_templates[?name == `Preconfigure for Netweaver`]') }} + 
+# {{ lookup('file', '../resources/controller/templates.yml') | from_yaml | json_query('controller_templates[?name == `Deploy SAP HANA`]') }} +
+# {{ lookup('file', '../resources/controller/templates.yml') | from_yaml | json_query('controller_templates[?name == `Install Netweaver`]') }} +
+# {{ lookup('file', '../resources/controller/templates.yml') | from_yaml | json_query('controller_templates[?name == `Reinstate HSR`]') }}
 
 # controller_workflows:
 #   - name: Provision S4HANA SID

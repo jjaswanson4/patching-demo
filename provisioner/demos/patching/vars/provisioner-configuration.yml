@@ -11,26 +11,42 @@ project: Demo Provisioner Codebase
 
 # This is the default prefix for assets created for this demo.
 # Change this variable to use a different prefix.
-demo_prefix: "Patching Demo"
+demo_prefix: Patching Demo
 
-#
-#
+# This is the realitive path to the vars files for this demo.
+# Typically this contains a vars file for the provisioner, Satellite, and Controller.
+vars_files_path: demos/patching/vars
+
+# This is the inventory that stores the information about the infrastructure needed for the demo.
+# This is commonly an instance of Satellite, Controller, and some "demo hosts".
 inventory: "{{ demo_prefix }} Infrastructure"
 
-#
-#
-execution_environment_image: patching-demo-provisioner-ee
+# This is the execution environment used for this demo provisioner.
+# This execution environment will automatically be configured in Controller.
+execution_environment:
+  name: Demo Provisioner EE
+  image: patching-demo-provisioner-ee
 
-controller_hostname: patching-controller.josh.lab.msp.redhat.com
-controller_configuration_file: demos/patching/vars/controller-configuration.yml
+# This is the information used for the instance of Controller for the demo.
+# This can be the same instance as where the provisioner is deployed, but it's not recommended.
+controller:
+  hostname: patching-controller.josh.lab.msp.redhat.com
+  configuration_file: "{{ vars_files_path }}/controller-configuration.yml"
+  ip_address: 10.15.121.10
+  username: admin
+  password: "{{ controller_password }}"
 
-satellite_hostname: patching-satellite.josh.lab.msp.redhat.com
-satellite_configuration_file: demos/patching/vars/satellite-configuration.yml
+# This is the information used for the instance of Satellite for the demo.
+# This can be the same instance as where the provisioner is deployed, but it's not recommended.
+satellite:
+  hostname: patching-satellite.josh.lab.msp.redhat.com
+  configuration_file: "{{ vars_files_path }}/satellite-configuration.yml"
+  ip_address: 10.15.121.1
+  username: admin
+  password: "{{ satellite_password }}"
 
-
-
-# Provisioner components
-
+# These are where demo specific components are defined, in hash form. These will automatically be added to the common resources.
+# If there is no need for a specific, resource, simply define an empty var, such as `controller_organizations: []`
 controller_organizations: []
 controller_credential_types: []
 controller_credentials: []
@@ -333,20 +349,20 @@ controller_groups:
         activation_keys: "ak-{  { application }}-{  { os }}-{  { lifecycle_environment }}"
 
 controller_templates:
-- name: Prepare New Content
-  inventory: "{{ inventory }}"
-  limit: satellite
-  project: Demo Provisioner Codebase
-  playbook: provisioner/demos/patching/playbooks/prepare-new-content.yml
-  execution_environment: Demo Provisioner EE
-  ask_credential_on_launch: yes
-- name: Roll Back Content
-  inventory: "{{ inventory }}"
-  limit: satellite
-  project: Demo Provisioner Codebase
-  playbook: provisioner/demos/patching/playbooks/rollback-content.yml
-  execution_environment: Demo Provisioner EE
-  ask_credential_on_launch: yes
+  - name: Prepare New Content
+    inventory: "{{ inventory }}"
+    limit: satellite
+    project: Demo Provisioner Codebase
+    playbook: provisioner/demos/patching/playbooks/prepare-new-content.yml
+    execution_environment: Demo Provisioner EE
+    ask_credential_on_launch: yes
+  - name: Roll Back Content
+    inventory: "{{ inventory }}"
+    limit: satellite
+    project: Demo Provisioner Codebase
+    playbook: provisioner/demos/patching/playbooks/rollback-content.yml
+    execution_environment: Demo Provisioner EE
+    ask_credential_on_launch: yes
 
 controller_workflows:
   - name: Provision Patching Demo
@@ -357,162 +373,193 @@ controller_workflows:
     survey_enabled: yes
     survey: "{{ lookup('file', '../resources/controller/provisioner-workflow-survey.yml') | from_yaml }}"
     simplified_workflow_nodes:
-    # Work nodes
-      - unified_job_template: Setup Red Hat Satellite
-        identifier: node102
-        inventory: "{{ inventory }}"
-        success_nodes:
-          - node101
-        failure_nodes:
-          - node201
       - unified_job_template: Provision Systems
+        identifier: node101
+        inventory: "{{ inventory }}"
+        limit: satellite
+        credentials:
+          - "{{ demo_prefix }} Peripheral Credentials"
+          - "{{ demo_prefix }} Root Account"
+        success_nodes:
+          - node102
+        failure_nodes:
+          - node901
+      - unified_job_template: Install Satellite
         identifier: node102
         inventory: "{{ inventory }}"
-        limit: sap
+        limit: satellite
         credentials:
-          - Demo Provisioner Peripheral Credentials
-          - Demo Provisioner Root Account
+          - "{{ demo_prefix }} Peripheral Credentials"
+          - "{{ demo_prefix }} Root Account"
         success_nodes:
           - node103
-          - node104
         failure_nodes:
-          - node202
-      - unified_job_template: Configure Ansible Controller
+          - node901
+      - unified_job_template: Configure Satellite
         identifier: node103
         inventory: "{{ inventory }}"
-        limit: "{{ asset_prefix }}-controller-configuration"
+        limit: satellite
         credentials:
-          - Demo Provisioner Peripheral Credentials
+          - "{{ demo_prefix }} Peripheral Credentials"
+          - "{{ demo_prefix }} Root Account"
         success_nodes:
-          - node112
+          - node301
         failure_nodes:
+          - node901
+      - unified_job_template: Provision Systems
+        identifier: node201
+        inventory: "{{ inventory }}"
+        limit: controller
+        credentials:
+          - "{{ demo_prefix }} Peripheral Credentials"
+          - "{{ demo_prefix }} Root Account"
+        success_nodes:
+          - node202
+        failure_nodes:
+          - node901
+      - unified_job_template: Install Ansible Controller
+        identifier: node202
+        inventory: "{{ inventory }}"
+        limit: controller
+        credentials:
+          - "{{ demo_prefix }} Peripheral Credentials"
+          - "{{ demo_prefix }} Root Account"
+        success_nodes:
+          - node202
+        failure_nodes:
+          - node901
+      - unified_job_template: Configure Ansible Controller
+        identifier: node203
+        inventory: "{{ inventory }}"
+        limit: controller
+        credentials:
+          - "{{ demo_prefix }} Peripheral Credentials"
+          - "{{ demo_prefix }} Root Account"
+        extra_data:
+          ansible_connection: local
+          ansible_python_interpreter: '{  { ansible_playbook_python }}'
+        all_parents_must_converge: yes
+        failure_nodes:
+          - node901
+      - unified_job_template: Provision Systems
+        identifier: node301
+        inventory: "{{ inventory }}"
+        limit: demo_hosts
+        credentials:
+          - "{{ demo_prefix }} Peripheral Credentials"
+          - "{{ demo_prefix }} Root Account"
+        success_nodes:
+          - node302
           - node203
+        failure_nodes:
+          - node901
       - unified_job_template: Preconfigure for SAP
-        identifier: node104
+        identifier: node302
         inventory: "{{ inventory }}"
         limit: sap
         credentials:
-          - Demo Provisioner Peripheral Credentials
-          - Demo Provisioner Root Account
+          - "{{ demo_prefix }} Peripheral Credentials"
+          - "{{ demo_prefix }} Root Account"
         success_nodes:
-          - node105
-          - node106
+          - node303
+          - node304
         failure_nodes:
-          - node204
+          - node901
       - unified_job_template: Preconfigure for HANA
-        identifier: node105
+        identifier: node303
         inventory: "{{ inventory }}"
         limit: hana
         credentials:
-          - Demo Provisioner Root Account
+          - "{{ demo_prefix }} Root Account"
         success_nodes:
-          - node107
-          - node108
-          - node112
+          - node305
+          - node306
+          - node401
         failure_nodes:
-          - node205
+          - node901
       - unified_job_template: Preconfigure for Netweaver
-        identifier: node106
+        identifier: node304
         inventory: "{{ inventory }}"
         limit: netweaver
         credentials:
-          - Demo Provisioner Root Account
+          - "{{ demo_prefix }} Root Account"
         success_nodes:
-          - node109
-          - node110
-          - node112
+          - node307
+          - node308
+          - node401
         failure_nodes:
-          - node206
+          - node901
       - unified_job_template: Deploy SAP HANA
-        identifier: node107
+        identifier: node305
         inventory: "{{ inventory }}"
         limit: 'hana:&non_production'
         credentials:
-          - Demo Provisioner Root Account
+          - "{{ demo_prefix }} Root Account"
         success_nodes:
-          - node109
+          - node307
         failure_nodes:
-          - node207
+          - node901
       - unified_job_template: Deploy SAP HANA
-        identifier: node108
+        identifier: node306
         inventory: "{{ inventory }}"
         limit: 'hana:&production'
         credentials:
-          - Demo Provisioner Root Account
+          - "{{ demo_prefix }} Root Account"
         success_nodes:
-          - node110
+          - node308
         failure_nodes:
-          - node208
+          - node901
       - unified_job_template: Install Netweaver
-        identifier: node109
+        identifier: node307
         inventory: "{{ inventory }}"
         limit: 'netweaver:&non_production'
         credentials:
-          - Demo Provisioner Root Account
+          - "{{ demo_prefix }} Root Account"
         all_parents_must_converge: yes
         success_nodes:
-          - node111
+          - node309
         failure_nodes:
-          - node209
+          - node901
       - unified_job_template: Install Netweaver
-        identifier: node110
+        identifier: node308
         inventory: "{{ inventory }}"
         limit: 'netweaver:&production'
         credentials:
-          - Demo Provisioner Root Account
+          - "{{ demo_prefix }} Root Account"
         all_parents_must_converge: yes
         success_nodes:
-          - node111
+          - node309
         failure_nodes:
-          - node210
+          - node901
       - unified_job_template: Reinstate HSR
-        identifier: node111
+        identifier: node309
         inventory: "{{ inventory }}"
         limit: 'hana:&primary'
         credentials:
-          - Demo Provisioner Root Account
+          - "{{ demo_prefix }} Root Account"
         all_parents_must_converge: yes
         success_nodes:
           - node999
         failure_nodes:
-          - node211
-      - unified_job_template: Prepare New Content | Patching Demo
-        identifier: node112
+          - node901
+      - unified_job_template: Prepare New Content
+        identifier: node401
         credentials:
-          - Demo Provisioner Peripheral Credentials
+          - "{{ demo_prefix }} Peripheral Credentials"
         all_parents_must_converge: yes
         success_nodes:
           - node999
         failure_nodes:
-          - node212
-    # Notification Nodes
-      - unified_job_template: Send Provisioner Email | Succeeded
+          - node901
+      - unified_job_template: Send Provisioner Email
         identifier: node999
         all_parents_must_converge: yes
-      - unified_job_template: Send Provisioner Email | Failed
-        identifier: node201
-      - unified_job_template: Send Provisioner Email | Failed
-        identifier: node202
-      - unified_job_template: Send Provisioner Email | Failed
-        identifier: node203
-      - unified_job_template: Send Provisioner Email | Failed
-        identifier: node204
-      - unified_job_template: Send Provisioner Email | Failed
-        identifier: node205
-      - unified_job_template: Send Provisioner Email | Failed
-        identifier: node206
-      - unified_job_template: Send Provisioner Email | Failed
-        identifier: node207
-      - unified_job_template: Send Provisioner Email | Failed
-        identifier: node208
-      - unified_job_template: Send Provisioner Email | Failed
-        identifier: node209
-      - unified_job_template: Send Provisioner Email | Failed
-        identifier: node210
-      - unified_job_template: Send Provisioner Email | Failed
-        identifier: node211
-      - unified_job_template: Send Provisioner Email | Failed
-        identifier: node212
+        extra_data:
+          provisioner_status: success
+      - unified_job_template: Send Provisioner Email
+        identifier: node901
+        extra_data:
+          provisioner_status: failed
   # - name: Teardown Patching Demo
   #   organization: Demo Provisioner
   #   state: "{{ controller_state | default('present') }}"
@@ -606,27 +653,3 @@ controller_workflows:
   #       limit: demo_hosts
   #       credentials:
   #         - Demo Provisioner Peripheral Credentials
-
-controller_user_accounts:
-  - username: demo-admin
-    password: "{{ ansible_password }}"
-    email: dont@email.me
-    update_secrets: no
-  - username: demo-provisioner
-    password: "{{ ansible_password }}"
-    email: dont@email.me
-    update_secrets: no  
-
-controller_teams:
-  - name: Demo Provisioner Team
-    description: Team that can provision demos
-    organization: "{{ controller_organization }}"
-
-controller_roles:
-  - user: demo-admin
-    organization: "{{ controller_organization }}"
-    role: admin
-  - user: demo-provisioner
-    target_team: Demo Provisioner Team
-    organization: "{{ controller_organization }}"
-    role: member

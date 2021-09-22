@@ -21,3 +21,5 @@ collections:
   - name: awx.awx
   - name: community.vmware
   - name: sap.linux
+  - name: jjaswanson4.utilities
+  - name: redhat.satellite

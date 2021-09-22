@@ -1,0 +1,27 @@
+---
+
+- name: build out satellite
+  hosts:
+    - all
+  vars:
+    deploy_satellite: yes
+  pre_tasks:
+    - name: super secure way to grab the manifest file
+      ansible.builtin.get_url:
+        url: http://satellite06.lab.msp.redhat.com/pub/satellite-manifest.zip
+        dest: /tmp/satellite-manifest.zip
+      delegate_to: localhost
+      when:
+        - deploy_satellite | bool
+  tasks:
+    - name: include configuration roles
+      block:
+        - name: include initial roles
+          ansible.builtin.include_role:
+            name: "{{ role }}"
+          loop_control:
+            loop_var: role
+          loop:
+            - jjaswanson4.utilities.add_virtual_disk
+            - jjaswanson4.setup_rhel_for_satellite.setup_storage
+            - jjaswanson4.install_satellite.install_satellite

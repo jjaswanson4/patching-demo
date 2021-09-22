@@ -8,19 +8,14 @@
     - localhost
   gather_facts: no
   vars:
-    resources_path: ../resources
+    resources_path: resources
     controller_resources: "{{ resources_path }}/controller/"
-  pre_tasks:
-    - name: map provisioner controller vars
-      ansible.builtin.set_fact:
-        controller_hostname: "{{ provisioner_controller.hostname }}"
-        controller_validate_certs: "{{ provisioner_controller.validate_certs }}"
-        controller_username: "{{ provisioner_controller.username }}"
-        controller_password: "{{ provisioner_controller.password }}"
 
+  pre_tasks:
     - name: load in {{ demo }} provisioner vars
       ansible.builtin.include_vars:
         file: "demos/{{ demo }}/vars/provisioner-configuration.yml"
+
     - name: load in preconfigured resources
       ansible.builtin.set_fact:
         preconfigured:
@@ -72,43 +67,3 @@
     - redhat_cop.controller_configuration.projects
     - redhat_cop.controller_configuration.job_templates
     - redhat_cop.controller_configuration.workflow_job_templates
-    # - redhat_cop.controller_configuration.users
-    # - redhat_cop.controller_configuration.teams
-    # - redhat_cop.controller_configuration.roles
-
-# - name: apply {{ demo }} demo provisioner configuration to ansible controller
-#   hosts:
-#     - localhost
-#   gather_facts: no
-#   vars_files:
-#     - "demos/{{ demo }}/vars/provisioner-configuration.yml" 
-#   roles:
-#     - redhat_cop.controller_configuration.organizations
-#     - redhat_cop.controller_configuration.credential_types
-#     - redhat_cop.controller_configuration.credentials
-#     - redhat_cop.controller_configuration.execution_environments
-#     - redhat_cop.controller_configuration.inventories
-#     - redhat_cop.controller_configuration.hosts
-#     - redhat_cop.controller_configuration.groups
-#     - redhat_cop.controller_configuration.projects
-#     - redhat_cop.controller_configuration.job_templates
-#     - redhat_cop.controller_configuration.workflow_job_templates
-#     - redhat_cop.controller_configuration.users
-#     - redhat_cop.controller_configuration.teams
-#     - redhat_cop.controller_configuration.roles
-
-# - name: perform post-provisioner configuration items
-#   hosts:
-#     - localhost
-#   gather_facts: no
-#   vars_files:
-#     - "demos/{{ demo }}/vars/provisioner-configuration.yml" 
-#   tasks:
-#     - name: give demo provisioner team access to new provisioning workflows
-#       ansible.builtin.include_role:
-#         name: redhat_cop.controller_configuration.roles
-#       vars:
-#         controller_roles:
-#           - team: Demo Provisioner Team
-#             role: execute
-#             workflows: "{{ controller_workflows | community.general.json_query('[*].name') }}"

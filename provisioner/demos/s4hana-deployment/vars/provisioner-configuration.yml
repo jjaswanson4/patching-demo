@@ -13,38 +13,40 @@ project: Demo Provisioner Codebase
 # Change this variable to use a different prefix.
 demo_prefix: "S4HANA Deployment Demo"
 
-#
-#
+# This is the realitive path to the vars files for this demo.
+# Typically this contains a vars file for the provisioner, Satellite, and Controller.
 vars_files_path: demos/s4hana-deployment/vars
 
-#
-#
+# This is the inventory that stores the information about the infrastructure needed for the demo.
+# This is commonly an instance of Satellite, Controller, and some "demo hosts".
 inventory: "{{ demo_prefix }} Infrastructure"
 
-#
-#
+# This is the execution environment used for this demo provisioner.
+# This execution environment will automatically be configured in Controller.
 execution_environment:
   name: Demo Provisioner EE
   image: patching-demo-provisioner-ee
 
-#
-#
+# This is the information used for the instance of Controller for the demo.
+# This can be the same instance as where the provisioner is deployed, but it's not recommended.
 controller:
   hostname: s4hana-deployment-controller.josh.lab.msp.redhat.com
   configuration_file: "{{ vars_files_path }}/controller-configuration.yml"
   ip_address: 10.15.121.13
-  username: "{{ controller_username }}"
+  username: admin
   password: "{{ controller_password }}"
 
-#
-#
+# This is the information used for the instance of Satellite for the demo.
+# This can be the same instance as where the provisioner is deployed, but it's not recommended.
 satellite:
   hostname: s4hana-deployment-satellite.josh.lab.msp.redhat.com
   configuration_file: "{{ vars_files_path }}/satellite-configuration.yml"
   ip_address: 10.15.121.3
+  username: admin
+  password: "{{ satellite_password }}"
 
-# Provisioner components
-
+# These are where demo specific components are defined, in hash form. These will automatically be added to the common resources.
+# If there is no need for a specific, resource, simply define an empty var, such as `controller_organizations: []`
 controller_organizations: []
 controller_credential_types: []
 controller_credentials: []

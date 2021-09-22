@@ -1,0 +1,14 @@
+---
+
+- name: install Ansible Automation Platform
+  hosts:
+    - all
+  pre_tasks:
+    - name: ensure /var is big enough
+      community.general.lvol:
+        vg: os
+        lv: var
+        size: 20g
+        resizefs: yes
+  roles:
+    - jjaswanson4.utilities.install_aap
