@@ -5,11 +5,20 @@
     - all
   gather_facts: no
   pre_tasks:
-    - name: run credential config role for content credentials
-      ansible.builtin.include_role:
-        name: redhat_cop.controller_configuration.credentials
-      vars:
-        controller_credentials: "{{ lookup('file', '../controller/content-credentials.yml') | from_yaml }}"
+    - name: run bootstrap tasks
+      block:
+        - name: super secure way to grab the manifest
+          ansible.builtin.get_url:
+            url: http://satellite06.lab.msp.redhat.com/pub/controller-manifest.zip
+            dest: /tmp/controller-manifest.zip
+        - name: apply manifest to controller
+          ansible.builtin.include_role:
+            name: redhat_cop.controller_configuration.license
+        - name: run credential config role for content credentials
+          ansible.builtin.include_role:
+            name: redhat_cop.controller_configuration.credentials
+          vars:
+            controller_credentials: "{{ lookup('file', '../controller/content-credentials.yml') | from_yaml }}"
       when:
         - bootstrap_controller is defined
         - bootstrap_controller

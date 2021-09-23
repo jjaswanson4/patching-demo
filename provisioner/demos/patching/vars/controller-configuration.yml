@@ -18,6 +18,12 @@ controller_install:
   pg:
     password: 'R3dh4t123'
 
+bootstrap_controller: yes
+
+controller_license:
+  manitest: /tmp/controller-manifest.zip
+  eula_accepted: yes
+
 controller_organizations:
   - name: "{  { audience }}"
     galaxy_credentials:
