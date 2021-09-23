@@ -10,7 +10,7 @@
         host: smtp.redhat.com
         to: "{{ provisioner }} <{{ provisioner_email }}>"
         from: Demo Provisioner <dont@email.me>
-        subject: Demo Provisioning {{ provisioning_status }}
+        subject: Demo Provisioning {{ provisioner_status }}
         body: >
           Hello {{ provisioner }},
 
