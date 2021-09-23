@@ -12,6 +12,22 @@
     controller_resources: "{{ resources_path }}/controller/"
 
   pre_tasks:
+    - name: configure content credentials if requested (defaults to yes)
+      block:
+        - name: load in content credentials
+          ansible.builtin.set_fact:
+            controller_credentials: "{{ lookup('file', controller_resources + 'content-credentials.yml') | from_yaml }}"
+
+        - name: force ansible to instanciate vars
+          ansible.builtin.set_fact:
+            controller_credentials: "{{ lookup('vars', 'controller_credentials') | default(omit) }}"
+
+        - name: run credential config role for content credentials
+          ansible.builtin.include_role:
+            name: redhat_cop.controller_configuration.credentials
+      when:
+        - configure_content_credentials | default(true)
+
     - name: load in {{ demo }} provisioner vars
       ansible.builtin.include_vars:
         file: "demos/{{ demo }}/vars/provisioner-configuration.yml"
@@ -28,7 +44,6 @@
           controller_groups: "{{ lookup('file', controller_resources + 'groups.yml') | from_yaml }}"
           controller_projects: "{{ lookup('file', controller_resources + 'projects.yml') | from_yaml }}"
           controller_templates: "{{ lookup('file', controller_resources + 'templates.yml') | from_yaml }}"
-          controller_workflows: "{{ lookup('file', controller_resources + 'workflows.yml') | from_yaml }}"
 
     - name: add demo specific resources
       ansible.builtin.set_fact:
@@ -41,7 +56,6 @@
         controller_groups: "{{ preconfigured.controller_groups + controller_groups }}"
         controller_projects: "{{ preconfigured.controller_projects + controller_projects }}"
         controller_templates: "{{ preconfigured.controller_templates + controller_templates }}"
-        controller_workflows: "{{ preconfigured.controller_workflows + controller_workflows }}"
 
     - name: set facts so ansible instanciates vars
       ansible.builtin.set_fact:
