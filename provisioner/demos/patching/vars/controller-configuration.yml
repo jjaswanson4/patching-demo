@@ -21,8 +21,7 @@ controller_install:
 bootstrap_controller: yes
 
 controller_license:
-  manitest: /tmp/controller-manifest.zip
-  eula_accepted: yes
+  manifest: /tmp/controller-manifest.zip
 
 controller_organizations:
   - name: "{  { audience }}"
