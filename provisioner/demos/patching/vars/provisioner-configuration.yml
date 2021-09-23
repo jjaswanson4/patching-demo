@@ -383,8 +383,8 @@ controller_workflows:
         success_nodes:
           - node102
         failure_nodes:
-          - node901
-      - unified_job_template: Install Satellite
+          - node1101
+      - unified_job_template: Install Red Hat Satellite
         identifier: node102
         inventory: "{{ inventory }}"
         limit: satellite
@@ -394,8 +394,8 @@ controller_workflows:
         success_nodes:
           - node103
         failure_nodes:
-          - node901
-      - unified_job_template: Configure Satellite
+          - node1102
+      - unified_job_template: Configure Red Hat Satellite
         identifier: node103
         inventory: "{{ inventory }}"
         limit: satellite
@@ -405,7 +405,7 @@ controller_workflows:
         success_nodes:
           - node301
         failure_nodes:
-          - node901
+          - node1103
       - unified_job_template: Provision Systems
         identifier: node201
         inventory: "{{ inventory }}"
@@ -416,7 +416,7 @@ controller_workflows:
         success_nodes:
           - node202
         failure_nodes:
-          - node901
+          - node1201
       - unified_job_template: Install Ansible Controller
         identifier: node202
         inventory: "{{ inventory }}"
@@ -425,9 +425,9 @@ controller_workflows:
           - "{{ demo_prefix }} Peripheral Credentials"
           - "{{ demo_prefix }} Root Account"
         success_nodes:
-          - node202
+          - node203
         failure_nodes:
-          - node901
+          - node1202
       - unified_job_template: Configure Ansible Controller
         identifier: node203
         inventory: "{{ inventory }}"
@@ -435,12 +435,9 @@ controller_workflows:
         credentials:
           - "{{ demo_prefix }} Peripheral Credentials"
           - "{{ demo_prefix }} Root Account"
-        extra_data:
-          ansible_connection: local
-          ansible_python_interpreter: '{  { ansible_playbook_python }}'
         all_parents_must_converge: yes
         failure_nodes:
-          - node901
+          - node1203
       - unified_job_template: Provision Systems
         identifier: node301
         inventory: "{{ inventory }}"
@@ -452,7 +449,7 @@ controller_workflows:
           - node302
           - node203
         failure_nodes:
-          - node901
+          - node1301
       - unified_job_template: Preconfigure for SAP
         identifier: node302
         inventory: "{{ inventory }}"
@@ -464,7 +461,7 @@ controller_workflows:
           - node303
           - node304
         failure_nodes:
-          - node901
+          - node1302
       - unified_job_template: Preconfigure for HANA
         identifier: node303
         inventory: "{{ inventory }}"
@@ -476,7 +473,7 @@ controller_workflows:
           - node306
           - node401
         failure_nodes:
-          - node901
+          - node1303
       - unified_job_template: Preconfigure for Netweaver
         identifier: node304
         inventory: "{{ inventory }}"
@@ -488,7 +485,7 @@ controller_workflows:
           - node308
           - node401
         failure_nodes:
-          - node901
+          - node1304
       - unified_job_template: Deploy SAP HANA
         identifier: node305
         inventory: "{{ inventory }}"
@@ -498,7 +495,7 @@ controller_workflows:
         success_nodes:
           - node307
         failure_nodes:
-          - node901
+          - node1305
       - unified_job_template: Deploy SAP HANA
         identifier: node306
         inventory: "{{ inventory }}"
@@ -508,7 +505,7 @@ controller_workflows:
         success_nodes:
           - node308
         failure_nodes:
-          - node901
+          - node1306
       - unified_job_template: Install Netweaver
         identifier: node307
         inventory: "{{ inventory }}"
@@ -519,7 +516,7 @@ controller_workflows:
         success_nodes:
           - node309
         failure_nodes:
-          - node901
+          - node1307
       - unified_job_template: Install Netweaver
         identifier: node308
         inventory: "{{ inventory }}"
@@ -530,7 +527,7 @@ controller_workflows:
         success_nodes:
           - node309
         failure_nodes:
-          - node901
+          - node1308
       - unified_job_template: Reinstate HSR
         identifier: node309
         inventory: "{{ inventory }}"
@@ -541,7 +538,7 @@ controller_workflows:
         success_nodes:
           - node999
         failure_nodes:
-          - node901
+          - node1309
       - unified_job_template: Prepare New Content
         identifier: node401
         credentials:
@@ -550,14 +547,74 @@ controller_workflows:
         success_nodes:
           - node999
         failure_nodes:
-          - node901
+          - node1401
       - unified_job_template: Send Provisioner Email
         identifier: node999
         all_parents_must_converge: yes
         extra_data:
           provisioner_status: success
       - unified_job_template: Send Provisioner Email
-        identifier: node901
+        identifier: node1101
+        extra_data:
+          provisioner_status: failed
+      - unified_job_template: Send Provisioner Email
+        identifier: node1102
+        extra_data:
+          provisioner_status: failed
+      - unified_job_template: Send Provisioner Email
+        identifier: node1103
+        extra_data:
+          provisioner_status: failed
+      - unified_job_template: Send Provisioner Email
+        identifier: node1201
+        extra_data:
+          provisioner_status: failed
+      - unified_job_template: Send Provisioner Email
+        identifier: node1202
+        extra_data:
+          provisioner_status: failed
+      - unified_job_template: Send Provisioner Email
+        identifier: node1203
+        extra_data:
+          provisioner_status: failed
+      - unified_job_template: Send Provisioner Email
+        identifier: node1301
+        extra_data:
+          provisioner_status: failed
+      - unified_job_template: Send Provisioner Email
+        identifier: node1302
+        extra_data:
+          provisioner_status: failed
+      - unified_job_template: Send Provisioner Email
+        identifier: node1303
+        extra_data:
+          provisioner_status: failed
+      - unified_job_template: Send Provisioner Email
+        identifier: node1304
+        extra_data:
+          provisioner_status: failed
+      - unified_job_template: Send Provisioner Email
+        identifier: node1305
+        extra_data:
+          provisioner_status: failed
+      - unified_job_template: Send Provisioner Email
+        identifier: node1306
+        extra_data:
+          provisioner_status: failed
+      - unified_job_template: Send Provisioner Email
+        identifier: node1307
+        extra_data:
+          provisioner_status: failed
+      - unified_job_template: Send Provisioner Email
+        identifier: node1308
+        extra_data:
+          provisioner_status: failed
+      - unified_job_template: Send Provisioner Email
+        identifier: node1309
+        extra_data:
+          provisioner_status: failed
+      - unified_job_template: Send Provisioner Email
+        identifier: node1401
         extra_data:
           provisioner_status: failed
   # - name: Teardown Patching Demo
