@@ -32,7 +32,7 @@ execution_environment:
 controller:
   hostname: patching-controller.josh.lab.msp.redhat.com
   configuration_file: "{{ vars_files_path }}/controller-configuration.yml"
-  ip_address: 10.15.121.10
+  ip_address: 10.15.121.11
   username: admin
   password: "{{ controller_password }}"
 
@@ -682,7 +682,7 @@ controller_workflows:
       - unified_job_template: Unregister from Insights
         identifier: node101
         inventory: "{{ inventory }}"
-        limit: demo_hosts
+        limit: 'demo_hosts:controller'
         credentials:
           - "{{ demo_prefix }} Root Account"
         always_nodes:
@@ -692,7 +692,7 @@ controller_workflows:
       - unified_job_template: Teardown Systems
         identifier: node102
         inventory: "{{ inventory }}"
-        limit: demo_hosts
+        limit: 'demo_hosts:controller'
         credentials:
           - "{{ demo_prefix }} Peripheral Credentials"
       - unified_job_template: Roll Back Content
@@ -702,6 +702,6 @@ controller_workflows:
       - unified_job_template: Cleanup DNS Records
         identifier: node104
         inventory: "{{ inventory }}"
-        limit: demo_hosts
+        limit: 'demo_hosts:controller'
         credentials:
           - "{{ demo_prefix }} Peripheral Credentials"
