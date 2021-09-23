@@ -5,24 +5,24 @@
     - all
   gather_facts: no
   pre_tasks:
+    - name: run bootstrap tasks for fresh install
+      block:
+        - name: login to registry.redhat.io
+          ansible.builtin.shell:
+            cmd: podman login --username "{{ crhc_username }}" --password "{{ crhc_password }}" registry.redhat.io
+          become: yes
+          become_user: awx
+          #no_log: yes
+          delegate_to: "{{ inventory_hostname }}"
 
-    - name: load additional resources when requested
-      ansible.builtin.set_fact:
-        controller_organizations: "{{ controller_organizations + lookup('file', '../controller/organizations.yml') | from_yaml }}"
-      
-    - name: force ansible to instanciate vars
-      ansible.builtin.set_fact:
-        controller_organizations: "{{ lookup('vars', 'controller_organizations') }}"
-   
-    - name: run credential config role for content credentials
-      ansible.builtin.include_role:
-        name: redhat_cop.controller_configuration.credentials
-      vars:
-        controller_credentials: "{{ lookup('file', '../controller/content-credentials.yml') | from_yaml }}"
+        - name: run credential config role for content credentials
+          ansible.builtin.include_role:
+            name: redhat_cop.controller_configuration.credentials
+          vars:
+            controller_credentials: "{{ lookup('file', '../controller/content-credentials.yml') | from_yaml }}"
       when:
-        - controller_content_credentials is defined or
-          load_resources is defined
-
+        - bootstrap_controller is defined
+        - bootstrap_controller
 
   tasks:
     - name: ansible controller configuration block
