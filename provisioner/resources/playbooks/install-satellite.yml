@@ -17,3 +17,5 @@
             - jjaswanson4.utilities.add_virtual_disk
             - jjaswanson4.setup_rhel_for_satellite.setup_storage
             - jjaswanson4.install_satellite.install_satellite
+      when:
+        - deploy_satellite | bool
