@@ -10,7 +10,7 @@
         username: admin
         password: "{{ satellite_password }}"
         validate_certs: false
-        server_url: "{{ satellite_url }}"
+        server_url: "https://{{ satellite_hostname }}"
         name: "{{ inventory_hostname }}"
         hostgroup: "{{ parent_hostgroup }}/{{ child_hostgroup }}"
       delegate_to: localhost

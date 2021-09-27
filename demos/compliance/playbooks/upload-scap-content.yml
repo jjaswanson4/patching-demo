@@ -16,15 +16,15 @@
       block:
         - name: find satellite organization id
           ansible.builtin.uri:
-            url: "{{ satellite_url }}/katello/api/organizations?search=name={{ audience }}"
+            url: "https://{{ satellite_hostname }}/katello/api/organizations?search=name={{ audience }}"
           register: satellite_organizations
         - name: find satellite location id
           ansible.builtin.uri:
-            url: "{{ satellite_url }}/api/locations?search=name={{ audience }}"
+            url: "https://{{ satellite_hostname }}/api/locations?search=name={{ audience }}"
           register: satellite_locations
         - name: find satellite proxy id
           ansible.builtin.uri:
-            url: "{{ satellite_url }}/api/smart_proxies?search=name={{ satellite_url | regex_replace('https://', '') }}"
+            url: "https://{{ satellite_hostname }}/api/smart_proxies?search=name={{ satellite_hostname }}"
           register: satellite_proxies
       delegate_to: localhost
     - name: set IDs as facts
@@ -38,7 +38,7 @@
       block:
         - name: import theforeman.foreman_scap_client ansible role
           ansible.builtin.uri:
-            url: "{{ satellite_url }}/ansible/api/ansible_roles/import"
+            url: "https://{{ satellite_hostname }}/ansible/api/ansible_roles/import"
             method: PUT
             body:
               organization_id: "{{ organization_id }}"
@@ -47,7 +47,7 @@
               role_names: "{{ ansible_roles }}"
         - name: import ansible vars from theforeman.foreman_scap_client ansible role
           ansible.builtin.uri:
-            url: "{{ satellite_url }}/ansible/api/ansible_variables/import"
+            url: "https://{{ satellite_hostname }}/ansible/api/ansible_variables/import"
             method: PUT
             body:
               organization_id: "{{ organization_id }}"
