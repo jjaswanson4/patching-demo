@@ -32,7 +32,7 @@
   tasks:
     - name: create compliance policy in satellite
       ansible.builtin.uri:
-        url: "https://{{ satellite_hostgroup }}/api/compliance/policies"
+        url: "https://{{ satellite_hostname }}/api/compliance/policies"
         method: POST
         body:
           policy:
