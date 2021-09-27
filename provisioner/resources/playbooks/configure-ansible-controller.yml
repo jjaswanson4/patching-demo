@@ -17,11 +17,14 @@
         - name: load in content credentials
           ansible.builtin.set_fact:
             controller_content_credentials: "{{ lookup('file', '../controller/content-credentials.yml') | from_yaml }}"
+        - name: force evaluation of vars
+          ansible.builtin.set_fact:
+            controller_content_credentials: "{{ lookup('vars', 'controller_credentials')"
         - name: run credential config role for content credentials
           ansible.builtin.include_role:
             name: redhat_cop.controller_configuration.credentials
           vars:
-            controller_credentials: "{{ lookup('vars', 'controller_content_credentials') }}"
+            controller_credentials: "{{ controller_content_credentials }}"
       when:
         - bootstrap_controller is defined
         - bootstrap_controller
