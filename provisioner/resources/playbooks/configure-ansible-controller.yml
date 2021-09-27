@@ -23,6 +23,10 @@
         - bootstrap_controller is defined
         - bootstrap_controller
 
+    - name: allow for vars to not be instanciated
+      ansible.builtin.set_fact:
+        controller_credential_types: "{{ controller_credential_types | regex_replace(',,', '  ') }}"
+
   tasks:
     - name: ansible controller configuration block
       block:
