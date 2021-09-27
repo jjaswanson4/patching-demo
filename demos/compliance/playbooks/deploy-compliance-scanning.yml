@@ -10,7 +10,7 @@
         username: admin
         password: "{{ satellite_password }}"
         validate_certs: false
-        server_url: "{{ satellite_url }}"
+        server_url: "https://{{ satellite_hostname }}"
         job_template: Ansible Roles - Ansible Default
         search_query: "hostgroup_fullname = {{ parent_hostgroup }}/{{ child_hostgroup }}"
       delegate_to: localhost
