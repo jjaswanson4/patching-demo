@@ -3,17 +3,7 @@
 - name: create compliance policies on console.redhat.com
   hosts:
     - all
-  pre_tasks:
-    - name: set parent_profile_id for OS | RHEL7
-      ansible.builtin.set_fact:
-        parent_profile_id: "{{ rhel7_parent_profile_id }}"
-      when:
-        - ansible_distribution_major_version == '7'
-    - name: set parent_profile_id for OS | RHEL8
-      ansible.builtin.set_fact:
-        parent_profile_id: "{{ rhel8_parent_profile_id }}"
-      when:
-        - ansible_distribution_major_version == '8'
+  gather_facts: no
   tasks:
     - name: create compliance profile
       ansible.builtin.uri:
@@ -31,7 +21,7 @@
             attributes:
               name: "{{ policy_name }}"
               parent_profile_id: "{{ parent_profile_id }}"
-              compliance_threshold: 100
+              compliance_threshold: 95
       register: create_compliance_policy
       changed_when:
         - create_compliance_policy.status == 201
