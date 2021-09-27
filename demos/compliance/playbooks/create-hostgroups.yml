@@ -10,10 +10,10 @@
         username: admin
         password: "{{ satellite_password }}"
         validate_certs: false
-        server_url: "{{ satellite_url }}"
+        server_url: "https://{{ satellite_hostname }}"
         name: "{{ child_hostgroup }}"
         parent: "{{ parent_hostgroup }}"
         ansible_roles: "{{ ansible_roles }}"
-        openscap_proxy: "{{ satellite_url | regex_replace('https://', '') }}"
+        openscap_proxy: "{{ satellite_hostname }}"
       delegate_to: localhost
       throttle: 1
