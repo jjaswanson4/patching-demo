@@ -16,11 +16,11 @@
       block:
         - name: search for scap content profile information
           ansible.builtin.uri:
-            url: "{{ satellite_url }}/api/compliance/scap_content_profiles?search=title~{{ policy_name | regex_replace(' ', '%20') }}"
+            url: "https://{{ satellite_hostname }}/api/compliance/scap_content_profiles?search=title~{{ policy_name | regex_replace(' ', '%20') }}"
           register: scap_content_profiles
         - name: get hostgroup id
           ansible.builtin.uri:
-            url: "{{ satellite_url }}/api/hostgroups?search=title={{ parent_hostgroup }}/{{ child_hostgroup }}"
+            url: "https://{{ satellite_hostname }}/api/hostgroups?search=title={{ parent_hostgroup }}/{{ child_hostgroup }}"
           register: hostgroup_id
         - name: grab os specific profile
           ansible.builtin.set_fact:
@@ -32,7 +32,7 @@
   tasks:
     - name: create compliance policy in satellite
       ansible.builtin.uri:
-        url: "{{ satellite_url }}/api/compliance/policies"
+        url: "https://{{ satellite_hostgroup }}/api/compliance/policies"
         method: POST
         body:
           policy:
