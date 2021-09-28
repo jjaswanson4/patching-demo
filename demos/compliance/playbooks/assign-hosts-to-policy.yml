@@ -40,7 +40,7 @@
         body_format: json
         status_code:
           - 200
-          - 404
+          - 409
         body:
           data:
             relationships:
@@ -48,5 +48,11 @@
                 data:
                   - id: "{{ insights_host_id }}"
                     type: host
+      register: associate_host
       delegate_to: localhost
+      changed_when:
+        - associate_host.status == 200
+      failed_when:
+        - associate_host.status != 200
+        - associate_host.status != 409
       throttle: 1
