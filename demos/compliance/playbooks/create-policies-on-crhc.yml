@@ -29,3 +29,4 @@
         - create_compliance_policy.status != 201
         - create_compliance_policy.status != 406
       delegate_to: localhost
+      throttle: 1
