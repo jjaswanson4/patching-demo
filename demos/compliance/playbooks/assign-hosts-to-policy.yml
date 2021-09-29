@@ -21,7 +21,7 @@
           register: insights_host_info
         - name: grab compliance profiles from console.redhat.com
           ansible.builtin.uri:
-            url: https://console.redhat.com/api/compliance/v1/profiles?search=canonical=false+os_major_version={{ ansible_distribution_major_version }}+ref_id~{{ child_hostgroup }}
+            url: https://console.redhat.com/api/compliance/v1/profiles?search=canonical=false+os_major_version={{ ansible_distribution_major_version }}+ref_id~{{ child_hostgroup }}+external=false
           register: compliance_profiles
       throttle: 1
       delegate_to: localhost
