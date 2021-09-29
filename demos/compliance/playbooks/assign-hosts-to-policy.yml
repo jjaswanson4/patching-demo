@@ -19,19 +19,18 @@
           ansible.builtin.uri:
             url: https://console.redhat.com/api/inventory/v1/hosts?insights_id={{ insights_id.content | b64decode }}
           register: insights_host_info
-          throttle: 1
         - name: grab compliance profiles from console.redhat.com
           ansible.builtin.uri:
-            url: https://console.redhat.com/api/compliance/v1/profiles?limit=100
+            url: https://console.redhat.com/api/compliance/v1/profiles?search=canonical=false+os_major_version={{ ansible_distribution_major_version }}+ref_id~{{ child_hostgroup }}
           register: compliance_profiles
-          throttle: 1
+      throttle: 1
       delegate_to: localhost
     - name: set host_id and compliance_policy_id facts
       ansible.builtin.set_fact:
         insights_host_id: "{{ insights_host_info.json | json_query('results[0].id') }}"
         compliance_policy_id: "{{ compliance_profiles.json | json_query(json_query) }}"
       vars:
-        json_query: "data[?attributes.name == '{{ policy_name }}' && attributes.os_version == '{{ ansible_distribution_major_version }}'].id | [0]"
+        json_query: "data[?attributes.name == '{{ policy_name }}' && attributes.os_major_version == '{{ ansible_distribution_major_version }}'].id | [0]"
   tasks:
     - name: add hosts to complaince policies on console.redhat.com
       ansible.builtin.uri:
@@ -49,10 +48,10 @@
                   - id: "{{ insights_host_id }}"
                     type: host
       register: associate_host
-      delegate_to: localhost
       changed_when:
         - associate_host.status == 200
       failed_when:
         - associate_host.status != 200
         - associate_host.status != 409
       throttle: 1
+      delegate_to: localhost
