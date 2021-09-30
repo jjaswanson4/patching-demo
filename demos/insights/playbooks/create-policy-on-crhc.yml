@@ -1,0 +1,35 @@
+---
+
+- name: create policy on console.redhat.com
+  hosts:
+    - all
+  gather_facts: no
+  module_defaults:
+    ansible.builtin.uri:
+        user: "{{ crhc_username }}"
+        password: "{{ crhc_password }}"
+        force_basic_auth: yes
+  tasks:
+    - name: create profile
+      ansible.builtin.uri:
+        url: https://console.redhat.com/api/policies/v1/policies?alsoStore=true
+        method: POST
+        body_format: json
+        status_code:
+          - 200
+          - 201
+          - 409
+        body:
+          name: Base Security Settings
+          actions: notification
+          conditions: not facts.enabled_services contains 'firewalld' or not facts.selinux_current_mode contains 'enforcing'
+          isEnabled: true
+      register: create_policy
+      changed_when:
+        - create_policy.status == 201
+      failed_when:
+        - create_policy.status != 200
+        - create_policy.status != 201
+        - create_policy.status != 409
+      delegate_to: localhost
+      throttle: 1
