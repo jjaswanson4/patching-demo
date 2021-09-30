@@ -1,7 +1,7 @@
 ---
 
-ansible_host: 10.15.121.3
-ip_address: "{{ ansible_host }}"
+ansible_host: "{{ satellite.ip_address }}"
+ip_address: "{  { ansible_host }}"
 cpus: 8
 memory_mb: 24576
 os: rhel7
@@ -23,7 +23,7 @@ ignore_compute_resource_errors: true
 
 satellite:
   admin_username: admin
-  admin_password: "{{ satellite_password }}"
+  admin_password: "{  { satellite_password }}"
   version: 6.9
   logical_volumes:
     - name: cache
@@ -64,13 +64,13 @@ satellite:
     - "--foreman-proxy-dns true"
   foreman:
     organizations:
-      - name: "{{ audience }}"
+      - name: "{  { audience }}"
         initial_organization: yes
     locations:
-      - name: "{{ audience }}"
+      - name: "{  { audience }}"
         initial_location: yes
         organizations:
-          - name: "{{ audience }}"
+          - name: "{  { audience }}"
     settings:
       - name: default_download_policy
         value: on_demand
@@ -90,12 +90,12 @@ satellite:
         provider_params:
           url: vcenter02.lab.msp.redhat.com
           user: 'Administrator@vsphere.local'
-          password: "{{ vcenter_password }}"
+          password: "{  { vcenter_password }}"
           datacenter: MSP Lab
         organizations:
-          - name: "{{ audience }}"
+          - name: "{  { audience }}"
         locations:
-          - name: "{{ audience }}"
+          - name: "{  { audience }}"
     compute_profiles:
       - name: general-vlan146
         compute_resource: vcenter02.lab.msp.redhat.com
@@ -130,9 +130,9 @@ satellite:
     domains:
       - name: josh.lab.msp.redhat.com
         organizations:
-          - name: "{{ audience }}"
+          - name: "{  { audience }}"
         locations:
-          - name: "{{ audience }}"
+          - name: "{  { audience }}"
     subnets:
       - name: VLAN146
         network: 10.15.120.0
@@ -143,9 +143,9 @@ satellite:
         ipam: None
         boot_mode: Static
         organizations:
-          - name: "{{ audience }}"
+          - name: "{  { audience }}"
         locations:
-          - name: "{{ audience }}"
+          - name: "{  { audience }}"
         domains:
           - name: josh.lab.msp.redhat.com
     hostgroups:
@@ -153,39 +153,39 @@ satellite:
         architecture: x86_64
         compute_profile: general-vlan146
         compute_resource: vcenter02.lab.msp.redhat.com
-        content_source: "{{ inventory_hostname }}"
+        content_source: "{  { inventory_hostname }}"
         content_view: composite-rhel7
         domain: josh.lab.msp.redhat.com
         lifecycle_environment: Production
         operatingsystem: RHEL Server 7.9
         ptable: RHEL7 Kickstart Partition Table
-        organization_of_content_source: "{{ audience }}"
+        organization_of_content_source: "{  { audience }}"
         organizations:
-          - "{{ audience }}"
+          - "{  { audience }}"
         locations:
-          - "{{ audience }}"
+          - "{  { audience }}"
         subnet: VLAN146
         pxe_loader: None
-        root_pass: "{{ ansible_password }}"
+        root_pass: "{  { ansible_password }}"
         kickstart_repository: Red Hat Enterprise Linux 7 Server Kickstart x86_64 7.9
       - name: rhel8
         architecture: x86_64
         compute_profile: general-vlan146
         compute_resource: vcenter02.lab.msp.redhat.com
-        content_source: "{{ inventory_hostname }}"
+        content_source: "{  { inventory_hostname }}"
         content_view: composite-rhel8
         domain: josh.lab.msp.redhat.com
         lifecycle_environment: Production
         operatingsystem: RedHat-8.4
         ptable: RHEL8 Kickstart Partition Table
-        organization_of_content_source: "{{ audience }}"
+        organization_of_content_source: "{  { audience }}"
         organizations:
-          - "{{ audience }}"
+          - "{  { audience }}"
         locations:
-          - "{{ audience }}"
+          - "{  { audience }}"
         subnet: VLAN146
         pxe_loader: None
-        root_pass: "{{ ansible_password }}"
+        root_pass: "{  { ansible_password }}"
         kickstart_repository: Red Hat Enterprise Linux 8 for x86_64 - BaseOS Kickstart 8.4
     operating_systems:
       - name: RHEL Server 7.9
@@ -202,21 +202,21 @@ satellite:
         update_args: --partition-tables "RHEL8 Kickstart Partition Table,Kickstart default"
     partition_tables:
       - name: RHEL7 Kickstart Partition Table
-        file: ../demos/common/files/rhel8-ptable.erb
+        file: ../satellite/rhel7-ptable.erb
         os_family: Redhat
         organizations:
-          - name: "{{ audience }}"
+          - name: "{  { audience }}"
         locations:
-          - name: "{{ audience }}"
+          - name: "{  { audience }}"
       - name: RHEL8 Kickstart Partition Table
-        file: ../demos/common/files/rhel8-ptable.erb
+        file: ../satellite/rhel8-ptable.erb
         os_family: Redhat
         organizations:
-          - name: "{{ audience }}"
+          - name: "{  { audience }}"
         locations:
-          - name: "{{ audience }}"
+          - name: "{  { audience }}"
   katello:
-    - organization_name: "{{ audience }}"
+    - organization_name: "{  { audience }}"
       state: present
       manifest: "/tmp/satellite-manifest.zip"
       repo_sync_attempts: 1

@@ -1,110 +1,211 @@
 ---
 
-controller_organizations:
-  - name: "{{ audience }}"
-    galaxy_credentials:
-      - MSP Lab Automation Hub - RH Certified
-      - MSP Lab Automation Hub - Community
-      - Ansible Galaxy
+ansible_host: "{{ controller.ip_address }}"
+ip_address: "{  { ansible_host }}"
+cpus: 4
+memory_mb: 16384
+os: rhel8
+application: general
 
-controller_execution_environments:
-  - name: Compliance Demo EE
-    image: 'aap20-hub.josh.lab.msp.redhat.com/compliance-demo-ee:latest'
-    organization: "{{ audience }}"
-    credential: MSP Lab AAP20 Automation Hub
-    pull: always
-  - name: Compliance Demo Compliance EE
-    image: 'aap20-hub.josh.lab.msp.redhat.com/compliance-demo-compliance-ee:1.0.0'
-    organization: "{{ audience }}"
-    credential: MSP Lab AAP20 Automation Hub
-    pull: always
+htop_url: https://dl.fedoraproject.org/pub/epel/8/Everything/x86_64/Packages/h/htop-3.0.5-1.el8.x86_64.rpm
+
+aap_download_url: http://satellite06.lab.msp.redhat.com/pub/ansible-automation-platform-setup-bundle-2.0.0-1-early-access.tar.gz
+aap_bundle: ansible-automation-platform-setup-bundle-2.0.0-1-early-access.tar.gz
+
+controller_install:
+  admin_password: "{  { controller_password }}"
+  pg:
+    password: 'R3dh4t123'
+
+bootstrap_controller: yes
+
+controller_license:
+  manifest: /tmp/controller-manifest.zip
+
+controller_organizations:
+  - name: "{  { audience }}"
+    galaxy_credentials:
+      - Ansible Galaxy
 
 controller_credential_types:
   - name: Console.redhat.com Credentials
     kind: cloud
+    inputs:
+      fields:
+        - id: crhc_username
+          type: string
+          label: crhc_username
+        - id: crhc_password
+          type: string
+          label: crhc_password
+          secret: yes
     injectors:
       extra_vars:
-        crhc_username: "{{ crhc_username }}"
-        crhc_password: "{{ crhc_password }}"
+        crhc_username: "{  { crhc_username }}"
+        crhc_password: "{  { crhc_password }}"
+  - name: Satellite API Credentials
+    kind: cloud
+    inputs:
+      fields:
+        - id: satellite_hostname
+          type: string
+          label: Satellite Hostname
+        - id: satellite_username
+          type: string
+          label: satellite_username
+        - id: satellite_password
+          type: string
+          label: satellite_password
+          secret: yes
+    injectors:
+      extra_vars:
+        satellite_hostname: "{{ satellite.hostname }}"
+        satellite_username: admin
+        satellite_password: "{  { satellite_password }}"
 
 controller_credentials:
-  - name: Compliance Demo Peripheral Credentials
-    credential_type: Demo Provisioner Peripheral Credentials
-    organization: "{{ audience }}"
+  - name: MSP Lab AAP20 Automation Hub
+    organization: "{  { audience }}"
+    credential_type: Container Registry
+    inputs:
+      host: aap20-hub.josh.lab.msp.redhat.com
+      username: "{{ hub_username }}"
+      password: "{{ hub_password }}"
+      verify_ssl: no
   - name: Console.redhat.com Credentials
     credential_type: Console.redhat.com Credentials
-    organization: "{{ audience }}"
+    organization: "{  { audience }}"
+    inputs:
+      crhc_username: "{  { crhc_username }}"
+      crhc_password: "{  { crhc_password }}"
+  - name: Satellite API Credentials
+    credential_type: Satellite API Credentials
+    organization: "{  { audience }}"
+    inputs:
+      satellite_hostname: "{{ satellite.hostname }}"
+      satellite_username: admin
+      satellite_password: "{  { satellite_password }}"
   - name: Compliance Root Credentials
     credential_type: Machine
-    organization: "{{ audience }}"
+    organization: "{  { audience }}"
     inputs:
       username: root
-      password: "{{ ansible_password }}"
+      password: "{  { ansible_password }}"
   - name: Compliance Non-Root Credentials
     credential_type: Machine
-    organization: "{{ audience }}"
+    organization: "{  { audience }}"
     inputs:
       username: compliance-user
-      password: "{{ ansible_password }}{{ ansible_password }}"
-      become_password: "{{ ansible_password }}{{ ansible_password }}"
+      password: "{  { ansible_password }}{  { ansible_password }}"
+      become_password: "{  { ansible_password }}{  { ansible_password }}"
 
+controller_execution_environments:
+  - name: Compliance Demo EE
+    image: 'aap20-hub.josh.lab.msp.redhat.com/compliance-demo-ee:latest'
+    organization: "{  { audience }}"
+    credential: MSP Lab AAP20 Automation Hub
+    pull: always
+  - name: Compliance Demo Compliance EE
+    image: 'aap20-hub.josh.lab.msp.redhat.com/compliance-demo-compliance-ee:latest'
+    organization: "{  { audience }}"
+    credential: MSP Lab AAP20 Automation Hub
+    pull: always
 
 controller_inventories:
-  - name: "{{ audience }} Infrastructure"
-    organization: "{{ audience }}"
+  - name: "{  { audience }} Infrastructure"
+    organization: "{  { audience }}"
     variables:
-      satellite_url: https://compliance-satellite.josh.lab.msp.redhat.com
       ansible_roles:
         - theforeman.foreman_scap_client
-      
 
 controller_hosts:
   - name: compliance-satellite.josh.lab.msp.redhat.com
-    inventory: "{{ audience }} Infrastructure"
+    inventory: "{  { audience }} Infrastructure"
     variables:
       ansible_host: 10.15.121.3
   - name: rhel7-hipaa.josh.lab.msp.redhat.com
-    inventory: "{{ audience }} Infrastructure"
+    inventory: "{  { audience }} Infrastructure"
     variables:
       ansible_host: 10.15.121.50
   - name: rhel8-hipaa.josh.lab.msp.redhat.com
-    inventory: "{{ audience }} Infrastructure"
+    inventory: "{  { audience }} Infrastructure"
     variables:
       ansible_host: 10.15.121.51
+  - name: rhel7-pci.josh.lab.msp.redhat.com
+    inventory: "{  { audience }} Infrastructure"
+    variables:
+      ansible_host: 10.15.121.52
+  - name: rhel8-pci.josh.lab.msp.redhat.com
+    inventory: "{  { audience }} Infrastructure"
+    variables:
+      ansible_host: 10.15.121.53
 
 controller_groups:
   - name: satellite
-    inventory: "{{ audience }} Infrastructure"
+    inventory: "{  { audience }} Infrastructure"
     hosts:
       - compliance-satellite.josh.lab.msp.redhat.com
-  - name: hipaa
-    inventory: "{{ audience }} Infrastructure"
+  - name: rhel7_hipaa
+    inventory: "{  { audience }} Infrastructure"
     hosts:
       - rhel7-hipaa.josh.lab.msp.redhat.com
+    variables:
+      parent_profile_id: 5d7af59d-2266-4e09-8024-07a48eb1557c
+  - name: rhel8_hipaa
+    inventory: "{  { audience }} Infrastructure"
+    hosts:
       - rhel8-hipaa.josh.lab.msp.redhat.com
+    variables:
+      parent_profile_id: e5264e5d-d4b3-4c82-80a0-93448de468a7
+  - name: hipaa
+    inventory: "{  { audience }} Infrastructure"
+    children:
+      - rhel7_hipaa
+      - rhel8_hipaa
     variables:
       policy_name: Health Insurance Portability and Accountability Act (HIPAA)
       child_hostgroup: hipaa
-      rhel7_parent_profile_id: 5d7af59d-2266-4e09-8024-07a48eb1557c
-      rhel8_parent_profile_id: e5264e5d-d4b3-4c82-80a0-93448de468a7
-  - name: rhel7
-    inventory: "{{ audience }} Infrastructure"
+  - name: rhel7_pci
+    inventory: "{  { audience }} Infrastructure"
     hosts:
-      - rhel7-hipaa.josh.lab.msp.redhat.com
+      - rhel7-pci.josh.lab.msp.redhat.com
+    variables:
+      policy_name: PCI-DSS v3.2.1 Control Baseline for Red Hat Enterprise Linux 7
+      parent_profile_id: 0a86f58e-3640-434e-bb6b-4589bbf781bd
+  - name: rhel8_pci
+    inventory: "{  { audience }} Infrastructure"
+    hosts:
+      - rhel8-pci.josh.lab.msp.redhat.com
+    variables:
+      policy_name: PCI-DSS v3.2.1 Control Baseline for Red Hat Enterprise Linux 8
+      parent_profile_id: fab8563c-f071-4aec-8454-7e150601a6c3
+  - name: pci
+    inventory: "{  { audience }} Infrastructure"
+    children:
+      - rhel7_pci
+      - rhel8_pci
+    variables:
+      child_hostgroup: pci      
+  - name: rhel7
+    inventory: "{  { audience }} Infrastructure"
+    children:
+      - rhel7_hipaa
+      - rhel7_pci
     variables:
       os: rhel7
       parent_hostgroup: rhel7
   - name: rhel8
-    inventory: "{{ audience }} Infrastructure"
-    hosts:
-      - rhel8-hipaa.josh.lab.msp.redhat.com
+    inventory: "{  { audience }} Infrastructure"
+    children:
+      - rhel8_hipaa
+      - rhel8_pci
     variables:
       os: rhel8
       parent_hostgroup: rhel8
 
 controller_projects:
-  - name: "{{ audience }} Compliance Code"
-    organization: "{{ audience }}"
+  - name: "{  { audience }} Compliance Code"
+    organization: "{  { audience }}"
     scm_branch: main
     scm_type: git
     scm_url: https://github.com/jjaswanson4/patching-demo.git
@@ -112,86 +213,86 @@ controller_projects:
 
 controller_templates:
   - name: Upload SCAP Content
-    organization: "{{ audience }}"
+    organization: "{  { audience }}"
     ask_inventory_on_launch: yes
     ask_limit_on_launch: yes
-    project: "{{ audience }} Compliance Code"
+    project: "{  { audience }} Compliance Code"
     playbook: demos/compliance/playbooks/upload-scap-content.yml
     execution_environment: Compliance Demo EE
     ask_credential_on_launch: yes
   - name: Create Hostgroups
-    organization: "{{ audience }}"
+    organization: "{  { audience }}"
     ask_inventory_on_launch: yes
     ask_limit_on_launch: yes
-    project: "{{ audience }} Compliance Code"
+    project: "{  { audience }} Compliance Code"
     playbook: demos/compliance/playbooks/create-hostgroups.yml
     execution_environment: Compliance Demo EE
     ask_credential_on_launch: yes
   - name: Move Hosts to Hostgroups
-    organization: "{{ audience }}"
+    organization: "{  { audience }}"
     ask_inventory_on_launch: yes
     ask_limit_on_launch: yes
-    project: "{{ audience }} Compliance Code"
+    project: "{  { audience }} Compliance Code"
     playbook: demos/compliance/playbooks/move-hosts-to-hostgroups.yml
     execution_environment: Compliance Demo EE
     ask_credential_on_launch: yes
   - name: Create Policies on Satellite
-    organization: "{{ audience }}"
+    organization: "{  { audience }}"
     ask_inventory_on_launch: yes
     ask_limit_on_launch: yes
-    project: "{{ audience }} Compliance Code"
+    project: "{  { audience }} Compliance Code"
     playbook: demos/compliance/playbooks/create-policies-on-satellite.yml
     execution_environment: Compliance Demo EE
     ask_credential_on_launch: yes
   - name: Deploy Compliance Scanning
-    organization: "{{ audience }}"
+    organization: "{  { audience }}"
     ask_inventory_on_launch: yes
     ask_limit_on_launch: yes
-    project: "{{ audience }} Compliance Code"
+    project: "{  { audience }} Compliance Code"
     playbook: demos/compliance/playbooks/deploy-compliance-scanning.yml
     execution_environment: Compliance Demo EE
     ask_credential_on_launch: yes
   - name: Create Policies on Console.redhat.com
-    organization: "{{ audience }}"
+    organization: "{  { audience }}"
     ask_inventory_on_launch: yes
     ask_limit_on_launch: yes
-    project: "{{ audience }} Compliance Code"
+    project: "{  { audience }} Compliance Code"
     playbook: demos/compliance/playbooks/create-policies-on-crhc.yml
     execution_environment: Compliance Demo EE
     ask_credential_on_launch: yes
   - name: Assign Hosts to Policy on Console.redhat.com
-    organization: "{{ audience }}"
+    organization: "{  { audience }}"
     ask_inventory_on_launch: yes
     ask_limit_on_launch: yes
-    project: "{{ audience }} Compliance Code"
+    project: "{  { audience }} Compliance Code"
     playbook: demos/compliance/playbooks/assign-hosts-to-policy.yml
     execution_environment: Compliance Demo EE
     ask_credential_on_launch: yes
   - name: Run Compliance Scan
-    organization: "{{ audience }}"
+    organization: "{  { audience }}"
     ask_inventory_on_launch: yes
     ask_limit_on_launch: yes
-    project: "{{ audience }} Compliance Code"
+    project: "{  { audience }} Compliance Code"
     playbook: demos/compliance/playbooks/run-compliance-scan.yml
     execution_environment: Compliance Demo EE
     ask_credential_on_launch: yes
     ask_variables_on_launch: yes
     become_enabled: yes
   - name: Run Compliance Roles
-    organization: "{{ audience }}"
+    organization: "{  { audience }}"
     ask_inventory_on_launch: yes
     ask_limit_on_launch: yes
-    project: "{{ audience }} Compliance Code"
+    project: "{  { audience }} Compliance Code"
     playbook: demos/compliance/playbooks/run-compliance-roles.yml
     execution_environment: Compliance Demo Compliance EE
     ask_credential_on_launch: yes
     ask_variables_on_launch: yes
     become_enabled: yes
   - name: Reboot Systems
-    organization: "{{ audience }}"
+    organization: "{  { audience }}"
     ask_inventory_on_launch: yes
     ask_limit_on_launch: yes
-    project: "{{ audience }} Compliance Code"
+    project: "{  { audience }} Compliance Code"
     playbook: demos/compliance/playbooks/reboot-systems.yml
     execution_environment: Compliance Demo EE
     ask_credential_on_launch: yes
@@ -199,18 +300,19 @@ controller_templates:
 
 controller_workflows:
   - name: Setup Satellite Compliance Scanning
-    organization: "{{ audience }}"
+    organization: "{  { audience }}"
     state: "{{ controller_state | default('present') }}"
     extra_vars:
       demo: compliance
-      audience: "{{ audience }}"
+      audience: "{  { audience }}"
     simplified_workflow_nodes:
       - unified_job_template: Upload SCAP Content
         identifier: node101
-        inventory: "{{ audience }} Infrastructure"
+        inventory: "{  { audience }} Infrastructure"
         limit: satellite
         credentials:
-          - Compliance Demo Peripheral Credentials
+          - Satellite API Credentials
+          - Compliance Root Credentials
         success_nodes:
           - node102
       - approval_node:
@@ -220,10 +322,10 @@ controller_workflows:
           - node103
       - unified_job_template: Create Hostgroups
         identifier: node103
-        inventory: "{{ audience }} Infrastructure"
+        inventory: "{  { audience }} Infrastructure"
         limit: rhel7:rhel8
         credentials:
-          - Compliance Demo Peripheral Credentials
+          - Satellite API Credentials
         success_nodes:
           - node104
       - approval_node:
@@ -233,10 +335,10 @@ controller_workflows:
           - node105
       - unified_job_template: Move Hosts to Hostgroups
         identifier: node105
-        inventory: "{{ audience }} Infrastructure"
+        inventory: "{  { audience }} Infrastructure"
         limit: rhel7:rhel8
         credentials:
-          - Compliance Demo Peripheral Credentials
+          - Satellite API Credentials
         success_nodes:
           - node106
       - approval_node:
@@ -246,10 +348,10 @@ controller_workflows:
           - node107
       - unified_job_template: Create Policies on Satellite
         identifier: node107
-        inventory: "{{ audience }} Infrastructure"
+        inventory: "{  { audience }} Infrastructure"
         limit: rhel7:rhel8
         credentials:
-          - Compliance Demo Peripheral Credentials
+          - Satellite API Credentials
         success_nodes:
           - node108
       - approval_node:
@@ -259,21 +361,21 @@ controller_workflows:
           - node109
       - unified_job_template: Deploy Compliance Scanning
         identifier: node109
-        inventory: "{{ audience }} Infrastructure"
+        inventory: "{  { audience }} Infrastructure"
         limit: rhel7:rhel8
         credentials:
-          - Compliance Demo Peripheral Credentials
+          - Satellite API Credentials
 
   - name: Setup Insights Compliance Scanning
-    organization: "{{ audience }}"
+    organization: "{  { audience }}"
     state: "{{ controller_state | default('present') }}"
     extra_vars:
       demo: compliance
-      audience: "{{ audience }}"
+      audience: "{  { audience }}"
     simplified_workflow_nodes:
       - unified_job_template: Create Policies on Console.redhat.com
         identifier: node101
-        inventory: "{{ audience }} Infrastructure"
+        inventory: "{  { audience }} Infrastructure"
         limit: rhel7:rhel8
         credentials:
           - Console.redhat.com Credentials
@@ -287,22 +389,22 @@ controller_workflows:
           - node103
       - unified_job_template: Assign Hosts to Policy on Console.redhat.com
         identifier: node103
-        inventory: "{{ audience }} Infrastructure"
+        inventory: "{  { audience }} Infrastructure"
         limit: rhel7:rhel8
         credentials:
           - Console.redhat.com Credentials
           - Compliance Root Credentials
 
   - name: Apply Compliance Automation
-    organization: "{{ audience }}"
+    organization: "{  { audience }}"
     state: "{{ controller_state | default('present') }}"
     extra_vars:
       demo: compliance
-      audience: "{{ audience }}"
+      audience: "{  { audience }}"
     simplified_workflow_nodes:
       - unified_job_template: Run Compliance Scan
         identifier: node101
-        inventory: "{{ audience }} Infrastructure"
+        inventory: "{  { audience }} Infrastructure"
         limit: rhel7:rhel8
         credentials:
           - Compliance Non-Root Credentials
@@ -315,7 +417,7 @@ controller_workflows:
           - node103
       - unified_job_template: Run Compliance Roles
         identifier: node103
-        inventory: "{{ audience }} Infrastructure"
+        inventory: "{  { audience }} Infrastructure"
         limit: rhel7:rhel8
         credentials:
           - Compliance Non-Root Credentials
@@ -323,7 +425,7 @@ controller_workflows:
           - node104
       - unified_job_template: Reboot Systems
         identifier: node104
-        inventory: "{{ audience }} Infrastructure"
+        inventory: "{  { audience }} Infrastructure"
         limit: rhel7:rhel8
         credentials:
           - Compliance Non-Root Credentials
@@ -331,7 +433,7 @@ controller_workflows:
           - node105
       - unified_job_template: Run Compliance Scan
         identifier: node105
-        inventory: "{{ audience }} Infrastructure"
+        inventory: "{  { audience }} Infrastructure"
         limit: rhel7:rhel8
         credentials:
           - Compliance Non-Root Credentials

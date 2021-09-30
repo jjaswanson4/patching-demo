@@ -9,108 +9,79 @@ controller_organization: Demo Provisioner
 # Change this to change the name of the project for the provisioner job templates.
 project: Demo Provisioner Codebase
 
-controller_inventories:
-  - name: Compliance Demo Infrastructure
-    organization: Demo Provisioner
-    variables:
-      dns_zone: josh.lab.msp.redhat.com
-      dns:
-        server: idm05.lab.msp.redhat.com
-        password: "{  { dns_pass }}"
-        records:
-          - name: "{  { inventory_hostname.split('.')[0] }}"
-            zone: josh.lab.msp.redhat.com
-            type: A
-            value: "{  { ip_address }}"
-          - name: "{  { ip_address.split('.')[-1] }}"
-            zone: "{  { ip_address.split('.')[2] }}.15.10.in-addr.arpa."
-            type: PTR
-            value: "{  { inventory_hostname }}."
-      config_files:
-        - hosts
-        - resolv.conf
-      timesync_ntp_servers:
-        - hostname: 0.rhel.pool.ntp.org
-          iburst: yes
-        - hostname: 1.rhel.pool.ntp.org
-          iburst: yes
-        - hostname: 2.rhel.pool.ntp.org
-          iburst: yes
-        - hostname: 3.rhel.pool.ntp.org
-          iburst: yes
-      vcenter:
-        server: vcenter02.lab.msp.redhat.com
-        username: 'Administrator@vsphere.local'
-        password: "{  { vcenter_password }}"
-        datacenter: MSP Lab
-      selinux_policy: targeted
-      selinux_state: permissive
-      dns_resolv:
-        search_domains:
-          - josh.lab.msp.redhat.com
-          - lab.msp.redhat.com
-        nameservers:
-          - 10.15.120.4
-          - 10.15.108.5
-        options:
-          - 'timeout:1'
-      base_packages:
-        disable_gpg_check: yes
-        packages:
-          - lsof
-          - vim
-          - sos
-          - redhat-support-tool
-          - "{  { htop_url }}"
-      ignore_virtual_disk_errors: yes
-      remove_cdrom: no
+# This is the default prefix for assets created for this demo.
+# Change this variable to use a different prefix.
+demo_prefix: Compliance Demo
+
+# This is the realitive path to the vars files for this demo.
+# Typically this contains a vars file for the provisioner, Satellite, and Controller.
+vars_files_path: demos/compliance/vars
+
+# This is the inventory that stores the information about the infrastructure needed for the demo.
+# This is commonly an instance of Satellite, Controller, and some "demo hosts".
+inventory: "{{ demo_prefix }} Infrastructure"
+
+# This is the execution environment used for this demo provisioner.
+# This execution environment will automatically be configured in Controller.
+execution_environment:
+  name: Demo Provisioner EE
+  image: patching-demo-provisioner-ee
+
+# This is the information used for the instance of Controller for the demo.
+# This can be the same instance as where the provisioner is deployed, but it's not recommended.
+controller:
+  hostname: compliance-controller.josh.lab.msp.redhat.com
+  configuration_file: "{{ vars_files_path }}/controller-configuration.yml"
+  ip_address: 10.15.121.13
+  username: admin
+  password: "{{ controller_password }}"
+
+# This is the information used for the instance of Satellite for the demo.
+# This can be the same instance as where the provisioner is deployed, but it's not recommended.
+satellite:
+  hostname: compliance-satellite.josh.lab.msp.redhat.com
+  configuration_file: "{{ vars_files_path }}/satellite-configuration.yml"
+  ip_address: 10.15.121.3
+  username: admin
+  password: "{{ satellite_password }}"
+
+# These are where demo specific components are defined, in hash form. These will automatically be added to the common resources.
+# If there is no need for a specific, resource, simply define an empty var, such as `controller_organizations: []`
+controller_organizations: []
+controller_credential_types: []
+controller_credentials: []
+controller_execution_environments: []
+controller_inventories: []
+controller_projects: []
 
 controller_hosts:
-  - name: compliance-satellite.josh.lab.msp.redhat.com
-    inventory: Compliance Demo Infrastructure
-    variables: "{{ lookup('file', 'demos/compliance/vars/satellite-configuration.yml') | from_yaml }}"
-  - name: compliance-demo
-    inventory: Local Action Inventory
-    variables: "{{ lookup('file', 'demos/compliance/vars/controller-configuration.yml') | from_yaml }}"
   - name: rhel7-hipaa.josh.lab.msp.redhat.com
-    inventory: Compliance Demo Infrastructure
+    inventory: "{{ inventory }}"
     variables:
       ansible_host: 10.15.121.50
       ip_address: "{  { ansible_host }}"
   - name: rhel8-hipaa.josh.lab.msp.redhat.com
-    inventory: Compliance Demo Infrastructure
+    inventory: "{{ inventory }}"
     variables:
       ansible_host: 10.15.121.51
-      ip_address: "{  { ansible_host }}" 
-    
-controller_groups:
-  - name: satellite
-    inventory: Compliance Demo Infrastructure
-    hosts:
-      - compliance-satellite.josh.lab.msp.redhat.com
-  - name: management_plane
-    inventory: Compliance Demo Infrastructure
+      ip_address: "{  { ansible_host }}"
+  - name: rhel7-pci.josh.lab.msp.redhat.com
+    inventory: "{{ inventory }}"
     variables:
-      lifecycle_environment: production
-      provisioning:
-        satellite:
-          server: satellite06.lab.msp.redhat.com
-          username: admin
-          password: "{  { satellite_password }}"
-        host_group: "{  { os }}"
-        organization: MSP Lab
-        location: MSP Lab
-        method: bootdisk
-        dns_domain: josh.lab.msp.redhat.com
-        cpus: "{  { cpus }}"
-        memory_mb: "{  { memory_mb }}"
-        activation_keys: "ak-{  { application }}-{  { os }}-{  { lifecycle_environment }}"
-    children:
-      - satellite
+      ansible_host: 10.15.121.52
+      ip_address: "{  { ansible_host }}"
+  - name: rhel8-pci.josh.lab.msp.redhat.com
+    inventory: "{{ inventory }}"
+    variables:
+      ansible_host: 10.15.121.53
+      ip_address: "{  { ansible_host }}" 
+
+controller_groups:
   - name: rhel7
     inventory: Compliance Demo Infrastructure
     hosts:
       - rhel7-hipaa.josh.lab.msp.redhat.com
+      - rhel7-pci.josh.lab.msp.redhat.com
     variables:
       os: rhel7
       htop_url: https://dl.fedoraproject.org/pub/epel/7/x86_64/Packages/h/htop-2.2.0-3.el7.x86_64.rpm
@@ -118,6 +89,7 @@ controller_groups:
     inventory: Compliance Demo Infrastructure
     hosts:
       - rhel8-hipaa.josh.lab.msp.redhat.com
+      - rhel8-pci.josh.lab.msp.redhat.com
     variables:
       os: rhel8
       htop_url: https://dl.fedoraproject.org/pub/epel/8/Everything/x86_64/Packages/h/htop-3.0.5-1.el8.x86_64.rpm
@@ -167,109 +139,133 @@ controller_workflows:
     extra_vars:
       demo: compliance
     survey_enabled: yes
-    survey:
-      name: ''
-      description: ''
-      spec:
-        - type: text
-          question_name: "Demo Audience?"
-          question_description: "Who is the audience for this demo?"
-          variable: audience
-          required: yes
-        - type: text
-          question_name: "Provisioner?"
-          question_description: "Who is provisioning this demo?"
-          variable: provisioner
-          required: yes
-          default: 'Josh Swanson'
-        - type: text
-          question_name: "Provisioner's Email?"
-          question_description: "What is the provisioner's email address?"
-          variable: provisioner_email
-          required: yes
-          default: 'joshswanson@redhat.com'
-        - type: multiplechoice
-          question_name: Deploy Satellite?
-          question_description: Should satellite be deployed?
-          variable: deploy_satellite
-          choices:
-            - "yes"
-            - "no"
-          default: "yes"
-          required: yes
-        - type: multiplechoice
-          question_name: Configure controller?
-          question_description: Should controller be configured?
-          variable: configure_controller
-          choices:
-            - "yes"
-            - "no"
-          default: "yes"
-          required: yes
-        - type: multiplechoice
-          question_name: Provision demo hosts?
-          question_description: Should the demo hosts be provisioned?
-          variable: provision_demo_hosts
-          choices:
-            - "yes"
-            - "no"
-          default: "yes"
-          required: yes           
+    survey: "{{ lookup('file', '../resources/controller/provisioner-workflow-survey.yml') | from_yaml }}"          
     simplified_workflow_nodes:
-    # Work nodes
-      - unified_job_template: Configure Ansible Controller
+      - unified_job_template: Provision Systems
         identifier: node101
-        limit: compliance-demo
-        credentials:
-          - Demo Provisioner Peripheral Credentials
-        success_nodes:
-          - node999
-        failure_nodes:
-          - node201
-      - unified_job_template: Setup Red Hat Satellite
-        identifier: node102
-        inventory: Compliance Demo Infrastructure
+        inventory: "{{ inventory }}"
         limit: satellite
         credentials:
-          - Demo Provisioner Peripheral Credentials
-          - Demo Provisioner Root Account
+          - "{{ demo_prefix }} Peripheral Credentials"
+          - "{{ demo_prefix }} Root Account"
+        success_nodes:
+          - node102
+        failure_nodes:
+          - node1101
+      - unified_job_template: Install Red Hat Satellite
+        identifier: node102
+        inventory: "{{ inventory }}"
+        limit: satellite
+        credentials:
+          - "{{ demo_prefix }} Peripheral Credentials"
+          - "{{ demo_prefix }} Root Account"
         success_nodes:
           - node103
         failure_nodes:
-          - node202
-      - unified_job_template: Provision Systems
+          - node1102
+      - unified_job_template: Configure Red Hat Satellite
         identifier: node103
-        inventory: Compliance Demo Infrastructure
-        limit: demo_hosts
+        inventory: "{{ inventory }}"
+        limit: satellite
         credentials:
-          - Demo Provisioner Peripheral Credentials
-          - Demo Provisioner Root Account
+          - "{{ demo_prefix }} Peripheral Credentials"
+          - "{{ demo_prefix }} Root Account"
         success_nodes:
-          - node104
+          - node301
         failure_nodes:
-          - node203
-      - unified_job_template: Create Compliance User
-        identifier: node104
-        inventory: Compliance Demo Infrastructure
-        limit: demo_hosts
+          - node1103
+      - unified_job_template: Provision Systems
+        identifier: node201
+        inventory: "{{ inventory }}"
+        limit: controller
         credentials:
-          - Demo Provisioner Root Account
+          - "{{ demo_prefix }} Peripheral Credentials"
+          - "{{ demo_prefix }} Root Account"
+        success_nodes:
+          - node202
+        failure_nodes:
+          - node1201
+      - unified_job_template: Install Ansible Controller
+        identifier: node202
+        inventory: "{{ inventory }}"
+        limit: controller
+        credentials:
+          - "{{ demo_prefix }} Peripheral Credentials"
+          - "{{ demo_prefix }} Root Account"
+        success_nodes:
+          - node203
+        failure_nodes:
+          - node1202
+      - unified_job_template: Configure Ansible Controller
+        identifier: node203
+        inventory: "{{ inventory }}"
+        limit: controller
+        credentials:
+          - "{{ demo_prefix }} Peripheral Credentials"
+          - "{{ demo_prefix }} Root Account"
         success_nodes:
           - node999
         failure_nodes:
-          - node204
-    # Notification Nodes
-      - unified_job_template: Send Provisioner Email | Succeeded
+          - node1203
+      - unified_job_template: Provision Systems
+        identifier: node301
+        inventory: "{{ inventory }}"
+        limit: demo_hosts
+        credentials:
+          - "{{ demo_prefix }} Peripheral Credentials"
+          - "{{ demo_prefix }} Root Account"
+        success_nodes:
+          - node302
+        failure_nodes:
+          - node1301
+      - unified_job_template: Create Compliance User
+        identifier: node302
+        inventory: "{{ inventory }}"
+        limit: demo_hosts
+        credentials:
+          - "{{ demo_prefix }} Peripheral Credentials"
+          - "{{ demo_prefix }} Root Account"
+        success_nodes:
+          - node999
+        failure_nodes:
+          - node1302
+      - unified_job_template: Send Provisioner Email
         identifier: node999
         all_parents_must_converge: yes
-      - unified_job_template: Send Provisioner Email | Failed
-        identifier: node201
-      - unified_job_template: Send Provisioner Email | Failed
-        identifier: node202
-      - unified_job_template: Send Provisioner Email | Failed
-        identifier: node203
-      - unified_job_template: Send Provisioner Email | Failed
-        identifier: node204
+        extra_data:
+          provisioner_status: success
+      - unified_job_template: Send Provisioner Email
+        identifier: node1101
+        extra_data:
+          provisioner_status: failed
+      - unified_job_template: Send Provisioner Email
+        identifier: node1102
+        extra_data:
+          provisioner_status: failed
+      - unified_job_template: Send Provisioner Email
+        identifier: node1103
+        extra_data:
+          provisioner_status: failed
+      - unified_job_template: Send Provisioner Email
+        identifier: node1201
+        extra_data:
+          provisioner_status: failed
+      - unified_job_template: Send Provisioner Email
+        identifier: node1202
+        extra_data:
+          provisioner_status: failed
+      - unified_job_template: Send Provisioner Email
+        identifier: node1203
+        extra_data:
+          provisioner_status: failed
+      - unified_job_template: Send Provisioner Email
+        identifier: node1301
+        extra_data:
+          provisioner_status: failed
+      - unified_job_template: Send Provisioner Email
+        identifier: node1302
+        extra_data:
+          provisioner_status: failed
   - name: Teardown Compliance Demo
     organization: Demo Provisioner
     state: "{{ controller_state | default('present') }}"
@@ -286,19 +282,12 @@ controller_workflows:
           variable: audience
           required: yes
     simplified_workflow_nodes:
-      - unified_job_template: Remove Controller Configuration
-        identifier: node995
-        limit: compliance-demo
-        credentials:
-          - Demo Provisioner Peripheral Credentials
-        always_nodes:
-          - node997
       - unified_job_template: Unregister from Insights
         identifier: node996
         inventory: Compliance Demo Infrastructure
-        limit: 'demo_hosts:satellite'
+        limit: 'demo_hosts:satellite:controller'
         credentials:
-          - Demo Provisioner Root Account
+          - "{{ demo_prefix }} Root Account"
         always_nodes:
           - node997
       - unified_job_template: Teardown Systems
@@ -306,57 +295,57 @@ controller_workflows:
         inventory: Compliance Demo Infrastructure
         limit: demo_hosts
         credentials:
-          - Demo Provisioner Peripheral Credentials
+          - "{{ demo_prefix }} Peripheral Credentials"
         always_nodes:
           - node998
       - unified_job_template: Teardown Systems
         identifier: node998
         inventory: Compliance Demo Infrastructure
-        limit: satellite
+        limit: management_plane
         credentials:
-          - Demo Provisioner Peripheral Credentials
+          - "{{ demo_prefix }} Peripheral Credentials"
         always_nodes:
           - node999
       - unified_job_template: Cleanup DNS Records
         identifier: node999
         inventory: Compliance Demo Infrastructure
-        limit: 'demo_hosts:satellite'
+        limit: 'demo_hosts:satellite:controller'
         credentials:
-          - Demo Provisioner Peripheral Credentials
-  - name: Reset Compliance Demo
-    organization: Demo Provisioner
-    state: "{{ controller_state | default('present') }}"
-    extra_vars:
-      demo: compliance
-    survey_enabled: yes
-    survey:
-      name: ''
-      description: ''
-      spec:
-        - type: text
-          question_name: "Demo Audience?"
-          question_description: "Who is the audience for this demo"
-          variable: audience
-          required: yes
-    simplified_workflow_nodes:
-      - unified_job_template: Unregister from Insights
-        identifier: node101
-        inventory: Compliance Demo Infrastructure
-        limit: demo_hosts
-        credentials:
-          - Demo Provisioner Root Account
-        always_nodes:
-          - node102
-          - node103
-      - unified_job_template: Teardown Systems
-        identifier: node102
-        inventory: Compliance Demo Infrastructure
-        limit: demo_hosts
-        credentials:
-          - Demo Provisioner Peripheral Credentials
-      - unified_job_template: Cleanup DNS Records
-        identifier: node103
-        inventory: Compliance Demo Infrastructure
-        limit: demo_hosts
-        credentials:
-          - Demo Provisioner Peripheral Credentials
+          - "{{ demo_prefix }} Peripheral Credentials"
+  # - name: Reset Compliance Demo
+  #   organization: Demo Provisioner
+  #   state: "{{ controller_state | default('present') }}"
+  #   extra_vars:
+  #     demo: compliance
+  #   survey_enabled: yes
+  #   survey:
+  #     name: ''
+  #     description: ''
+  #     spec:
+  #       - type: text
+  #         question_name: "Demo Audience?"
+  #         question_description: "Who is the audience for this demo"
+  #         variable: audience
+  #         required: yes
+  #   simplified_workflow_nodes:
+  #     - unified_job_template: Unregister from Insights
+  #       identifier: node101
+  #       inventory: Compliance Demo Infrastructure
+  #       limit: demo_hosts
+  #       credentials:
+  #         - Demo Provisioner Root Account
+  #       always_nodes:
+  #         - node102
+  #         - node103
+  #     - unified_job_template: Teardown Systems
+  #       identifier: node102
+  #       inventory: Compliance Demo Infrastructure
+  #       limit: demo_hosts
+  #       credentials:
+  #         - Demo Provisioner Peripheral Credentials
+  #     - unified_job_template: Cleanup DNS Records
+  #       identifier: node103
+  #       inventory: Compliance Demo Infrastructure
+  #       limit: demo_hosts
+  #       credentials:
+  #         - Demo Provisioner Peripheral Credentials
