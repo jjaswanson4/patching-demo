@@ -1,0 +1,41 @@
+---
+
+- name: create baseline on console.redhat.com
+  hosts:
+    - all
+  gather_facts: no
+  module_defaults:
+    ansible.builtin.uri:
+        user: "{{ crhc_username }}"
+        password: "{{ crhc_password }}"
+        force_basic_auth: yes
+  tasks:
+    - name: create baseline
+      ansible.builtin.uri:
+        url: https://console.redhat.com/api/system-baseline/v1/baselines
+        method: POST
+        body_format: json
+        status_code:
+          - 200
+          - 400
+        body:
+          display_name: Q4 2021 Baseline
+          baseline_facts:
+            - name: arch
+              value: x86_64
+            - name: infrastructure_type
+              value: virtual
+            - name: os_kernel_version
+              value: '4.18.10'
+            - name: os_release
+              value: '8.4'
+            - name: tuned_profile
+              value: virtual-guest
+      register: create_baseline
+      changed_when:
+        - create_baseline.status == 200
+      failed_when:
+        - create_baseline.status != 200
+        - create_baseline.status != 400
+      delegate_to: localhost
+      throttle: 1
