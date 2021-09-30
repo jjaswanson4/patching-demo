@@ -32,7 +32,7 @@ execution_environment:
 controller:
   hostname: s4hana-deployment-controller.josh.lab.msp.redhat.com
   configuration_file: "{{ vars_files_path }}/controller-configuration.yml"
-  ip_address: 10.15.121.13
+  ip_address: 10.15.121.12
   username: admin
   password: "{{ controller_password }}"
 
@@ -41,7 +41,7 @@ controller:
 satellite:
   hostname: s4hana-deployment-satellite.josh.lab.msp.redhat.com
   configuration_file: "{{ vars_files_path }}/satellite-configuration.yml"
-  ip_address: 10.15.121.3
+  ip_address: 10.15.121.2
   username: admin
   password: "{{ satellite_password }}"
 
@@ -66,10 +66,98 @@ controller_workflows:
     survey_enabled: yes
     survey: "{{ lookup('file', '../resources/controller/provisioner-workflow-survey.yml') | from_yaml }}"
     simplified_workflow_nodes:
-    # Work nodes
-      - unified_job_template: Setup Red Hat Satellite
+      - unified_job_template: Provision Systems
         identifier: node101
         inventory: "{{ inventory }}"
-      - unified_job_template: Setup Ansible Controller
+        limit: satellite
+        credentials:
+          - "{{ demo_prefix }} Peripheral Credentials"
+          - "{{ demo_prefix }} Root Account"
+        success_nodes:
+          - node102
+        failure_nodes:
+          - node1101
+      - unified_job_template: Install Red Hat Satellite
         identifier: node102
         inventory: "{{ inventory }}"
+        limit: satellite
+        credentials:
+          - "{{ demo_prefix }} Peripheral Credentials"
+          - "{{ demo_prefix }} Root Account"
+        success_nodes:
+          - node103
+        failure_nodes:
+          - node1102
+      - unified_job_template: Configure Red Hat Satellite
+        identifier: node103
+        inventory: "{{ inventory }}"
+        limit: satellite
+        credentials:
+          - "{{ demo_prefix }} Peripheral Credentials"
+          - "{{ demo_prefix }} Root Account"
+        success_nodes:
+          - node999
+        failure_nodes:
+          - node1103
+      - unified_job_template: Provision Systems
+        identifier: node201
+        inventory: "{{ inventory }}"
+        limit: controller
+        credentials:
+          - "{{ demo_prefix }} Peripheral Credentials"
+          - "{{ demo_prefix }} Root Account"
+        success_nodes:
+          - node202
+        failure_nodes:
+          - node1201
+      - unified_job_template: Install Ansible Controller
+        identifier: node202
+        inventory: "{{ inventory }}"
+        limit: controller
+        credentials:
+          - "{{ demo_prefix }} Peripheral Credentials"
+          - "{{ demo_prefix }} Root Account"
+        success_nodes:
+          - node203
+        failure_nodes:
+          - node1202
+      - unified_job_template: Configure Ansible Controller
+        identifier: node203
+        inventory: "{{ inventory }}"
+        limit: controller
+        credentials:
+          - "{{ demo_prefix }} Peripheral Credentials"
+          - "{{ demo_prefix }} Root Account"
+        success_nodes:
+          - node999
+        failure_nodes:
+          - node1203
+      - unified_job_template: Send Provisioner Email
+        identifier: node999
+        all_parents_must_converge: yes
+        extra_data:
+          provisioner_status: success
+      - unified_job_template: Send Provisioner Email
+        identifier: node1101
+        extra_data:
+          provisioner_status: failed
+      - unified_job_template: Send Provisioner Email
+        identifier: node1102
+        extra_data:
+          provisioner_status: failed
+      - unified_job_template: Send Provisioner Email
+        identifier: node1103
+        extra_data:
+          provisioner_status: failed
+      - unified_job_template: Send Provisioner Email
+        identifier: node1201
+        extra_data:
+          provisioner_status: failed
+      - unified_job_template: Send Provisioner Email
+        identifier: node1202
+        extra_data:
+          provisioner_status: failed
+      - unified_job_template: Send Provisioner Email
+        identifier: node1203
+        extra_data:
+          provisioner_status: failed

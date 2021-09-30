@@ -18,6 +18,11 @@ controller_install:
   pg:
     password: 'R3dh4t123'
 
+bootstrap_controller: yes
+
+controller_license:
+  manifest: /tmp/controller-manifest.zip
+
 controller_organization: "{  { audience }}"
 project: "{  { audience }} S4HANA Deployment Code"
 
