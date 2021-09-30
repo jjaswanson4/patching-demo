@@ -15,7 +15,7 @@
   post_tasks:
     - name: login to registry.redhat.io
       ansible.builtin.shell:
-        cmd: podman login --username "{{ crhc_username }}" --password "{{ crhc_password }}" registry.redhat.io
+        cmd: "podman login --username '{{ crhc_username }}' --password '{{ crhc_password }}' registry.redhat.io"
       become: yes
       become_user: awx
       #no_log: yes
