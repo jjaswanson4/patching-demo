@@ -6,3 +6,5 @@ scratch*
 **/context
 test.yml
 test*
+ansible-navigator*
+*-artifact-*.json
