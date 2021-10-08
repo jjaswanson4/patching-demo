@@ -24,10 +24,6 @@ controller_license:
 
 controller_organizations:
   - name: "{  { audience }}"
-    galaxy_credentials:
-      - MSP Lab Automation Hub - RH Certified
-      - MSP Lab Automation Hub - Community
-      - Ansible Galaxy
 
 controller_credentials:
   - name: Patching Credentials
