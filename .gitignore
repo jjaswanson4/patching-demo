@@ -8,3 +8,6 @@ test.yml
 test*
 ansible-navigator*
 *-artifact-*.json
+tmp
+*.sh
+*test*
