@@ -1,6 +1,6 @@
 ---
 
-ansible_host: 10.15.121.1
+ansible_host: "{{ satellite.ip_address }}"
 ip_address: "{  { ansible_host }}"
 cpus: 8
 memory_mb: 24576
