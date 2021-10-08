@@ -371,7 +371,7 @@ controller_workflows:
     extra_vars:
       demo: patching
     survey_enabled: yes
-    survey: "{{ lookup('file', '../resources/controller/provisioner-workflow-survey.yml') | from_yaml }}"
+    survey: "{{ lookup('file', 'resources/controller/provisioner-workflow-survey.yml') | from_yaml }}"
     simplified_workflow_nodes:
       - unified_job_template: Provision Systems
         identifier: node101
