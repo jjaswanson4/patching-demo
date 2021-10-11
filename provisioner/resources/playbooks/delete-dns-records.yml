@@ -1,6 +1,6 @@
 ---
 
-- name: delete DN records
+- name: delete DNS records
   hosts:
     - all
   gather_facts: false
