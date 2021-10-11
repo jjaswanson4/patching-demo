@@ -8,7 +8,7 @@
        ansible.windows.win_dns_client:
         adapter_names: 'Ethernet*'
         dns_servers:
-          - "{{ pdc_dns_address }}"
+          - "{{ pdc_ip_address }}"
           - 127.0.0.1
   tasks:
     - name: confgure domain controllers
