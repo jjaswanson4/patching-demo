@@ -1,0 +1,4 @@
+---
+
+ansible_host: "{{ satellite.ip_address }}"
+ip_address: "{  { ansible_host }}"
