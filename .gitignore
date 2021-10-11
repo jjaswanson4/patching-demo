@@ -11,3 +11,4 @@ ansible-navigator*
 tmp
 *.sh
 *test*
+run.log
