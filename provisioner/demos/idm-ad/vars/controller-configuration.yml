@@ -1,0 +1,746 @@
+---
+
+ansible_host: "{{ controller.ip_address }}"
+ip_address: "{  { ansible_host }}"
+cpus: 4
+memory_mb: 16384
+os: rhel8
+application: general
+
+htop_url: https://dl.fedoraproject.org/pub/epel/8/Everything/x86_64/Packages/h/htop-3.0.5-1.el8.x86_64.rpm
+
+aap_download_url: http://satellite06.lab.msp.redhat.com/pub/ansible-automation-platform-setup-bundle-2.0.0-1-early-access.tar.gz
+aap_bundle: ansible-automation-platform-setup-bundle-2.0.0-1-early-access.tar.gz
+
+controller_install:
+  admin_password: "{  { controller_password }}"
+  pg:
+    password: 'R3dh4t123'
+
+bootstrap_controller: yes
+
+controller_license:
+  manifest: /tmp/controller-manifest.zip
+
+controller_organizations:
+  - name: "{  { audience }}"
+
+controller_credentials:
+  - name: RHEL Root Credentials
+    credential_type: Machine
+    organization: "{  { audience }}"
+    inputs:
+      username: root
+      password: "{{ ansible_password }}"
+  - name: Active Directory Domain Administrator Credentials
+    organization: "{  { audience }}"
+    credential_type: Machine
+    inputs:
+      username: Administrator@ad.josh.lab.msp.redhat.com
+      password: "{{ ansible_password }}"
+  - name: MSP Lab AAP20 Automation Hub
+    organization: "{  { audience }}"
+    inputs:
+      host: aap20-hub.josh.lab.msp.redhat.com
+      username: admin
+      password: "{{ ansible_password}}"
+      verify_ssl: no
+
+controller_execution_environments:
+  - name: IDM-AD Integration Demo EE
+    image: 'aap20-hub.josh.lab.msp.redhat.com/idm-ad-integration-demo-ee:latest'
+    organization: "{  { audience }}"
+    credential: MSP Lab AAP20 Automation Hub
+
+controller_inventories:
+  - name: "{  { audience }} Infrastructure"
+    organization: "{  { audience }}"
+
+controller_hosts:
+  - name: ad-dc1.ad.josh.lab.msp.redhat.com
+    inventory: "{{ inventory }}"
+    variables:
+      ansible_host: 10.15.121.60
+      ip_address: "{  { ansible_host }}"
+  - name: ad-dc2.ad.josh.lab.msp.redhat.com
+    inventory: "{{ inventory }}"
+    variables:
+      ansible_host: 10.15.121.61
+      ip_address: "{  { ansible_host }}"
+  - name: idm01.idm.josh.lab.msp.redhat.com
+    inventory: "{{ inventory }}"
+    variables:
+      ansible_host: 10.15.121.62
+      ip_address: "{  { ansible_host }}"
+  - name: idm02.idm.josh.lab.msp.redhat.com
+    inventory: "{{ inventory }}"
+    variables:
+      ansible_host: 10.15.121.63
+      ip_address: "{  { ansible_host }}"
+  - name: trust-client-1.idm.josh.lab.msp.redhat.com
+    inventory: "{{ inventory }}"
+    variables:  
+      ansible_host: 10.15.121.64
+      ip_address: "{  { ansible_host }}"
+  - name: trust-client-2.idm.josh.lab.msp.redhat.com
+    inventory: "{{ inventory }}"
+    variables:  
+      ansible_host: 10.15.121.65
+      ip_address: "{  { ansible_host }}"
+  - name: trust-client-3.idm.josh.lab.msp.redhat.com
+    inventory: "{{ inventory }}"
+    variables:  
+      ansible_host: 10.15.121.66
+      ip_address: "{  { ansible_host }}"
+  - name: trust-client-4.idm.josh.lab.msp.redhat.com
+    inventory: "{{ inventory }}"
+    variables:  
+      ansible_host: 10.15.121.67
+      ip_address: "{  { ansible_host }}"
+  - name: trust-client-5.idm.josh.lab.msp.redhat.com
+    inventory: "{{ inventory }}"
+    variables:  
+      ansible_host: 10.15.121.68
+      ip_address: "{  { ansible_host }}"
+
+controller_groups:
+  - name: pdc
+    inventory: "{{ inventory }}"
+    hosts:
+      - ad-dc1.ad.josh.lab.msp.redhat.com
+  - name: domain_controllers
+    inventory: "{{ inventory }}"
+    hosts:
+      - ad-dc2.ad.josh.lab.msp.redhat.com
+    variables:
+      pdc_ip_address: "{  { hostvars['ad-dc1.ad.josh.lab.msp.redhat.com']['ip_address'] }}"
+  - name: active_directory
+    inventory: "{{ inventory }}"
+    children:
+      - pdc
+      - domain_controllers
+    variables:
+      ad:
+        groups:
+          - name: infra_architects
+          - name: rhel_admins
+          - name: app-team-1
+          - name: app-team-2
+          - name: app-team-3
+          - name: app-team-4
+          - name: app-team-5
+        users:
+          - name: Olivia
+            groups:
+              - infra_architects
+          - name: Liam
+            groups:
+              - infra_architects
+          - name: Emma
+            groups:
+              - infra_architects
+          - name: Noah
+            groups:
+              - infra_architects
+          - name: Amelia
+            groups:
+              - infra_architects
+          - name: Oliver
+            groups:
+              - rhel_admins
+          - name: Ava
+            groups:
+              - rhel_admins
+          - name: Elijah
+            groups:
+              - rhel_admins
+          - name: Sophia
+            groups:
+              - rhel_admins
+          - name: Lucas
+            groups:
+              - rhel_admins
+          - name: Charlotte
+            groups:
+              - app-team-1
+          - name: Levi
+            groups:
+              - app-team-1
+          - name: Isabella
+            groups:
+              - app-team-1
+          - name: Mason
+            groups:
+              - app-team-1
+          - name: Mia
+            groups:
+              - app-team-1
+          - name: James
+            groups:
+              - app-team-1
+              - app-team-2
+          - name: Luna
+            groups:
+              - app-team-1
+              - app-team-2
+          - name: Asher
+            groups:
+              - app-team-1
+              - app-team-2
+          - name: Harper
+            groups:
+              - app-team-1
+              - app-team-2
+          - name: Leo
+            groups:
+              - app-team-1
+              - app-team-2
+          - name: Gianna
+            groups:
+              - app-team-2
+          - name: Mateo
+            groups:
+              - app-team-2
+          - name: Evelyn
+            groups:
+              - app-team-2
+          - name: Ethan
+            groups:
+              - app-team-2
+          - name: Aria
+            groups:
+              - app-team-2
+          - name: Benjamin
+            groups:
+              - app-team-3
+          - name: Ella
+            groups:
+              - app-team-3
+          - name: Jack
+            groups:
+              - app-team-3
+          - name: Ellie
+            groups:
+              - app-team-3
+          - name: Aiden
+            groups:
+              - app-team-3
+          - name: Mila
+            groups:
+              - app-team-3
+              - app-team-4
+              - app-team-5
+          - name: Logan
+            groups:
+              - app-team-3
+              - app-team-4
+              - app-team-5
+          - name: Layla
+            groups:
+              - app-team-3
+              - app-team-4
+              - app-team-5
+          - name: Grayson
+            groups:
+              - app-team-3
+              - app-team-4
+              - app-team-5
+          - name: Ryilee
+            groups:
+              - app-team-3
+              - app-team-4
+              - app-team-5
+          - name: Leriel
+            groups:
+              - app-team-4
+              - app-team-5
+          - name: Camila
+            groups:
+              - app-team-4
+              - app-team-5
+          - name: Jackson
+            groups:
+              - app-team-4
+              - app-team-5
+          - name: Avery
+            groups:
+              - app-team-4
+              - app-team-5
+          - name: Wyatt
+            groups:
+              - app-team-4
+              - app-team-5
+          - name: Lily
+            groups:
+              - app-team-5
+          - name: Henry
+            groups:
+              - app-team-5
+          - name: Scarlett
+            groups:
+              - app-team-5
+          - name: Sebastian
+            groups:
+              - app-team-5
+          - name: Sofia
+            groups:
+              - app-team-5
+          - name: Carter
+            groups:
+              - app-team-1
+              - app-team-5
+          - name: Nova
+            groups:
+              - app-team-1
+              - app-team-5
+          - name: Daniel
+            groups:
+              - app-team-1
+              - app-team-5
+          - name: Aurora
+            groups:
+              - app-team-1
+              - app-team-5
+          - name: William
+            groups:
+              - app-team-1
+              - app-team-5
+          - name: Chloe
+            groups:
+              - app-team-1
+              - app-team-2
+              - app-team-5
+          - name: Owen
+            groups:
+              - app-team-1
+              - app-team-2
+              - app-team-5
+          - name: Riley
+            groups:
+              - app-team-1
+              - app-team-2
+              - app-team-5
+          - name: Alexander
+            groups:
+              - app-team-1
+              - app-team-2
+              - app-team-5
+          - name: Abigail
+            groups:
+              - app-team-1
+              - app-team-2
+              - app-team-5
+          - name: Julian
+            groups:
+              - app-team-1
+              - app-team-2
+              - app-team-3
+              - app-team-5
+          - name: Hazel
+            groups:
+              - app-team-1
+              - app-team-2
+              - app-team-3
+              - app-team-5
+          - name: Ezra
+            groups:
+              - app-team-1
+              - app-team-2
+              - app-team-3
+              - app-team-5
+          - name: Nora
+            groups:
+              - app-team-1
+              - app-team-2
+              - app-team-3
+              - app-team-5
+          - name: Michael
+            groups:
+              - app-team-1
+              - app-team-2
+              - app-team-3
+              - app-team-5
+          - name: Zoey
+            groups:
+              - app-team-1
+              - app-team-2
+              - app-team-3
+              - app-team-4
+              - app-team-5
+          - name: Muhammad
+            groups:
+              - app-team-1
+              - app-team-2
+              - app-team-3
+              - app-team-4
+              - app-team-5
+          - name: Elena
+            groups:
+              - app-team-1
+              - app-team-2
+              - app-team-3
+              - app-team-4
+              - app-team-5
+          - name: Hudson
+            groups:
+              - app-team-1
+              - app-team-2
+              - app-team-3
+              - app-team-4
+              - app-team-5
+          - name: Penelope
+            groups:
+              - app-team-1
+              - app-team-2
+              - app-team-3
+              - app-team-4
+              - app-team-5    
+
+
+  - name: windows
+    inventory: "{{ inventory }}"
+    children:
+      - active_directory
+    variables:
+      ansible_connection: winrm
+      ansible_winrm_transport: ntlm
+      ansible_winrm_server_cert_validation: ignore
+      dns_zone: ad.josh.lab.msp.redhat.com
+      vcenter:
+        server: vcenter02.lab.msp.redhat.com
+        username: Administrator@vsphere.local
+      vm:
+        datacenter: MSP Lab
+        cluster: General
+        folder: vm
+        os: server2019
+        cpus: 4
+        memory_mb: 8192
+        networks:
+          - name: vlan146
+            ip: "{  { ip_address }}"
+            netmask: 255.255.252.0
+            gateway: 10.15.123.254
+            dns_servers:
+              - 10.15.120.4
+              - 10.15.108.5
+            type: static
+        customization:
+          dns_servers:
+            - 10.15.120.4
+            - 10.15.108.5
+          dns_suffix: ad.josh.lab.msp.redhat.com
+          hostname: "{  { inventory_hostname.split('.')[0] }}"
+          password: "{  { ansible_password }}"
+          timezone: '020'    
+      dns:
+        server: idm05.lab.msp.redhat.com
+        password: "{  { dns_pass }}"
+        records:
+          - name: "{  { inventory_hostname.split('.')[0] }}"
+            zone: "{  { dns_zone }}"
+            type: A
+            value: "{  { ip_address }}"
+          - name: "{  { ip_address.split('.')[-1] }}"
+            zone: "{  { ip_address.split('.')[2] }}.15.10.in-addr.arpa."
+            type: PTR
+            value: "{  { inventory_hostname }}."
+  - name: master
+    inventory: "{{ inventory }}"
+    hosts:
+      - idm01.idm.josh.lab.msp.redhat.com
+    variables:
+      ipaserver_setup_dns: yes
+      ipaserver_allow_zone_overlap: yes
+      ipaserver_setup_firewalld: no
+      ipaserver_forwarders:
+        - 10.11.5.19
+        - 10.2.32.1
+      ipaserver_setup_adtrust: yes
+  - name: replicas
+    inventory: "{{ inventory }}"
+    hosts:
+      - idm02.idm.josh.lab.msp.redhat.com  
+    variables:
+      ipareplica_setup_dns: yes
+      ipareplica_allow_zone_overlap: yes
+      ipareplica_setup_firewalld: no
+      ipareplica_forwarders:
+        - 10.11.5.19
+        - 10.2.32.1
+      ipareplica_setup_adtrust: yes
+      ipareplica_setup_ca: yes
+      dns_resolv:
+        search_domains:
+          - idm.josh.lab.msp.redhat.com
+          - josh.lab.msp.redhat.com
+          - lab.msp.redhat.com
+        nameservers:
+          - "{  { hostvars['idm01.idm.josh.lab.msp.redhat.com']['ansible_host'] }}"
+          - 10.15.108.5
+        options:
+          - 'timeout:1'
+  - name: clients
+    inventory: "{{ inventory }}"
+    hosts:
+      - trust-client-1.idm.josh.lab.msp.redhat.com
+      - trust-client-2.idm.josh.lab.msp.redhat.com
+      - trust-client-3.idm.josh.lab.msp.redhat.com
+      - trust-client-4.idm.josh.lab.msp.redhat.com
+      - trust-client-5.idm.josh.lab.msp.redhat.com
+    variables:
+      cpus: 2
+      memory_mb: 4096
+      ipaclient_domain: idm.josh.lab.msp.redhat.com
+      dns_resolv:
+        search_domains:
+          - idm.josh.lab.msp.redhat.com
+          - josh.lab.msp.redhat.com
+          - lab.msp.redhat.com
+        nameservers:
+          - "{  { hostvars['idm01.idm.josh.lab.msp.redhat.com']['ansible_host'] }}"
+          - "{  { hostvars['idm02.idm.josh.lab.msp.redhat.com']['ansible_host'] }}"
+          - 10.15.120.4
+        options:
+          - 'timeout:1'
+      # dns:
+      #   server: idm01.idm.josh.lab.msp.redhat.com
+      #   password: "{  { dns_pass }}"
+      #   records:
+      #     - name: "{  { inventory_hostname.split('.')[0] }}"
+      #       zone: "{  { dns_zone }}"
+      #       type: A
+      #       value: "{  { ip_address }}"
+      #     - name: "{  { ip_address.split('.')[-1] }}"
+      #       zone: "{  { ip_address.split('.')[2] }}.15.10.in-addr.arpa."
+      #       type: PTR
+      #       value: "{  { inventory_hostname }}."
+  - name: infra
+    inventory: "{{ inventory }}"
+    children:
+      - master
+      - replicas
+    variables:
+      crypto_policies_policy: DEFAULT:AD-SUPPORT
+      crypto_policies_reboot_ok: yes
+  - name: idm
+    inventory: "{{ inventory }}"
+    children:
+      - infra
+      - clients
+    variables:
+      ipaadmin_principal: admin
+      ipaadmin_password: "{  { ansible_password }}"
+      ipadm_password: "{  { ansible_password }}"
+      ipaserver_domain: idm.josh.lab.msp.redhat.com
+      ipaserver_realm: IDM.JOSH.LAB.MSP.REDHAT.COM
+  - name: rhel
+    inventory: "{{ inventory }}"
+    children:
+      - idm
+    variables:
+      cpus: 4
+      memory_mb: 8192
+      os: rhel8
+      application: general
+      lifecycle_environment: production
+      dns_zone: idm.josh.lab.msp.redhat.com
+      provisioning:
+        satellite:
+          server: satellite06.lab.msp.redhat.com
+          username: admin
+          password: "{  { satellite_password }}"
+        host_group: "{  { os }}"
+        organization: MSP Lab
+        location: MSP Lab
+        method: bootdisk
+        dns_domain: idm.josh.lab.msp.redhat.com
+        cpus: "{  { cpus }}"
+        memory_mb: "{  { memory_mb }}"
+        activation_keys: "ak-{  { application }}-{  { os }}-{  { lifecycle_environment }}"
+      firewall:
+        state: stopped
+        enabled: no
+      static_dns_entries:
+        - fqdn: satellite06.lab.msp.redhat.com
+          short_name: satellite06
+          ip_address: 10.15.120.7
+      dns:
+        server: idm05.lab.msp.redhat.com
+        password: "{  { dns_pass }}"
+        records:
+          - name: "{  { inventory_hostname.split('.')[0] }}"
+            zone: "{  { dns_zone }}"
+            type: A
+            value: "{  { ip_address }}"
+          - name: "{  { ip_address.split('.')[-1] }}"
+            zone: "{  { ip_address.split('.')[2] }}.15.10.in-addr.arpa."
+            type: PTR
+            value: "{  { inventory_hostname }}."
+      config_files:
+        - hosts
+        - resolv.conf
+      timesync_ntp_servers:
+        - hostname: 0.rhel.pool.ntp.org
+          iburst: yes
+        - hostname: 1.rhel.pool.ntp.org
+          iburst: yes
+        - hostname: 2.rhel.pool.ntp.org
+          iburst: yes
+        - hostname: 3.rhel.pool.ntp.org
+          iburst: yes
+      vcenter:
+        server: vcenter02.lab.msp.redhat.com
+        username: 'Administrator@vsphere.local'
+        password: "{  { vcenter_password }}"
+        datacenter: MSP Lab
+      selinux_policy: targeted
+      selinux_state: permissive
+      dns_resolv:
+        search_domains:
+          - idm.josh.lab.msp.redhat.com
+          - josh.lab.msp.redhat.com
+          - lab.msp.redhat.com
+        nameservers:
+          - 10.15.120.4
+          - 10.15.108.5
+        options:
+          - 'timeout:1'
+      base_packages:
+        disable_gpg_check: yes
+        packages:
+          - lsof
+          - vim
+          - sos
+          - redhat-support-tool
+      ignore_virtual_disk_errors: yes
+      remove_cdrom: no
+      run_additional_roles: yes
+      cockpit_packages:
+        - cockpit-storaged
+        - cockpit-pcp
+        - cockpit-sosreport
+        - cockpit-networkmanager
+        - cockpit-packagekit
+
+controller_projects:
+  - name: "{  { audience }} Code"
+    organization: "{  { audience }}"
+    scm_branch: main
+    scm_type: git
+    scm_url: https://github.com/jjaswanson4/patching-demo.git
+    wait: yes
+
+controller_templates:
+  - name: Setup for IDM Install
+    inventory: "{  { audience }} Infrastructure"
+    limit: infra
+    project: "{  { audience }} Code"
+    organization: "{  { audience }}"
+    playbook: demos/idm-ad/playbooks/setup-for-idm.yml
+    execution_environment: IDM AD Integration Demo EE
+    credentials:
+      - RHEL Root Credentials
+  - name: Install IDM Master
+    inventory: "{  { audience }} Infrastructure"
+    limit: master
+    project: "{  { audience }} Code"
+    organization: "{  { audience }}"
+    playbook: demos/idm-ad/playbooks/install-idm-master.yml
+    execution_environment: IDM AD Integration Demo EE
+    credentials:
+      - RHEL Root Credentials
+  - name: Install IDM Replicas
+    inventory: "{  { audience }} Infrastructure"
+    limit: replicas
+    project: "{  { audience }} Code"
+    organization: "{  { audience }}"
+    playbook: demos/idm-ad/playbooks/install-idm-replica.yml
+    execution_environment: IDM AD Integration Demo EE
+    credentials:
+      - RHEL Root Credentials
+  - name: Setup AD for Trust
+    inventory: "{  { audience }} Infrastructure"
+    limit: pdc
+    project: "{  { audience }} Code"
+    organization: "{  { audience }}"
+    playbook: demos/idm-ad/playbooks/setup-ad-for-ad-trust.yml
+    execution_environment: IDM AD Integration Demo EE
+    credentials:
+      - Active Directory Domain Administrator Credentials
+  - name: Setup IDM for Trust
+    inventory: "{  { audience }} Infrastructure"
+    limit: master
+    project: "{  { audience }} Code"
+    organization: "{  { audience }}"
+    playbook: demos/idm-ad/playbooks/setup-ad-for-ad-trust.yml
+    execution_environment: IDM AD Integration Demo EE
+    credentials:
+      - RHEL Root Credentials
+  - name: Create AD Trust
+    inventory: "{  { audience }} Infrastructure"
+    limit: pdc
+    project: "{  { audience }} Code"
+    organization: "{  { audience }}"
+    playbook: demos/idm-ad/playbooks/create-ad-trust.yml
+    execution_environment: IDM AD Integration Demo EE
+    credentials:
+      - RHEL Root Credentials
+
+controller_workflows:
+  - name: Integrate IDM with AD for Linux Authentication
+    organization: "{  { audience }}"
+    state: "{{ controller_state | default('present') }}"
+    simplified_workflow_nodes:
+      - approval_node:
+          name: Approve 'Setup for IDM Install'
+        identifier: node101
+        success_nodes:
+          - node102
+      - unified_job_template: Setup for IDM Install 
+        identifier: node102
+        success_nodes:
+          - node103
+      - approval_node:
+          name: Approve 'Install IDM Master'
+        identifier: node103
+        success_nodes:
+          - node104
+      - unified_job_template: Install IDM Master
+        identifier: node104
+        success_nodes:
+          - node105
+      - approval_node:
+          name: Approve 'Install IDM Replicas'
+        identifier: node105
+        success_nodes:
+          - node106
+      - unified_job_template: Install IDM Replicas
+        identifier: node106
+        success_nodes:
+          - node107
+      - approval_node:
+          name: Approve 'Setup AD for Trust'
+        identifier: node107
+        success_nodes:
+          - node108
+      - unified_job_template: Setup AD for Trust
+        identifier: node108
+        success_nodes:
+          - node109
+      - approval_node:
+          name: Approve 'Setup IDM for Trust'
+        identifier: node109
+        success_nodes:
+          - node110
+      - unified_job_template: Setup IDM for Trust
+        identifier: node110
+        success_nodes:
+          - node111
+      - approval_node:
+          name: Approve 'Create AD Trust'
+        identifier: node111
+        success_nodes:
+          - node112
+      - unified_job_template: Create AD Trust
+        identifier: node112
