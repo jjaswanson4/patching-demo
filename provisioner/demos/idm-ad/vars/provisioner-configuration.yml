@@ -45,6 +45,8 @@ satellite:
   username: admin
   password: "{{ satellite_password }}"
 
+controller_configuration_credentials_secure_logging: no
+
 # These are where demo specific components are defined, in hash form. These will automatically be added to the common resources.
 # If there is no need for a specific, resource, simply define an empty var, such as `controller_organizations: []`
 controller_organizations: []
@@ -663,6 +665,13 @@ controller_templates:
     playbook: provisioner/demos/idm-ad/playbooks/populate-ad.yml
     execution_environment: Demo Provisioner EE
     ask_credential_on_launch: yes
+  - name: Teardown Windows Systems
+    ask_inventory_on_launch: yes
+    ask_limit_on_launch: yes
+    project: "{{ project }}"
+    playbook: provisioner/demos/idm-ad/playbooks/populate-ad.yml
+    execution_environment: Demo Provisioner EE
+    ask_credential_on_launch: yes 
 
 controller_workflows:
   - name: Provision IDM-AD Integration Demo
@@ -795,93 +804,48 @@ controller_workflows:
         identifier: node1301
         extra_data:
           provisioner_status: failed
-
-
-  # - name: Teardown Patching Demo
-  #   organization: Demo Provisioner
-  #   state: "{{ controller_state | default('present') }}"
-  #   extra_vars:
-  #     demo: patching
-  #   survey_enabled: yes
-  #   survey:
-  #     name: ''
-  #     description: ''
-  #     spec:
-  #       - type: text
-  #         question_name: "Demo Audience?"
-  #         question_description: "Who is the audience for this demo"
-  #         variable: audience
-  #         required: yes
-  #   simplified_workflow_nodes:
-  #     - unified_job_template: Unregister from Insights
-  #       identifier: node996
-  #       inventory: "{{ inventory }}"
-  #       limit: 'demo_hosts:satellite:controller'
-  #       credentials:
-  #         - "{{ demo_prefix }} Root Account"
-  #       always_nodes:
-  #         - node997
-  #     - unified_job_template: Teardown Systems
-  #       identifier: node997
-  #       inventory: "{{ inventory }}"
-  #       limit: demo_hosts
-  #       credentials:
-  #         - "{{ demo_prefix }} Peripheral Credentials"
-  #       always_nodes:
-  #         - node998
-  #     - unified_job_template: Teardown Systems
-  #       identifier: node998
-  #       inventory: "{{ inventory }}"
-  #       limit: management_plane
-  #       credentials:
-  #         - "{{ demo_prefix }} Peripheral Credentials"
-  #       always_nodes:
-  #         - node999
-  #     - unified_job_template: Cleanup DNS Records
-  #       identifier: node999
-  #       inventory: "{{ inventory }}"
-  #       limit: 'demo_hosts:management_plane'
-  #       credentials:
-  #         - "{{ demo_prefix }} Peripheral Credentials"
-  # - name: Reset Patching Demo
-  #   organization: Demo Provisioner
-  #   state: "{{ controller_state | default('present') }}"
-  #   extra_vars:
-  #     demo: patching
-  #   survey_enabled: yes
-  #   survey:
-  #     name: ''
-  #     description: ''
-  #     spec:
-  #       - type: text
-  #         question_name: "Demo Audience?"
-  #         question_description: "Who is the audience for this demo"
-  #         variable: audience
-  #         required: yes
-  #   simplified_workflow_nodes:
-  #     - unified_job_template: Unregister from Insights
-  #       identifier: node101
-  #       inventory: "{{ inventory }}"
-  #       limit: 'demo_hosts:controller'
-  #       credentials:
-  #         - "{{ demo_prefix }} Root Account"
-  #       always_nodes:
-  #         - node102
-  #         - node103
-  #         - node104
-  #     - unified_job_template: Teardown Systems
-  #       identifier: node102
-  #       inventory: "{{ inventory }}"
-  #       limit: 'demo_hosts:controller'
-  #       credentials:
-  #         - "{{ demo_prefix }} Peripheral Credentials"
-  #     - unified_job_template: Roll Back Content
-  #       identifier: node103
-  #       credentials:
-  #         - "{{ demo_prefix }} Peripheral Credentials"
-  #     - unified_job_template: Cleanup DNS Records
-  #       identifier: node104
-  #       inventory: "{{ inventory }}"
-  #       limit: 'demo_hosts:controller'
-  #       credentials:
-  #         - "{{ demo_prefix }} Peripheral Credentials"
+  - name: Teardown Patching Demo
+    organization: Demo Provisioner
+    state: "{{ controller_state | default('present') }}"
+    extra_vars:
+      demo: idm-ad
+    survey_enabled: yes
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - type: text
+          question_name: "Demo Audience?"
+          question_description: "Who is the audience for this demo"
+          variable: audience
+          required: yes
+    simplified_workflow_nodes:
+      - unified_job_template: Unregister from Insights
+        identifier: node101
+        inventory: "{{ inventory }}"
+        limit: 'rhel:controller'
+        credentials:
+          - "{{ demo_prefix }} Root Account"
+        always_nodes:
+          - node102
+      - unified_job_template: Teardown Systems
+        identifier: node102
+        inventory: "{{ inventory }}"
+        limit: 'rhel:controller'
+        credentials:
+          - "{{ demo_prefix }} Peripheral Credentials"
+      - unified_job_template: Teardown Windows Systems
+        identifier: node201
+        inventory: "{{ inventory }}"
+        limit: windows
+        credentials:
+          - "{{ demo_prefix }} Peripheral Credentials"
+        always_nodes:
+          - node999
+      - unified_job_template: Cleanup DNS Records
+        identifier: node999
+        inventory: "{{ inventory }}"
+        limit: 'rhel:controller:windows'
+        credentials:
+          - "{{ demo_prefix }} Peripheral Credentials"
+        all_parents_must_converge: yes
