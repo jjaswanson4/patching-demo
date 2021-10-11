@@ -669,7 +669,7 @@ controller_templates:
     ask_inventory_on_launch: yes
     ask_limit_on_launch: yes
     project: "{{ project }}"
-    playbook: provisioner/demos/idm-ad/playbooks/populate-ad.yml
+    playbook: provisioner/demos/idm-ad/playbooks/teardown-windows.yml
     execution_environment: Demo Provisioner EE
     ask_credential_on_launch: yes 
 
@@ -804,7 +804,7 @@ controller_workflows:
         identifier: node1301
         extra_data:
           provisioner_status: failed
-  - name: Teardown Patching Demo
+  - name: Teardown IDM-AD Integration Demo
     organization: Demo Provisioner
     state: "{{ controller_state | default('present') }}"
     extra_vars:
@@ -834,6 +834,8 @@ controller_workflows:
         limit: 'rhel:controller'
         credentials:
           - "{{ demo_prefix }} Peripheral Credentials"
+        always_nodes:
+          - node999
       - unified_job_template: Teardown Windows Systems
         identifier: node201
         inventory: "{{ inventory }}"
