@@ -19,12 +19,12 @@
   tasks:
     - name: provision windows vm
       community.vmware.vmware_guest:
-        hostname: vcenter02.lab.msp.redhat.com
-        username: "Administrator@vsphere.local"
+        hostname: "{{ vcenter.server }}"
+        username: "{{ vcenter.username }}"
         password: "{{ vcenter_password }}"
         validate_certs: no
-        datacenter: MSP Lab
-        cluster: General
+        datacenter: "{{ vm.datacenter }}"
+        cluster: "{{ vm.cluster }}"
         name: "{{ inventory_hostname }}"
         folder: "{{ vm.folder }}"
         template: "{{ vm.os }}-template"
