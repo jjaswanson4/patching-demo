@@ -24,6 +24,6 @@
         - forest_creation.reboot_required
     - name: allow AD to fully come up
       ansible.builtin.pause:
-        minutes: 2
+        minutes: 5
       when:
         - forest_creation.reboot_required
