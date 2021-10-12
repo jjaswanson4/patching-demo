@@ -11,8 +11,8 @@
     - name: setup forward zone
       freeipa.ansible_freeipa.ipadnsforwardzone:
         ipaadmin_password: "{{ ipaadmin_password }}"
-        name: "{{ hostvars['server2016-ad1.ad.josh.lab.msp.redhat.com']['dns_zone'] }}"
+        name: "{{ hostvars['ad-dc1.ad.josh.lab.msp.redhat.com']['dns_zone'] }}"
         forwarders:
-          - ip_address: "{{ hostvars['server2016-ad1.ad.josh.lab.msp.redhat.com']['ip_address'] }}"
-          - ip_address: "{{ hostvars['server2016-ad2.ad.josh.lab.msp.redhat.com']['ip_address'] }}"
+          - ip_address: "{{ hostvars['ad-dc1.ad.josh.lab.msp.redhat.com']['ip_address'] }}"
+          - ip_address: "{{ hostvars['ad-dc2.ad.josh.lab.msp.redhat.com']['ip_address'] }}"
         forwardpolicy: first
