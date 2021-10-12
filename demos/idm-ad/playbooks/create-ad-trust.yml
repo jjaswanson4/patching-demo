@@ -11,6 +11,6 @@
     - name: create one-way trust with AD
       freeipa.ansible_freeipa.ipatrust:
         ipaadmin_password: "{{ ipaadmin_password }}"
-        realm: "{{ hostvars['server2016-ad1.ad.josh.lab.msp.redhat.com']['dns_zone'] }}"
+        realm: "{{ hostvars['ad-dc1.ad.josh.lab.msp.redhat.com']['dns_zone'] }}"
         admin: "{{ domain_administrator_username }}"
         password: "{{ ansible_password }}"
