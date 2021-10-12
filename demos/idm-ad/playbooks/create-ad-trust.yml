@@ -5,7 +5,7 @@
     - all
   pre_tasks:
     - name: set AD auth facts
-      ansible.builtin.set_facts:
+      ansible.builtin.set_fact:
         domain_administrator_username: "Administrator@{{ hostvars['ad-dc1.ad.josh.lab.msp.redhat.com']['dns_zone'] }}"
   tasks:
     - name: create one-way trust with AD
