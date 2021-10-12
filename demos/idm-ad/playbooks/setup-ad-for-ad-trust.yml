@@ -18,6 +18,6 @@
           )        
           Add-DnsServerConditionalForwarderZone -Name $DNS_Zone -ReplicationScope Forest -MasterServers $IDM_Master,$IDM_Replica
         parameters:
-          DNS_Zone: "{{ hostvars['idm01.idm.josh.lab.msp.redhat.com']['dns_zone'] }}"
+          DNS_Zone: "{{ hostvars['idm01.idm.josh.lab.msp.redhat.com']['ipaserver_domain'] }}"
           IDM_Master: "{{ hostvars['idm01.idm.josh.lab.msp.redhat.com']['ip_address'] }}"
           IDM_Replica: "{{ hostvars['idm02.idm.josh.lab.msp.redhat.com']['ip_address'] }}"
