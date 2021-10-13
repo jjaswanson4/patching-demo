@@ -45,6 +45,10 @@ satellite:
   username: admin
   password: "{{ satellite_password }}"
 
+# This toggles secure logging, for example: when configuring credentials on Ansible Controller.
+# Since I'm using my own instance, secure logging isn't a requirement.
+controller_configuration_credentials_secure_logging: no
+
 # These are where demo specific components are defined, in hash form. These will automatically be added to the common resources.
 # If there is no need for a specific, resource, simply define an empty var, such as `controller_organizations: []`
 controller_organizations: []
