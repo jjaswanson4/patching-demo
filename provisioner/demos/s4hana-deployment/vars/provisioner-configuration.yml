@@ -25,7 +25,7 @@ inventory: "{{ demo_prefix }} Infrastructure"
 # This execution environment will automatically be configured in Controller.
 execution_environment:
   name: Demo Provisioner EE
-  image: patching-demo-provisioner-ee
+  image: demo-provisioner-ee
 
 # This is the information used for the instance of Controller for the demo.
 # This can be the same instance as where the provisioner is deployed, but it's not recommended.
@@ -44,6 +44,10 @@ satellite:
   ip_address: 10.15.121.2
   username: admin
   password: "{{ satellite_password }}"
+
+# This toggles secure logging, for example: when configuring credentials on Ansible Controller.
+# Since I'm using my own instance, secure logging isn't a requirement.
+controller_configuration_credentials_secure_logging: no
 
 # These are where demo specific components are defined, in hash form. These will automatically be added to the common resources.
 # If there is no need for a specific, resource, simply define an empty var, such as `controller_organizations: []`
