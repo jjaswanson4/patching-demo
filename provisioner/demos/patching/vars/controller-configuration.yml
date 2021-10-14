@@ -39,6 +39,14 @@ controller_credentials:
       host: https://patching-satellite.josh.lab.msp.redhat.com
       username: admin
       password: "{{ satellite_password }}"
+  - name: MSP Lab AAP20 Automation Hub
+    organization: "{  { audience }}"
+    credential_type: Container Registry
+    inputs:
+      host: aap20-hub.josh.lab.msp.redhat.com
+      username: admin
+      password: "{{ ansible_password }}"
+      verify_ssl: no
 
 controller_execution_environments:
   - name: Patching Demo EE
@@ -92,6 +100,7 @@ controller_inventory_sources:
     inventory: "{  { audience }} Infrastructure"
     credential: Red Hat Satellite Credentials
     organization: "{  { audience }}"
+    wait: yes
 
 controller_groups:
   - name: primary
