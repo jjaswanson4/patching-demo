@@ -7,7 +7,7 @@
     - jjaswanson4.utilities.mount_nfs_shares
     - jjaswanson4.utilities.add_virtual_disk
     - redhat.rhel_system_roles.storage
-    - sap.linux.preconfigure
+    - sap.rhel.preconfigure
     - redhat_sap.sap_hostagent
   handlers:
     - name: reboot system

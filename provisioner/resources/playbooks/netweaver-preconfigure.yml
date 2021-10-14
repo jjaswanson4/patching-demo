@@ -4,7 +4,7 @@
   hosts:
     - all
   roles:
-    - sap.linux.netweaver_preconfigure
+    - sap.rhel.netweaver_preconfigure
   post_tasks:
     - name: check if reboot is required
       ansible.builtin.shell: yum needs-restarting -r

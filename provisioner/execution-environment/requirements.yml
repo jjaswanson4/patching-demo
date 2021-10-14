@@ -17,21 +17,31 @@ roles:
     src: https://github.com/jjaswanson4/sap-hana-ha-pacemaker/archive/refs/tags/v2.0.0.tar.gz
 
 collections:
+  # "core" ansible collections
   - name: community.general
-  - name: vmware.vmware_rest
-  - name: redhat.rhel_system_roles
-  - name: jjaswanson4.utilities
-    version: '>=1.8.0'
-  - name: jjaswanson4.setup_rhel_for_satellite
-  - name: jjaswanson4.install_satellite
-    version: '>=1.2.4'
-  - name: jjaswanson4.configure_satellite
-    version: '>=2.1.4'
   - name: ansible.posix
-  - name: redhat_cop.controller_configuration
-  - name: awx.awx
-  - name: redhat.satellite
-  - name: community.vmware
-  - name: sap.linux
+  - name: jjaswanson4.utilities
+
+  # windows ansible collections
   - name: ansible.windows
   - name: community.windows
+
+  # vmware ansible collections
+  - name: vmware.vmware_rest
+  - name: community.vmware
+
+  # rhel ansible collections
+  - name: redhat.rhel_system_roles
+
+  # satellite ansible collections
+  - name: redhat.satellite
+  - name: jjaswanson4.setup_rhel_for_satellite
+  - name: jjaswanson4.install_satellite
+  - name: jjaswanson4.configure_satellite
+  
+  # controller ansible collections
+  - name: ansible.controller
+  - name: redhat_cop.controller_configuration
+
+  # sap ansible collections
+  - name: sap.rhel
