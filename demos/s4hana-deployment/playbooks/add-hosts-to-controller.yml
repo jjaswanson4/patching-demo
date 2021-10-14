@@ -230,8 +230,8 @@
               username: admin
               password: "{  { ansible_password }}"
             host_group: "{  { os }}"
-            organization: "{  { audience }}"
-            location: "{  { audience }}"
+            organization: "{  { company }}"
+            location: "{  { company }}"
             method: bootdisk
             dns_domain: josh.lab.msp.redhat.com
             cpus: "{  { cpus }}"
