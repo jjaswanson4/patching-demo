@@ -40,7 +40,7 @@ collections:
   - name: jjaswanson4.configure_satellite
   
   # controller ansible collections
-  - name: ansible.controller
+  - name: awx.awx
   - name: redhat_cop.controller_configuration
 
   # sap ansible collections
