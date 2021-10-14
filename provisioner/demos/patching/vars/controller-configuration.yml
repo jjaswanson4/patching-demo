@@ -53,6 +53,7 @@ controller_execution_environments:
     image: 'aap20-hub.josh.lab.msp.redhat.com/patching-demo-ee:latest'
     organization: "{  { audience }}"
     credential: MSP Lab AAP20 Automation Hub
+    pull: always
 
 controller_teams:
   - name: "{  { audience }} Application Team"
