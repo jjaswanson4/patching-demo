@@ -4,6 +4,8 @@
   hosts:
     - all
   gather_facts: no
+  collections:
+    - ansible.controller
   pre_tasks:
     - name: run bootstrap tasks
       block:
