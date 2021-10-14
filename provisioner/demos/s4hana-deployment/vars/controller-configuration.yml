@@ -70,7 +70,7 @@ controller_credential_types:
         controller_validate_certs: "no"
 
 controller_credentials:
-  - name: Provisioning Peripheral Credentials
+  - name: Peripheral Credentials
     organization: "{  { audience }}"
     credential_type: Peripheral Credentials
     inputs:
@@ -86,8 +86,8 @@ controller_credentials:
     credential_type: Container Registry
     inputs:
       host: aap20-hub.josh.lab.msp.redhat.com
-      username: "{  { hub_username }}"
-      password: "{  { hub_password }}"
+      username: admin
+      password: "{  { ansible_password }}"
       verify_ssl: no
   - name: Root Credentials
     credential_type: Machine
@@ -97,10 +97,11 @@ controller_credentials:
       password: "{  { ansible_password }}"
 
 controller_execution_environments:
-  - name: S4HANA Deployment EE
+  - name: S4HANA Deployment Demo EE
     image: aap20-hub.josh.lab.msp.redhat.com/s4hana-deployment-demo-ee:latest
     organization: "{  { audience }}"
     credential: MSP Lab AAP20 Automation Hub
+    pull: always
 
 controller_teams:
   - name: "{  { audience }} SAP Infrastructure Team"
@@ -114,6 +115,10 @@ controller_teams:
     organization: "{  { audience }}"
 
 controller_user_accounts:
+  - username: "{  { audience }}_admin"
+    password: "{{ ansible_password }}"
+    email: dont@email.me
+    update_secrets: no
   - username: "{  { audience }}_infrastructure"
     password: "{{ ansible_password }}"
     email: dont@email.me
@@ -177,6 +182,8 @@ controller_templates:
     project: "{  { controller_projects[0].name }}"
     playbook: demos/s4hana-deployment/playbooks/add-hosts-to-controller.yml
     execution_environment: "{  { controller_execution_environments[0].name }}"
+    credentials:
+      - Peripheral Credentials
   - name: Provision Systems
     organization: "{  { audience }}"
     ask_inventory_on_launch: yes
@@ -189,6 +196,8 @@ controller_templates:
     ask_credential_on_launch: yes
     extra_vars:
       ansible_become: no
+      provision_demo_hosts: yes
+      run_additional_roles: no
   - name: Preconfigure for SAP
     organization: "{  { audience }}"
     ask_inventory_on_launch: yes
@@ -249,6 +258,8 @@ controller_workflows:
   - name: Provision S4HANA SID
     organization: "{  { audience }}"
     state: "{{ controller_state | default('present') }}"
+    extra_vars:
+      company: "{  { audience }}"
     survey_enabled: yes
     survey:
       name: ''
@@ -322,18 +333,98 @@ controller_workflows:
     simplified_workflow_nodes:
       - unified_job_template: Add Hosts to Controller Inventory
         identifier: node101
+        success_nodes:
+          - node102
+      - unified_job_template: Provision Systems
+        identifier: node102
         inventory: "{  { controller_inventories[0].name }}"
-        limit: satellite
+        limit: sap
         credentials:
-          - Provisioning Peripheral Credentials
+          - Peripheral Credentials
           - Root Credentials
-  
+        success_nodes:
+          - node103
+      - approval_node:
+          name: Approve 'Preconfigure for SAP'
+        identifier: node103
+        success_nodes:
+          - node104
+      - unified_job_template: Preconfigure for SAP
+        identifier: node104
+        inventory: "{  { controller_inventories[0].name }}"
+        limit: sap
+        credentials:
+          - Peripheral Credentials
+          - Root Credentials
+        success_nodes:
+          - node105
+          - node106
+      - approval_node:
+          name: Approve 'Preconfigure for HANA'
+        identifier: node105
+        success_nodes:
+          - node107
+      - unified_job_template: Preconfigure for HANA
+        identifier: node107
+        inventory: "{  { controller_inventories[0].name }}"
+        limit: hana
+        credentials:
+          - Root Credentials
+        success_nodes:
+          - node109
+      - approval_node:
+          name: Approve 'Preconfigure for Netweaver'
+        identifier: node106
+        success_nodes:
+          - node108
+      - unified_job_template: Preconfigure for Netweaver
+        identifier: node108
+        inventory: "{  { controller_inventories[0].name }}"
+        limit: netweaver
+        credentials:
+          - Root Credentials
+        success_nodes:
+          - node110
+      - approval_node:
+          name: Approve 'Deploy SAP HANA'
+        identifier: node109
+        success_nodes:
+          - node111
+      - unified_job_template: Deploy SAP HANA
+        identifier: node111
+        inventory: "{  { controller_inventories[0].name }}"
+        limit: hana
+        credentials:
+          - Root Credentials
+        success_nodes:
+          - node110
+      - approval_node:
+          name: Approve 'Install Netweaver'
+        identifier: node110
+        all_parents_must_converge: yes
+        success_nodes:
+          - node112
+      - unified_job_template: Install Netweaver
+        identifier: node112
+        inventory: "{  { controller_inventories[0].name }}"
+        limit: netweaver
+        credentials:
+          - Root Credentials
+        success_nodes:
+          - node113
+      - unified_job_template: Reinstate HSR
+        identifier: node113
+        inventory: "{  { controller_inventories[0].name }}"
+        limit: 'hana:&primary'
+        credentials:
+          - Root Credentials
+
 controller_roles:
   # admin account
-  - user: "{  { audience }}_admin"
-    organization: "{  { audience }}"
-    role: admin
-  # Team Membershi
+  # - user: "{  { audience }}_admin"
+  #   organization: "{  { audience }}"
+  #   role: admin
+  # Team Membership
   - user: "{  { audience }}_infrastructure"
     target_team: "{  { audience }} SAP Infrastructure Team"
     organization: "{  { audience }}"
@@ -350,11 +441,11 @@ controller_roles:
   - team: "{  { audience }} SAP Infrastructure Team"
     role: admin
     credentials:
-      - S4HANA Deployment Peripheral Credentials
-      - S4HANA Deployment Root Credentials
-  - team: "{  { audience }} Infrastructure Team"
-    role: admin
-    inventory: "{  { audience }} SAP Infrastructure"
+      - Peripheral Credentials
+      - Root Credentials
+  # - team: "{  { audience }} Infrastructure Team"
+  #   role: admin
+  #   inventory: "{  { audience }} SAP Infrastructure"
   - team: "{  { audience }} SAP Infrastructure Team"
     role: admin
     project: "{  { audience }} S4HANA Deployment Code"
@@ -368,8 +459,8 @@ controller_roles:
   - team: "{  { audience }} BASIS Team"
     role: read
     credentials:
-      - S4HANA Deployment Peripheral Credentials
-      - S4HANA Deployment Root Credentials
+      - Peripheral Credentials
+      - Root Credentials
   - team: "{  { audience }} BASIS Team"
     role: update
     inventory: "{  { audience }} SAP Infrastructure"
@@ -398,8 +489,8 @@ controller_roles:
   - team: "{  { audience }} Business Analyst Team"
     role: read
     credentials:
-      - S4HANA Deployment Peripheral Credentials
-      - S4HANA Deployment Root Credentials
+      - Peripheral Credentials
+      - Root Credentials
   - team: "{  { audience }} Business Analyst Team"
     role: read
     inventory: "{  { audience }} SAP Infrastructure"
