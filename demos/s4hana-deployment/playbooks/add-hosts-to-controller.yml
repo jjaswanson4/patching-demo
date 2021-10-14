@@ -226,7 +226,7 @@
             enabled: no
           provisioning:
             satellite:
-              server: patching-satellite.josh.lab.msp.redhat.com
+              server: s4hana-deployment-satellite.josh.lab.msp.redhat.com
               username: admin
               password: "{  { ansible_password }}"
             host_group: "{  { os }}"
