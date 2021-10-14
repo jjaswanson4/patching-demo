@@ -440,6 +440,8 @@ controller_workflows:
           - "{{ demo_prefix }} Peripheral Credentials"
           - "{{ demo_prefix }} Root Account"
         all_parents_must_converge: yes
+        success_nodes:
+          - node999
         failure_nodes:
           - node1203
       - unified_job_template: Provision Systems
