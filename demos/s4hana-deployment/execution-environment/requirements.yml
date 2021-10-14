@@ -20,6 +20,6 @@ collections:
   - name: ansible.posix
   - name: awx.awx
   - name: community.vmware
-  - name: sap.linux
+  - name: sap.rhel
   - name: jjaswanson4.utilities
   - name: redhat.satellite
