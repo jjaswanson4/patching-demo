@@ -57,9 +57,40 @@ controller_credentials: []
 controller_execution_environments: []
 controller_inventories: []
 controller_projects: []
-controller_hosts: []
-controller_groups: []
 controller_templates: []
+
+controller_hosts:
+  - name: sapddhdb1.josh.lab.msp.redhat.com
+    inventory: "{{ inventory }}"
+    variables:
+      ansible_host: 10.15.121.41
+      ip_address: "{  { ansible_host }}"
+      sap_hana_hsr_alias: DC1
+  - name: sapddhdb2.josh.lab.msp.redhat.com
+    inventory: "{{ inventory }}"
+    variables:
+      ansible_host: 10.15.121.42
+      ip_address: "{  { ansible_host }}"
+      sap_hana_hsr_alias: DC2
+  - name: sapddapp1.josh.lab.msp.redhat.com
+    inventory: "{{ inventory }}"
+    variables:
+      ansible_host: 10.15.121.44
+      ip_address: "{  { ansible_host }}"
+
+controller_groups:
+  - name: demo_hosts
+    inventory: "{{ inventory }}"
+    hosts:
+      - sapddhdb1.josh.lab.msp.redhat.com
+      - sapddhdb2.josh.lab.msp.redhat.com
+      - sapddapp1.josh.lab.msp.redhat.com
+    variables:
+      provisioning:
+        satellite:
+          server: s4hana-deployment-satellite.josh.lab.msp.redhat.com
+          username: admin
+          password: "{  { ansible_password }}"
 
 controller_workflows:
   - name: Provision S4HANA Deployment Demo
@@ -165,3 +196,49 @@ controller_workflows:
         identifier: node1203
         extra_data:
           provisioner_status: failed
+  - name: Teardown S4HANA Deployment Demo
+    organization: Demo Provisioner
+    state: "{{ controller_state | default('present') }}"
+    extra_vars:
+      demo: patching
+    survey_enabled: yes
+    survey:
+      name: ''
+      description: ''
+      spec:
+        - type: text
+          question_name: "Demo Audience?"
+          question_description: "Who is the audience for this demo"
+          variable: audience
+          required: yes
+    simplified_workflow_nodes:
+      - unified_job_template: Unregister from Insights
+        identifier: node996
+        inventory: "{{ inventory }}"
+        limit: 'demo_hosts'
+        credentials:
+          - "{{ demo_prefix }} Root Account"
+        always_nodes:
+          - node997
+      - unified_job_template: Teardown Systems
+        identifier: node997
+        inventory: "{{ inventory }}"
+        limit: demo_hosts
+        credentials:
+          - "{{ demo_prefix }} Peripheral Credentials"
+        always_nodes:
+          - node998
+      - unified_job_template: Teardown Systems
+        identifier: node998
+        inventory: "{{ inventory }}"
+        limit: management_plane
+        credentials:
+          - "{{ demo_prefix }} Peripheral Credentials"
+        always_nodes:
+          - node999
+      - unified_job_template: Cleanup DNS Records
+        identifier: node999
+        inventory: "{{ inventory }}"
+        limit: 'demo_hosts:management_plane'
+        credentials:
+          - "{{ demo_prefix }} Peripheral Credentials"
