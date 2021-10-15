@@ -21,6 +21,14 @@ lvm:
 
 ignore_compute_resource_errors: true
 
+rex_jobs:
+  server: "{  { inventory_hostname }}"
+  username: admin
+  password: "{  { satellite_password }}"
+  jobs:
+    - job_template: Configure Cloud Connector
+      search_query: "name = {  { inventory_hostname }}"
+
 satellite:
   admin_username: admin
   admin_password: "{{ satellite_password }}"
