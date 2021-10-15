@@ -131,9 +131,19 @@ controller_workflows:
           - "{{ demo_prefix }} Peripheral Credentials"
           - "{{ demo_prefix }} Root Account"
         success_nodes:
-          - node999
+          - node104
         failure_nodes:
           - node1103
+      - unified_job_template: Run Remote Execution Jobs
+        identifier: node104
+        inventory: "{{ inventory }}"
+        limit: satellite
+        credentials:
+          - "{{ demo_prefix }} Peripheral Credentials"
+        success_nodes:
+          - node999
+        failure_nodes:
+          - node1104
       - unified_job_template: Provision Systems
         identifier: node201
         inventory: "{{ inventory }}"
@@ -166,7 +176,7 @@ controller_workflows:
         success_nodes:
           - node999
         failure_nodes:
-          - node1203
+          - node1203    
       - unified_job_template: Send Provisioner Email
         identifier: node999
         all_parents_must_converge: yes
@@ -182,6 +192,10 @@ controller_workflows:
           provisioner_status: failed
       - unified_job_template: Send Provisioner Email
         identifier: node1103
+        extra_data:
+          provisioner_status: failed
+      - unified_job_template: Send Provisioner Email
+        identifier: node1104
         extra_data:
           provisioner_status: failed
       - unified_job_template: Send Provisioner Email
