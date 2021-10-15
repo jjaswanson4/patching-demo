@@ -154,3 +154,12 @@
   playbook: provisioner/resources/playbooks/send-email.yml
   execution_environment: "{{ execution_environment.name }}"
   ask_variables_on_launch: yes
+- name: Run Remote Execution Jobs
+  organization: "{{ controller_organization }}"
+  ask_inventory_on_launch: yes
+  ask_limit_on_launch: yes
+  project: "{{ project }}"
+  allow_simultaneous: yes
+  playbook: provisioner/resources/playbooks/run-rex-job-via-satellite.yml
+  execution_environment: "{{ execution_environment.name }}"
+  ask_credential_on_launch: yes
