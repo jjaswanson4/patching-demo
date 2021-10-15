@@ -200,7 +200,7 @@ controller_workflows:
     organization: Demo Provisioner
     state: "{{ controller_state | default('present') }}"
     extra_vars:
-      demo: patching
+      demo: s4hana-deployment
     survey_enabled: yes
     survey:
       name: ''
