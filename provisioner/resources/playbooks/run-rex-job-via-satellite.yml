@@ -13,6 +13,7 @@
         server_url: "https://{{ rex_jobs.server }}"
         job_template: "{{ rex_job.job_template }}"
         search_query: "{{ rex_job.search_query }}"
+        inputs: '{{ rex_job.inputs | default(omit) }}'
       loop: "{{ rex_jobs.jobs }}"
       loop_control:
         loop_var: rex_job
