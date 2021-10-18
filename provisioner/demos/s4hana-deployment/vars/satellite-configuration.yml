@@ -28,6 +28,9 @@ rex_jobs:
   jobs:
     - job_template: Configure Cloud Connector
       search_query: "name = {  { inventory_hostname }}"
+      inputs:
+        satellite_user: admin
+        satellite_password: "{  { satellite_password }}"
 
 satellite:
   admin_username: admin
