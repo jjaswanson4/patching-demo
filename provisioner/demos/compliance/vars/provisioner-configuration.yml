@@ -45,14 +45,26 @@ satellite:
   username: admin
   password: "{{ satellite_password }}"
 
+# This toggles secure logging, for example: when configuring credentials on Ansible Controller.
+# Since I'm using my own instance, secure logging isn't a requirement.
+controller_configuration_credentials_secure_logging: no
+
 # These are where demo specific components are defined, in hash form. These will automatically be added to the common resources.
 # If there is no need for a specific, resource, simply define an empty var, such as `controller_organizations: []`
 controller_organizations: []
 controller_credential_types: []
-controller_credentials: []
 controller_execution_environments: []
 controller_inventories: []
 controller_projects: []
+
+controller_credentials:
+  - name: "{{ demo_prefix }} Non-Root Account"
+    credential_type: Machine
+    organization: "{{ controller_organization }}"
+    inputs:
+      username: compliance-user
+      password: "{{ ansible_password }}{{ ansible_password }}"
+      become_password: "{{ ansible_password }}{{ ansible_password }}"
 
 controller_hosts:
   - name: rhel7-hipaa.josh.lab.msp.redhat.com
@@ -139,7 +151,7 @@ controller_workflows:
     extra_vars:
       demo: compliance
     survey_enabled: yes
-    survey: "{{ lookup('file', '../resources/controller/provisioner-workflow-survey.yml') | from_yaml }}"          
+    survey: "{{ lookup('file', 'resources/controller/provisioner-workflow-survey.yml') | from_yaml }}"       
     simplified_workflow_nodes:
       - unified_job_template: Provision Systems
         identifier: node101
@@ -283,9 +295,29 @@ controller_workflows:
           required: yes
     simplified_workflow_nodes:
       - unified_job_template: Unregister from Insights
+        identifier: node994
+        inventory: Compliance Demo Infrastructure
+        limit: demo_hosts
+        extra_data:
+          ansible_become: yes
+        credentials:
+          - "{{ demo_prefix }} Non-Root Account"
+        failure_nodes:
+          - node995
+        success_nodes:
+          - node996
+      - unified_job_template: Unregister from Insights
+        identifier: node995
+        inventory: Compliance Demo Infrastructure
+        limit: demo_hosts
+        credentials:
+          - "{{ demo_prefix }} Root Account"
+        always_nodes:
+          - node996
+      - unified_job_template: Unregister from Insights
         identifier: node996
         inventory: Compliance Demo Infrastructure
-        limit: 'demo_hosts:satellite:controller'
+        limit: 'satellite:controller'
         credentials:
           - "{{ demo_prefix }} Root Account"
         always_nodes:
@@ -294,6 +326,7 @@ controller_workflows:
         identifier: node997
         inventory: Compliance Demo Infrastructure
         limit: demo_hosts
+        all_parents_must_converge: yes
         credentials:
           - "{{ demo_prefix }} Peripheral Credentials"
         always_nodes:

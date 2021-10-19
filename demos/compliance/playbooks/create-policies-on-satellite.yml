@@ -3,7 +3,6 @@
 - name: create compliance policies in satellite
   hosts:
     - all
-  gather_facts: no
   module_defaults:
     ansible.builtin.uri:
       user: admin
@@ -20,14 +19,14 @@
           register: scap_content_profiles
         - name: get hostgroup id
           ansible.builtin.uri:
-            url: "https://{{ satellite_hostname }}/api/hostgroups?search=title={{ parent_hostgroup }}/{{ child_hostgroup }}"
+            url: "https://{{ satellite_hostname }}/api/hostgroups?search=title={{ ansible_distribution_major_version }}/{{ policy_shortname }}"
           register: hostgroup_id
         - name: grab os specific profile
           ansible.builtin.set_fact:
             hostgroup_id: "{{ hostgroup_id | json_query('json.results[0].id') }}"
             scap_content_profile: "{{ scap_content_profiles | json_query(json_query) }}"
           vars:
-            json_query: json.results[?contains(scap_content.title, '{{ os }}')] | [0]
+            json_query: json.results[?contains(scap_content.title, '{{ ansible_distribution_major_version }}')] | [0]
       delegate_to: localhost
   tasks:
     - name: create compliance policy in satellite
@@ -36,7 +35,7 @@
         method: POST
         body:
           policy:
-            name: "{{ os }}-{{ child_hostgroup }}"
+            name: "{{ ansible_distribution_major_version }}-{{ policy_shortname }}"
             scap_content_id: "{{ scap_content_profile.scap_content.id }}"
             scap_content_profile_id: "{{ scap_content_profile.id }}"
             period: weekly

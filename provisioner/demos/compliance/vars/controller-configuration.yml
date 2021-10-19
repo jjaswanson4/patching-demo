@@ -145,63 +145,27 @@ controller_groups:
     inventory: "{  { audience }} Infrastructure"
     hosts:
       - compliance-satellite.josh.lab.msp.redhat.com
-  - name: rhel7_hipaa
+  - name: hipaa
     inventory: "{  { audience }} Infrastructure"
     hosts:
       - rhel7-hipaa.josh.lab.msp.redhat.com
-    variables:
-      parent_profile_id: 5d7af59d-2266-4e09-8024-07a48eb1557c
-  - name: rhel8_hipaa
-    inventory: "{  { audience }} Infrastructure"
-    hosts:
       - rhel8-hipaa.josh.lab.msp.redhat.com
     variables:
-      parent_profile_id: e5264e5d-d4b3-4c82-80a0-93448de468a7
-  - name: hipaa
-    inventory: "{  { audience }} Infrastructure"
-    children:
-      - rhel7_hipaa
-      - rhel8_hipaa
-    variables:
       policy_name: Health Insurance Portability and Accountability Act (HIPAA)
-      child_hostgroup: hipaa
-  - name: rhel7_pci
+      policy_shortname: hipaa
+  - name: pci_dss
     inventory: "{  { audience }} Infrastructure"
     hosts:
       - rhel7-pci.josh.lab.msp.redhat.com
-    variables:
-      policy_name: PCI-DSS v3.2.1 Control Baseline for Red Hat Enterprise Linux 7
-      parent_profile_id: 0a86f58e-3640-434e-bb6b-4589bbf781bd
-  - name: rhel8_pci
-    inventory: "{  { audience }} Infrastructure"
-    hosts:
       - rhel8-pci.josh.lab.msp.redhat.com
     variables:
-      policy_name: PCI-DSS v3.2.1 Control Baseline for Red Hat Enterprise Linux 8
-      parent_profile_id: fab8563c-f071-4aec-8454-7e150601a6c3
-  - name: pci
-    inventory: "{  { audience }} Infrastructure"
+      policy_name: PCI-DSS v3.2.1 Control Baseline for Red Hat Enterprise Linux
+      policy_shortname: pci_dss   
+  - name: compliance_hosts
+    inventory:  "{  { audience }} Infrastructure"
     children:
-      - rhel7_pci
-      - rhel8_pci
-    variables:
-      child_hostgroup: pci      
-  - name: rhel7
-    inventory: "{  { audience }} Infrastructure"
-    children:
-      - rhel7_hipaa
-      - rhel7_pci
-    variables:
-      os: rhel7
-      parent_hostgroup: rhel7
-  - name: rhel8
-    inventory: "{  { audience }} Infrastructure"
-    children:
-      - rhel8_hipaa
-      - rhel8_pci
-    variables:
-      os: rhel8
-      parent_hostgroup: rhel8
+      - hipaa
+      - pci_dss
 
 controller_projects:
   - name: "{  { audience }} Compliance Code"

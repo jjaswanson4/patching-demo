@@ -3,7 +3,6 @@
 - name: deploy compliance scanning via satellite
   hosts:
     - all
-  gather_facts: no
   tasks:
     - name: run ansible roles against hosts via satellite
       redhat.satellite.job_invocation:
@@ -12,5 +11,5 @@
         validate_certs: false
         server_url: "https://{{ satellite_hostname }}"
         job_template: Ansible Roles - Ansible Default
-        search_query: "hostgroup_fullname = {{ parent_hostgroup }}/{{ child_hostgroup }}"
+        search_query: "hostgroup_fullname = {{ ansible_distribution_major_version }}/{{ policy_shortname }}"
       delegate_to: localhost

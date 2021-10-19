@@ -3,7 +3,6 @@
 - name: create compliance hostgroups
   hosts:
     - all
-  gather_facts: no
   tasks:
     - name: create compliance hostgroups in satellite
       redhat.satellite.hostgroup:
@@ -11,8 +10,8 @@
         password: "{{ satellite_password }}"
         validate_certs: false
         server_url: "https://{{ satellite_hostname }}"
-        name: "{{ child_hostgroup }}"
-        parent: "{{ parent_hostgroup }}"
+        name: "{{ policy_shortname }}"
+        parent: "rhel{{ ansible_distribution_major_version }}"
         ansible_roles: "{{ ansible_roles }}"
         openscap_proxy: "{{ satellite_hostname }}"
       delegate_to: localhost
