@@ -9,8 +9,12 @@
   gather_facts: no
   vars:
     controller_state: absent
-  vars_files:
-    - "demos/{{ demo }}/vars/provisioner-configuration.yml"
+    resources_path: resources
+    controller_resources: "{{ resources_path }}/controller/"
+  pre_tasks:
+    - name: load in {{ demo }} provisioner vars
+      ansible.builtin.include_vars:
+        file: "demos/{{ demo }}/vars/provisioner-configuration.yml"
   roles:
     - redhat_cop.controller_configuration.workflow_job_templates
     - redhat_cop.controller_configuration.job_templates
@@ -29,8 +33,21 @@
   gather_facts: no
   vars:
     controller_state: absent
-  vars_files:
-    - demos/common/vars/provisioner-configuration.yml
+  pre_tasks:
+    - name: load in preconfigured resources
+      ansible.builtin.set_fact:
+        controller_organizations: "{{ lookup('file', controller_resources + 'organizations.yml') | from_yaml }}"
+        controller_credential_types: "{{ lookup('file', controller_resources + 'credential-types.yml') | from_yaml }}"
+        controller_credentials: "{{ lookup('file', controller_resources + 'credentials.yml') | from_yaml }}"
+        controller_execution_environments: "{{ lookup('file', controller_resources + 'execution-environments.yml') | from_yaml }}"
+        controller_inventories: "{{ lookup('file', controller_resources + 'inventories.yml') | from_yaml }}"
+        controller_hosts: "{{ lookup('file', controller_resources + 'hosts.yml') | from_yaml }}"
+        controller_groups: "{{ lookup('file', controller_resources + 'groups.yml') | from_yaml }}"
+        controller_projects: "{{ lookup('file', controller_resources + 'projects.yml') | from_yaml }}"
+        controller_templates: "{{ lookup('file', controller_resources + 'templates.yml') | from_yaml }}"
+      when:
+        - remove_common_configuration is defined
+        - remove_common_configuration
   tasks:
     - name: include roles to remove common provisioner configurations
       ansible.builtin.include_role:
