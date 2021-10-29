@@ -28,6 +28,7 @@
         variables:
           cpus: 8
           memory_mb: 73728
+          application: hana
           additional_storage:
             - size: 600Gb
               type: thin
@@ -99,6 +100,7 @@
         hosts:
           - sapddapp1.josh.lab.msp.redhat.com
         variables:
+          application: netweaver
           sap_s4hana_deployment_sid: "{{ sid }}"
           sap_s4hana_deployment_db_host: sapddhdb.josh.lab.msp.redhat.com
           sap_s4hana_deployment_db_sid: "{{ sid }}"
@@ -160,7 +162,6 @@
           remove_cdrom: no
           lifecycle_environment: production
           os: rhel8.4
-          application: sap
           sap_preconfigure_modify_etc_hosts: yes
           sap_domain: "josh.lab.msp.redhat.com"
           sap_hostagent_installation_type: "rpm"

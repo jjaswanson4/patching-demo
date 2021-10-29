@@ -213,7 +213,7 @@ satellite:
             - repo: Red Hat Enterprise Linux 8 for x86_64 - BaseOS (Kickstart)
               product: Red Hat Enterprise Linux for x86_64
               releasever: 8.4
-        - name: cv-ansible-rhel8
+        - name: cv-ansible2-rhel8
           repos:
             - repo: Red Hat Ansible Engine 2 for RHEL 8 x86_64 (RPMs)
               product: Red Hat Ansible Engine
@@ -247,11 +247,30 @@ satellite:
             - repo: Red Hat Enterprise Linux 8 for x86_64 - High Availability - Update Services for SAP Solutions (RPMs)
               product: Red Hat Enterprise Linux High Availability - Update Services for SAP Solutions
               releasever: 8.4
+        - name: cv-netweaver-rhel8
+          repos:
+            - repo: Red Hat Enterprise Linux 8 for x86_64 - SAP NetWeaver (RPMs)
+              product: Red Hat Enterprise Linux for SAP Applications for x86_64
+              releasever: 8
+        - name: cv-server-rhel8
+          repos:
+            - repo: Red Hat Enterprise Linux 8 for x86_64 - BaseOS (RPMs)
+              product: Red Hat Enterprise Linux for x86_64
+              releasever: 8
+        - name: cv-appstream-rhel8
+          repos:
+            - repo: Red Hat Enterprise Linux 8 for x86_64 - AppStream (RPMs)
+              product: Red Hat Enterprise Linux for x86_64
+              releasever: 8
+        - name: cv-satellitetools6.9-rhel8
+          repos:
+            - repo: Red Hat Satellite Tools 6.9 for RHEL 8 x86_64 (RPMs)
+              product: Red Hat Enterprise Linux for x86_64
       composite_content_views:
         - name: composite-rhel8
           auto_publish: false
           component_content_views:
-            - name: cv-ansible-rhel8
+            - name: cv-ansible2-rhel8
             - name: cv-e4s-server-rhel8.4
             - name: cv-e4s-appstream-rhel8.4
             - name: cv-r4s-netweaver-rhel8.4
@@ -259,8 +278,27 @@ satellite:
             - name: cv-e4s-satellitetools6.9-rhel8.4
             - name: cv-e4s-highavailability-rhel8.4
             - name: cv-kickstart-rhel8.4
+            - name: cv-netweaver-rhel8
       activation_keys:
-        - name: ak-sap-rhel8.4-production
+        - name: ak-netweaver-rhel8-non_production
+          lifecycle_environment: Non_Production
+          content_view: composite-rhel8
+          release_version: 8
+          content_overrides:
+            - label: satellite-tools-6.9-for-rhel-8-x86_64-rpms
+            - label: rhel-8-for-x86_64-sap-netweaver-rpms
+            - label: rhel-8-for-x86_64-baseos-rpms
+            - label: rhel-8-for-x86_64-appstream-rpms
+        - name: ak-netweaver-rhel8-production
+          lifecycle_environment: Production
+          content_view: composite-rhel8
+          release_version: 8
+          content_overrides:
+            - label: satellite-tools-6.9-for-rhel-8-x86_64-rpms
+            - label: rhel-8-for-x86_64-sap-netweaver-rpms
+            - label: rhel-8-for-x86_64-baseos-rpms
+            - label: rhel-8-for-x86_64-appstream-rpms
+        - name: ak-hana-rhel8.4-production
           lifecycle_environment: Production
           content_view: composite-rhel8
           release_version: 8.4
@@ -275,7 +313,7 @@ satellite:
               override: disabled
             - label: rhel-8-for-x86_64-appstream-rpms
               override: disabled
-        - name: ak-sap-rhel8.4-non_production
+        - name: ak-hana-rhel8.4-non_production
           lifecycle_environment: Non_Production
           content_view: composite-rhel8
           release_version: 8.4

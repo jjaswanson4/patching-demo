@@ -152,8 +152,12 @@ controller_groups:
     children:
       - primary
       - secondary
+    variables:
+      application: hana
   - name: netweaver
     inventory: "{  { audience }} SAP Infrastructure"
+    variables:
+      application: netweaver
   - name: s4hana
     inventory: "{  { audience }} SAP Infrastructure"
     children:
@@ -161,7 +165,6 @@ controller_groups:
       - netweaver
     variables:
       os: rhel8.4
-      application: sap
   - name: production
     inventory: "{  { audience }} SAP Infrastructure"
     variables:
