@@ -8,7 +8,7 @@ test.yml
 test*
 ansible-navigator*
 *-artifact-*.json
-tmp
+tmp*
 *.sh
 *test*
 run.log
