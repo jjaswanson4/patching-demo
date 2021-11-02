@@ -177,7 +177,26 @@ satellite:
           - "{  { audience }}"
         subnet: VLAN146
         pxe_loader: None
-        root_pass: "{{ ansible_password }}"
+        root_pass: "{  { ansible_password }}"
+        kickstart_repository: Red Hat Enterprise Linux 8 for x86_64 - BaseOS Kickstart 8.4
+      - name: rhel8
+        architecture: x86_64
+        compute_profile: general-vlan146
+        compute_resource: vcenter02.lab.msp.redhat.com
+        content_source: "{  { ansible_fqdn }}"
+        content_view: composite-rhel8
+        domain: josh.lab.msp.redhat.com
+        lifecycle_environment: Production
+        operatingsystem: RedHat-8.4
+        ptable: RHEL8 Kickstart Partition Table
+        organization_of_content_source: "{  { audience }}"
+        organizations:
+          - "{  { audience }}"
+        locations:
+          - "{  { audience }}"
+        subnet: VLAN146
+        pxe_loader: None
+        root_pass: "{  { ansible_password }}"
         kickstart_repository: Red Hat Enterprise Linux 8 for x86_64 - BaseOS Kickstart 8.4
     operating_systems:
       - name: RedHat-8.4
@@ -279,6 +298,9 @@ satellite:
             - name: cv-e4s-highavailability-rhel8.4
             - name: cv-kickstart-rhel8.4
             - name: cv-netweaver-rhel8
+            - name: cv-server-rhel8
+            - name: cv-appstream-rhel8
+            - name: cv-satellitetools6.9-rhel8
       activation_keys:
         - name: ak-netweaver-rhel8-non_production
           lifecycle_environment: Non_Production
